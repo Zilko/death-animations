@@ -1,0 +1,33 @@
+{
+	"geode": "4.6.2",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "zilko.wa",
+	"name": "wa",
+	"version": "v1.0.0",
+	"developer": "Zilko",
+	"description": "",
+	"resources": {
+	  "sprites": [
+			"resources/sprites/*/*.png",
+			"resources/sprites/*/*/*.png"
+			],
+		"files": [
+		  "resources/sounds/*.mp3"
+		],
+		"fonts": {
+      "segoe-semilight": {
+          "path": "resources/fonts/segoe-semilight.ttf",
+          "size": 100
+      },
+      "segoe-light": {
+          "path": "resources/fonts/segoe-light.ttf",
+          "size": 100
+      }
+    }
+	}
+}
