@@ -22,6 +22,17 @@ private:
     
 public:
 
+    ~Bsod() {
+        if (m_fpsLabel) {
+            m_fpsLabel->removeFromParentAndCleanup(true);
+            m_fpsLabel = nullptr;
+        }
+        
+        if (m_wasFPSVisible)
+            if (CCLabelBMFont* lbl = CCDirector::get()->m_pFPSNode)
+                lbl->setVisible(true);
+    }
+
     DEFINE_CREATE(Bsod)
     
     void start() override {
@@ -49,7 +60,7 @@ public:
     }
     
     void freeze(float dt) {
-        if (m_isPreview) return;
+        // if (m_isPreview) return;
         
         if (m_freezeSprite) {
             m_freezeSprite->removeFromParentAndCleanup(true);
@@ -66,18 +77,17 @@ public:
                     m_diePositions[channel] = pos;
                 }
                 
-            schedule(schedule_selector(Bsod::setChannelTime), 0.011f, kCCRepeatForever, 0.1f);
+            schedule(schedule_selector(Bsod::setChannelTime), 0, kCCRepeatForever, 0.01f);
             
             return;
         }
                     
-        CCSize winSize = CCDirector::get()->getWinSizeInPixels();
-        int width = winSize.width, height = winSize.height;
+        GLint viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
         
-        GLubyte* buffer = nullptr;
-        int dataLen = width * height * 3;
-        
-        buffer = new GLubyte[dataLen];
+        int width = viewport[2];
+        int height = viewport[3];
+        GLubyte* buffer = new GLubyte[width * height * 3];
         
         glReadBuffer(GL_BACK);
         glFinish();
@@ -93,7 +103,7 @@ public:
         texture->autorelease();
         
         m_freezeSprite = CCSprite::createWithTexture(texture);
-        m_freezeSprite->setScale(1.27f);
+        m_freezeSprite->setScale(CCDirector::get()->getWinSize().width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});
         
         addChild(m_freezeSprite);
@@ -238,14 +248,16 @@ public:
     }
     
     void end() override {
-        BaseAnimation::end();
-        
-        if (m_fpsLabel)
-            m_fpsLabel->removeFromParentAndCleanup(true);
+        Loader::get()->queueInMainThread([this] {            
+            BaseAnimation::end();
             
-        if (m_wasFPSVisible)
-            if (CCLabelBMFont* lbl = CCDirector::get()->m_pFPSNode)
-                lbl->setVisible(true);
+            if (m_fpsLabel)
+                m_fpsLabel->removeFromParentAndCleanup(true);
+                
+            if (m_wasFPSVisible)
+                if (CCLabelBMFont* lbl = CCDirector::get()->m_pFPSNode)
+                    lbl->setVisible(true);
+        });
     }
 
 };
