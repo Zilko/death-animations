@@ -12,12 +12,21 @@
 	"developer": "Zilko",
 	"description": "",
 	"resources": {
+	  "spritesheets": {
+      "among-us-death-1": [
+        "resources/sprites/animations/among-us/death-1/*.png"
+      ],
+      "among-us-death-2": [
+        "resources/sprites/animations/among-us/death-2/*.png"
+      ]
+    },
 	  "sprites": [
 			"resources/sprites/*/*.png",
 			"resources/sprites/*/*/*.png"
 			],
 		"files": [
-		  "resources/sounds/*.mp3"
+		  "resources/sounds/*.mp3",
+		  "resources/sounds/*.ogg"
 		],
 		"fonts": {
       "segoe-semilight": {

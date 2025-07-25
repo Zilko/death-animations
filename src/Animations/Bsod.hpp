@@ -60,8 +60,6 @@ public:
     }
     
     void freeze(float dt) {
-        // if (m_isPreview) return;
-        
         if (m_freezeSprite) {
             m_freezeSprite->removeFromParentAndCleanup(true);
             m_freezeSprite = nullptr;

@@ -17,7 +17,7 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        Utils::playSound(Anim::YouDied, "you-died.mp3", 3000, 5000, m_speed);
+        Utils::playSound(Anim::YouDied, "you-died.mp3", m_speed, 3000, 5000);
         
         CCSize winSize = CCDirector::get()->getWinSize();
         

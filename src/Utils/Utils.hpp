@@ -9,7 +9,8 @@ public:
 
     static int getRandomInt(int, int);
 
-    static void playSound(Anim, const std::string&, int, int, float);
+    static void playSound(Anim, const std::string&, float, int, int);
+    static void playSound(Anim, const std::string&, float, float);
     
     static BaseAnimation* createAnimation(Anim, CCNode*, PlayLayer*, AnimationDelegate*, float);
     

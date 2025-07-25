@@ -2,6 +2,7 @@
 
 #include "../Animations/YouDied.hpp"
 #include "../Animations/Bsod.hpp"
+#include "../Animations/AmongUs.hpp"
 
 #include <random>
 
@@ -13,7 +14,7 @@ int Utils::getRandomInt(int min, int max) {
     return dis(gen);
 }
 
-void Utils::playSound(Anim anim, const std::string& sound, int fade, int duration, float speed) {
+void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration) {
         if (!Utils::getSettingBool(getSelectedAnimation(anim).name, "play-sound-effects", true))
             return;
                 
@@ -23,15 +24,20 @@ void Utils::playSound(Anim anim, const std::string& sound, int fade, int duratio
     if (duration < 1000) duration = 1000;
             
     FMODAudioEngine::get()->playEffectAdvanced(
-        (Mod::get()->getResourcesDir() / "you-died.mp3").string().c_str(),
+        (Mod::get()->getResourcesDir() / sound).string().c_str(),
         1.f, 1.f, 1.f, speed, 1.f, 1.f, 0, duration, fade, fade, false, 1, false, false, 1, 1, 0, 1
     );
+}
+
+void Utils::playSound(Anim anim, const std::string& sound, float speed, float volume) {
+    FMODAudioEngine::get()->playEffect((Mod::get()->getResourcesDir() / sound).string().c_str(), speed, 1.f, volume);
 }
 
 BaseAnimation* Utils::createAnimation(Anim animation, CCNode* parentNode, PlayLayer* playLayer, AnimationDelegate* delegate, float speed) {
     switch (animation) {
         case Anim::YouDied: return YouDied::create(parentNode, playLayer, delegate, speed);
         case Anim::Bsod: return Bsod::create(parentNode, playLayer, delegate, speed);
+        case Anim::AmongUs: return AmongUs::create(parentNode, playLayer, delegate, speed);
         default: return nullptr;
     };
 }
