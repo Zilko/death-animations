@@ -1,10 +1,55 @@
 #include "BaseAnimation.hpp"
 
-constexpr std::array audioDelays = { 0.22f, 0.15f };
 
 class AmongUs : public BaseAnimation {
 
 private:
+
+    const std::string m_vertexShader = R"(
+        attribute vec4 a_position;
+        attribute vec2 a_texCoord;
+        attribute vec4 a_color;
+        
+        #ifdef GL_ES
+        varying lowp vec4 v_fragmentColor;
+        varying mediump vec2 v_texCoord;
+        #else
+        varying vec4 v_fragmentColor;
+        varying vec2 v_texCoord;
+        #endif
+        
+        void main() {
+            gl_Position = CC_MVPMatrix * a_position;
+            v_fragmentColor = a_color;
+            v_texCoord = a_texCoord;
+        }
+    )";
+    
+    const std::string m_shader = R"(
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+        
+        varying vec2 v_texCoord;
+        uniform sampler2D u_texture;
+        
+        uniform vec3 u_color1;
+        uniform vec3 u_color2;
+        
+        void main() {
+            vec4 c = texture2D(u_texture, v_texCoord);
+            
+            if (c.r / c.b > 2.0) {
+                c.rgb = u_color1 * vec3(c.r, c.r, c.r);
+            } else if (c.b / c.g > 2.0) {
+                c.rgb = u_color2 * vec3(c.b, c.b, c.b);
+            }
+            
+            gl_FragColor = c;
+        }
+    )";
+
+    constexpr static std::array m_audioDelays = { 0.22f, 0.15f, 0.15f, 0.15f };
 
     CCLayerColor* m_redLayer = nullptr;
     
@@ -12,7 +57,7 @@ private:
     CCSprite* m_animationSprite = nullptr;
     
     int m_currentFrame = 0;
-    int m_animation = 2;
+    int m_animation = 3;
     
 public:
 
@@ -59,8 +104,7 @@ public:
         m_bg->setScaleY(2.98f);
         m_bg->setRotation(0);
         
-        
-        // m_animation = Utils::getRandomInt(1, 2);
+        m_animation = Utils::getRandomInt(1, 4);
         
         CCSize winSize = CCDirector::get()->getWinSize();
         CCArray* animFrames = CCArray::create();
@@ -79,8 +123,8 @@ public:
         }
         
         m_animationSprite = CCSprite::createWithSpriteFrameName(fmt::format("among-us-death-{}-1.png"_spr, m_animation).c_str());
-        m_animationSprite->setAnchorPoint({0, 0});
-        m_animationSprite->setScale(winSize.width / m_animationSprite->getContentWidth());
+        m_animationSprite->setPosition(winSize / 2.f + ccp(31.5f, -6));
+        m_animationSprite->setScale(1.19f);
         m_animationSprite->runAction(
             CCSequence::create(
                 CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 60.f / m_speed)),
@@ -91,7 +135,24 @@ public:
         );
         
         addChild(m_animationSprite);
-        scheduleOnce(schedule_selector(AmongUs::playSound), audioDelays[m_animation - 1] / m_speed);
+        
+        CCGLProgram* program = new CCGLProgram();
+        program->autorelease();
+        program->initWithVertexShaderByteArray(m_vertexShader.c_str(), m_shader.c_str());
+        program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
+        program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
+        program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
+        program->link();
+        program->updateUniforms();
+        
+        m_animationSprite->setShaderProgram(program);
+        
+        program->use();
+        program->setUniformsForBuiltins();
+        program->setUniformLocationWith3f(glGetUniformLocation(program->getProgram(), "u_color1"), 1.f, 0.f, 1.f);
+        program->setUniformLocationWith3f(glGetUniformLocation(program->getProgram(), "u_color2"), 1.f, 0.f, 1.f);
+        
+        scheduleOnce(schedule_selector(AmongUs::playSound), m_audioDelays[m_animation - 1] / m_speed);
     }
     
     void fourthStep() {

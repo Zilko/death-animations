@@ -54,7 +54,7 @@ const std::vector<DeathAnimation> animations = {
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
     { .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
-    { .id = Anim::AmongUs, .thumbnail = "bsod-thumbnail.png", .name = "Among Us", .duration = 6.f }
+    { .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 6.f }
 };
 
 const std::vector<AnimationSetting> defaultSettings = {

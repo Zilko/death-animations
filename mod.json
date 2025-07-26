@@ -18,6 +18,12 @@
       ],
       "among-us-death-2": [
         "resources/sprites/animations/among-us/death-2/*.png"
+      ],
+      "among-us-death-3": [
+        "resources/sprites/animations/among-us/death-3/*.png"
+      ],
+      "among-us-death-4": [
+        "resources/sprites/animations/among-us/death-4/*.png"
       ]
     },
 	  "sprites": [
