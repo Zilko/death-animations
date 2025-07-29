@@ -58,7 +58,7 @@ enum Anim {
     ToBeContinued = 6,
     Celeste = 7,
     Wii = 8,
-    HollowKnight = 8
+    HollowKnight = 9
 };
 
 struct DeathAnimation {
