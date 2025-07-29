@@ -42,14 +42,16 @@ class $modify(ProPlayLayer, PlayLayer) {
             
         Anim anim = Utils::getSelectedAnimationEnum();
         
-        if (anim == Anim::None) return;
+        if (anim == Anim::None)
+            return;
+            
+        if (Utils::getRandomInt(1, 100) > static_cast<int>(Utils::getSettingFloat(anim, "probability")))
+            return;
         
-        const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
-        
-        if (m_isPracticeMode && !Utils::getSettingBool(animation.id, "play-on-practice"))
+        if (m_isPracticeMode && !Utils::getSettingBool(anim, "play-on-practice"))
             return;
 
-        if (getCurrentPercentInt() < Utils::getSettingFloat(animation.id, "only-after"))
+        if (getCurrentPercentInt() < Utils::getSettingFloat(anim, "only-after"))
             return;
         
         while (anim == Anim::Random)
@@ -57,7 +59,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         auto f = m_fields.self();
         
-        float speed = Utils::getSpeedValue(Utils::getSettingFloat(animation.id, "speed"));
+        float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
         f->m_animation = Utils::createAnimation(anim, this, this, nullptr, speed);      
       
@@ -67,7 +69,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         stopActionByTag(16);
         
-        if (Utils::getSettingBool(animation.id, "stop-auto-restart"))
+        if (Utils::getSettingBool(anim, "stop-auto-restart"))
             return;
         
         CCSequence* seq = CCSequence::create(
@@ -102,10 +104,10 @@ class $modify(PlayerObject) {
         if (this != m_gameLayer->m_player1 && this != m_gameLayer->m_player2)
             return PlayerObject::playDeathEffect();
             
-        auto f = static_cast<ProPlayLayer*>(m_gameLayer)->m_fields.self();
-        
         if (!Utils::getSelectedAnimation().stopDeathEffect)
-            PlayerObject::playDeathEffect();
+            return PlayerObject::playDeathEffect();
+            
+        stopActionByTag(11);
     }
     
 };

@@ -80,34 +80,12 @@ public:
             return;
         }
                     
-        GLint viewport[4];
-        glGetIntegerv(GL_VIEWPORT, viewport);
-        
-        int width = viewport[2];
-        int height = viewport[3];
-        GLubyte* buffer = new GLubyte[width * height * 3];
-        
-        glReadBuffer(GL_BACK);
-        glFinish();
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-        
-        for (int y = 0; y < height / 2; ++y)
-            for (int x = 0; x < width * 3; ++x)
-                std::swap(buffer[y * width * 3 + x], buffer[(height - 1 - y) * width * 3 + x]);
-        
-        CCTexture2D* texture = new CCTexture2D();
-        texture->initWithData(buffer, kCCTexture2DPixelFormat_RGB888, width, height, ccp(width, height));
-        texture->autorelease();
-        
-        m_freezeSprite = CCSprite::createWithTexture(texture);
+        m_freezeSprite = Utils::takeScreenshot();
         m_freezeSprite->setScale(CCDirector::get()->getWinSize().width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});
         
         addChild(m_freezeSprite);
-        
-        delete[] buffer;
-        
+                
         if (!m_didFreeze) {
             m_didFreeze = true;
             

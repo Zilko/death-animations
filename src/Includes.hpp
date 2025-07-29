@@ -56,7 +56,9 @@ enum Anim {
     Bsod = 4,
     AmongUs = 5,
     ToBeContinued = 6,
-    Celeste = 7
+    Celeste = 7,
+    Wii = 8,
+    HollowKnight = 8
 };
 
 struct DeathAnimation {
@@ -77,7 +79,7 @@ struct AnimationSetting {
 
 static const std::unordered_map<std::string, float> globalFloatDefaults = {
     { "speed", 0.230769f },
-    { "probabilty", 100.f }
+    { "probability", 100.f }
 };
 
 static const std::unordered_set<std::string> gloalBoolDefaults = {
@@ -96,28 +98,30 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
 };
 
 static const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
-    { Anim::Celeste, { { "respawn-animation", true } } }
+    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } }
 };
 
-static const std::array<DeathAnimation, 7> animations = {
+static const std::array<DeathAnimation, 9> animations = {
     DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
     DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
-    DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 6.f },
+    DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
     DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 6.f, .stopDeathEffect = true },
-    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 6.f }
+    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 6.f },
+    DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
+    DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f }
 };
 
-static const std::array<AnimationSetting, 7> defaultSettings = {
+static const std::array<AnimationSetting, 8> defaultSettings = {
     AnimationSetting{ .id = "speed", .name = "Speed", .type = SettingType::Speed },
     AnimationSetting{ .id = "only-after", .name = "Only After", .type = SettingType::Percent },
-    AnimationSetting{ .id = "probabilty", .name = "Probabilty", .type = SettingType::Percent },
+    AnimationSetting{ .id = "probability", .name = "Probability", .type = SettingType::Percent },
     AnimationSetting{ .id = "prevent-early-restart", .name = "Prevent Early Restart", .type = SettingType::Toggle },
     AnimationSetting{ .id = "stop-auto-restart", .name = "Stop Auto Restart", .type = SettingType::Toggle },
     AnimationSetting{ .id = "play-sound-effects", .name = "Play Sound Effects", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "play-on-practice", .name = "Play On Practice", .type = SettingType::Toggle }
-    // { "play-on-practice", "NEW BEST", SettingType::Toggle }
+    AnimationSetting{ .id = "play-on-practice", .name = "Play On Practice", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "only-on-new-best", .name = "Only On New Best ", .type = SettingType::Toggle }
 };
 
 static const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {

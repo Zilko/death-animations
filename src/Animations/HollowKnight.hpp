@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
-class ToBeContinued : public BaseAnimation {
+class HollowKnight : public BaseAnimation {
 
 public:
     
-    DEFINE_CREATE(ToBeContinued)
+    DEFINE_CREATE(HollowKnight)
 
     void start() override {
         BaseAnimation::start();

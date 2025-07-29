@@ -5,6 +5,8 @@
 #include "../Animations/AmongUs.hpp"
 #include "../Animations/Celeste.hpp"
 #include "../Animations/ToBeContinued.hpp"
+#include "../Animations/Wii.hpp"
+#include "../Animations/HollowKnight.hpp"
 
 #include <random>
 
@@ -17,7 +19,7 @@ int Utils::getRandomInt(int min, int max) {
 }
 
 void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration) {
-        if (!Utils::getSettingBool(getSelectedAnimation(anim).id, "play-sound-effects"))
+        if (!Utils::getSettingBool(anim, "play-sound-effects"))
             return;
                 
     duration = static_cast<int>(duration / speed / 1000.f) * 1000;
@@ -42,6 +44,8 @@ BaseAnimation* Utils::createAnimation(Anim animation, CCNode* parentNode, PlayLa
         case Anim::AmongUs: return AmongUs::create(parentNode, playLayer, delegate, speed);
         case Anim::Celeste: return Celeste::create(parentNode, playLayer, delegate, speed);
         case Anim::ToBeContinued: return ToBeContinued::create(parentNode, playLayer, delegate, speed);
+        case Anim::Wii: return Wii::create(parentNode, playLayer, delegate, speed);
+        case Anim::HollowKnight: return HollowKnight::create(parentNode, playLayer, delegate, speed);
         default: return nullptr;
     };
 }
@@ -126,4 +130,30 @@ void Utils::setDefaults(int id) {
     object.erase(std::to_string(id));
     
     Mod::get()->setSavedValue("settings", object);
+}
+
+CCSprite* Utils::takeScreenshot() {
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    
+    int width = viewport[2];
+    int height = viewport[3];
+    GLubyte* buffer = new GLubyte[width * height * 3];
+    
+    glReadBuffer(GL_BACK);
+    glFinish();
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+    
+    for (int y = 0; y < height / 2; ++y)
+        for (int x = 0; x < width * 3; ++x)
+            std::swap(buffer[y * width * 3 + x], buffer[(height - 1 - y) * width * 3 + x]);
+    
+    CCTexture2D* texture = new CCTexture2D();
+    texture->initWithData(buffer, kCCTexture2DPixelFormat_RGB888, width, height, ccp(width, height));
+    texture->autorelease();
+    
+    delete[] buffer;
+    
+    return CCSprite::createWithTexture(texture);
 }

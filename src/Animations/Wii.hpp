@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
-class ToBeContinued : public BaseAnimation {
+class Wii : public BaseAnimation {
 
 public:
     
-    DEFINE_CREATE(ToBeContinued)
+    DEFINE_CREATE(Wii)
 
     void start() override {
         BaseAnimation::start();

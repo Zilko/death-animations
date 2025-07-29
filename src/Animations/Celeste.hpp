@@ -254,18 +254,7 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        // CCSize winSize = CCDirector::get()->getWinSize();
         
-        // for (int i = 0; i < 6; i++) {
-        //     CCSprite* spr = CCSprite::create("transition-1-celeste.png"_spr);
-        //     spr->setScale(winSize.height / 6.f / spr->getContentHeight());
-        //     spr->setPosition({360 - spr->getContentWidth() * spr->getScale() * i + 19 * i, winSize.height -spr->getContentHeight() * spr->getScale() / 2.f - spr->getContentHeight() * spr->getScale() * i});
-        //     addChild(spr);
-            
-        //     CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, spr->getPositionX(), spr->getContentHeight() * spr->getScale());
-        //     layer->setPosition({0, spr->getPositionY() - spr->getContentHeight() * spr->getScale() / 2.f});
-        //     addChild(layer);
-        // }
         
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
@@ -283,17 +272,19 @@ public:
             m_explosion1->setPosition(player->getPosition());
             player->getParent()->addChild(m_explosion1, 10293823);
             
-            player = m_playLayer->m_player2;
-            
-            if (player && m_playLayer->m_gameState.m_isDualMode) {
-                m_explosion2 = CelesteExplosion::create(
-                    player,
-                    ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
-                    {172, 62, 56},
-                    m_speed
-                );
-                m_explosion2->setPosition(player->getPosition());
-                player->getParent()->addChild(m_explosion2, 10293823);
+            if (Utils::getSettingBool(Anim::Celeste, "second-player")) {
+                player = m_playLayer->m_player2;
+                
+                if (player && m_playLayer->m_gameState.m_isDualMode) {
+                    m_explosion2 = CelesteExplosion::create(
+                        player,
+                        ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
+                        {172, 62, 56},
+                        m_speed
+                    );
+                    m_explosion2->setPosition(player->getPosition());
+                    player->getParent()->addChild(m_explosion2, 10293823);
+                }
             }
         }
         
