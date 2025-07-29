@@ -50,17 +50,15 @@ public:
         
         Utils::playSound(Anim::AmongUs, "scary-among-us.ogg", m_speed, 0.5f);
 
-        CCSize winSize = CCDirector::get()->getWinSize();
-        
         m_bg = CCSprite::create("bg-among-us.png"_spr);
         m_bg->setScaleX(2.98f);
         m_bg->setScaleY(0.88f);
         m_bg->setRotation(-25);
-        m_bg->setPosition(winSize / 2.f);
+        m_bg->setPosition(m_size / 2.f);
         
         addChild(m_bg);
         
-        m_redLayer = CCLayerColor::create({255, 1, 0, 255}, winSize.width, winSize.height);
+        m_redLayer = CCLayerColor::create({255, 1, 0, 255}, m_size.width, m_size.height);
         
         addChild(m_redLayer);
         
@@ -88,7 +86,6 @@ public:
         if (m_animation == 0)
             m_animation = Utils::getRandomInt(1, 4);
         
-        CCSize winSize = CCDirector::get()->getWinSize();
         CCArray* animFrames = CCArray::create();
         CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
         CCSpriteFrame* lastValidFrame = nullptr;
@@ -105,7 +102,7 @@ public:
         }
         
         m_animationSprite = CCSprite::createWithSpriteFrameName(fmt::format("among-us-death-{}-1.png"_spr, m_animation).c_str());
-        m_animationSprite->setPosition(winSize / 2.f + ccp(31.5f, -6));
+        m_animationSprite->setPosition(m_size / 2.f + ccp(31.5f, -6));
         m_animationSprite->setScale(1.19f);
         m_animationSprite->runAction(
             CCSequence::create(

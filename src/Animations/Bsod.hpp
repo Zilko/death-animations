@@ -81,7 +81,7 @@ public:
         }
                     
         m_freezeSprite = Utils::takeScreenshot();
-        m_freezeSprite->setScale(CCDirector::get()->getWinSize().width / m_freezeSprite->getContentWidth());
+        m_freezeSprite->setScale(m_size.width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});
         
         addChild(m_freezeSprite);
@@ -104,28 +104,27 @@ public:
             m_fpsLabel = nullptr;
         }
 
-        CCSize winSize = CCDirector::get()->getWinSize();
         
-        CCLayerColor* m_bg = CCLayerColor::create({0, 120, 215, 255}, winSize.width, winSize.height);
+        CCLayerColor* m_bg = CCLayerColor::create({0, 120, 215, 255}, m_size.width, m_size.height);
         
         addChild(m_bg);
         
         CCSprite* face = CCSprite::create("sad_face_bsod.png"_spr);
         face->setScale(0.6f);
-        face->setPosition({74, winSize.height - 82});
+        face->setPosition({74, m_size.height - 82});
         
         addChild(face);
         
         CCSprite* text = CCSprite::create("text_bsod.png"_spr);
         text->setScale(0.59f);
-        text->setPosition({204, winSize.height - 181});
+        text->setPosition({204, m_size.height - 181});
         
         addChild(text);
         
         m_percentLabel = CCLabelBMFont::create("0% complete", "segoe-semilight.fnt"_spr);
         m_percentLabel->setScale(0.475f);
         m_percentLabel->setAnchorPoint({0, 0.5f});
-        m_percentLabel->setPosition({62, winSize.height - 186.5f});
+        m_percentLabel->setPosition({62, m_size.height - 186.5f});
         
         addChild(m_percentLabel);
         
@@ -133,7 +132,7 @@ public:
         lbl->setOpacity(190);
         lbl->setScale(0.2f);
         lbl->setAnchorPoint({0, 0.5f});
-        lbl->setPosition({124, winSize.height - 239.2f});
+        lbl->setPosition({124, m_size.height - 239.2f});
         
         addChild(lbl);
         

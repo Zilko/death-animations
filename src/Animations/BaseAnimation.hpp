@@ -2,7 +2,7 @@
 
 #include "../Includes.hpp"
 
-class BaseAnimation : public CCNode {
+class BaseAnimation : public CCLayer {
 
 protected:
 
@@ -11,6 +11,8 @@ protected:
     PlayLayer* m_playLayer = nullptr;
     
     AnimationDelegate* m_delegate = nullptr;
+    
+    CCSize m_size;
     
     bool m_isGoing = false;
     bool m_isPreview = false;
@@ -23,11 +25,15 @@ protected:
         m_delegate = delegate;
         m_speed = speed;
         m_isPreview = delegate != nullptr;
+        m_size = CCDirector::get()->getWinSize();
     }
 
 public:
 
     virtual void start() {
+        setContentSize(m_size);
+        setAnchorPoint({0, 0});
+        
         m_parentNode->addChild(this);
         m_isGoing = true;
     }

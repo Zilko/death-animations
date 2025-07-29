@@ -235,18 +235,6 @@ private:
     CelesteExplosion* m_explosion1 = nullptr;
     CelesteExplosion* m_explosion2 = nullptr;
     
-    ~Celeste() {
-        if (m_explosion1) {
-            m_explosion1->removeFromParentAndCleanup(true);
-            m_explosion1 = nullptr;
-        }
-        
-        if (m_explosion2) {
-            m_explosion2->removeFromParentAndCleanup(true);
-            m_explosion2 = nullptr;
-        }
-    }
-    
 public:
     
     DEFINE_CREATE(Celeste)
@@ -254,7 +242,21 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        
+        int transition = Utils::getSettingFloat(Anim::Celeste, "transition");
+        if (transition == 0)
+            transition = Utils::getRandomInt(1, 9);
+            
+        switch(transition) {
+            case 1: chapter1Transition(); break;
+            // case 2: chapter2Transition(); break;
+            // case 3: chapter3Transition(); break;
+            // case 4: chapter4Transition(); break;
+            // case 5: chapter5Transition(); break;
+            // case 6: chapter6Transition(); break;
+            // case 7: chapter7Transition(); break;
+            // case 8: chapter8Transition(); break;
+            // case 9: chapter9Transition(); break;
+        }
         
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
@@ -295,6 +297,23 @@ public:
     
     void playDeathSound(float) {
         Utils::playSound(Anim::AmongUs, "death-celeste.wav", m_speed, 1.f);
+    }
+    
+    void chapter1Transition() {
+        CCNode* container = CCNode::create();
+        // container->setPosition({-m_size.width, 0});
+        container->setPosition({0, 0}); 
+                
+        for (int i = 0; i < 6; i++) {
+            CCSprite* spr = CCSprite::create("transition-1-celeste.png"_spr);
+            spr->setScale(m_size.height / 6.f / spr->getContentHeight());
+            spr->setPosition({360 - spr->getContentWidth() * spr->getScale() * i + 19 * i, m_size.height -spr->getContentHeight() * spr->getScale() / 2.f - spr->getContentHeight() * spr->getScale() * i});
+            container->addChild(spr);
+            
+            CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, spr->getPositionX(), spr->getContentHeight() * spr->getScale());
+            layer->setPosition({0, spr->getPositionY() - spr->getContentHeight() * spr->getScale() / 2.f});
+            container->addChild(layer);
+        }
     }
     
     void end() override {

@@ -17,15 +17,13 @@ public:
         
         Utils::playSound(Anim::YouDied, "you-died.mp3", m_speed, 3000, 5000);
         
-        CCSize winSize = CCDirector::get()->getWinSize();
-        
-        m_bg = CCLayerColor::create({0, 0, 0, 0}, winSize.width, winSize.height);
+        m_bg = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
         m_bg->setOpacity(0);
         
         m_banner = CCSprite::create("bg-you-died.png"_spr);
         m_banner->setOpacity(0);
-        m_banner->setPosition(winSize / 2.f + ccp(0, -7));
-        m_banner->setScaleX(winSize.width / m_banner->getContentSize().width);
+        m_banner->setPosition(m_size / 2.f + ccp(0, -7));
+        m_banner->setScaleX(m_size.width / m_banner->getContentSize().width);
         
         m_title = CCSprite::create("text-you-died.png"_spr);
         m_title->setOpacity(0);
