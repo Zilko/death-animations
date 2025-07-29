@@ -30,6 +30,8 @@ void AnimationsLayer::selectAnimation(AnimationCell* cell) {
     
     m_settingsBtn->setEnabled(animation.id != Anim::None && animation.id != Anim::Random);
     m_settingsBtn->setOpacity(animation.id != Anim::None && animation.id != Anim::Random ? 255 : 90);
+    m_previewBtn->setEnabled(animation.id != Anim::None);
+    m_previewBtn->setOpacity(animation.id != Anim::None ? 255 : 90);
 }
 
 void AnimationsLayer::createdCell(AnimationCell* cell) {

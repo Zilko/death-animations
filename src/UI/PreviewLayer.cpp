@@ -57,7 +57,7 @@ void PreviewLayer::playerDied(float) {
     while (anim == Anim::Random || anim == Anim::None)
         anim = static_cast<Anim>(Utils::getRandomInt(1, animations.size()));
     
-    m_speed = Utils::getSpeedValue(Utils::getSettingFloat(animation.name, "speed", 0.230769f));
+    m_speed = Utils::getSpeedValue(Utils::getSettingFloat(animation.id, "speed"));
     m_duration = Utils::getSelectedAnimation(anim).duration / m_speed;
     m_animation = Utils::createAnimation(anim, m_mainLayer, nullptr, this, m_speed);
       
@@ -161,4 +161,8 @@ bool PreviewLayer::setup() {
     scheduleOnce(schedule_selector(PreviewLayer::spawnPlayer), 0.2f);
     
     return true;
+}
+
+CCNodeRGBA* PreviewLayer::getPlayer() {
+    return m_player;
 }

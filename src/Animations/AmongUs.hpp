@@ -4,26 +4,6 @@
 class AmongUs : public BaseAnimation {
 
 private:
-
-    const std::string m_vertexShader = R"(
-        attribute vec4 a_position;
-        attribute vec2 a_texCoord;
-        attribute vec4 a_color;
-        
-        #ifdef GL_ES
-        varying lowp vec4 v_fragmentColor;
-        varying mediump vec2 v_texCoord;
-        #else
-        varying vec4 v_fragmentColor;
-        varying vec2 v_texCoord;
-        #endif
-        
-        void main() {
-            gl_Position = CC_MVPMatrix * a_position;
-            v_fragmentColor = a_color;
-            v_texCoord = a_texCoord;
-        }
-    )";
     
     const std::string m_shader = R"(
         #ifdef GL_ES
@@ -104,7 +84,9 @@ public:
         m_bg->setScaleY(2.98f);
         m_bg->setRotation(0);
         
-        m_animation = Utils::getRandomInt(1, 4);
+        m_animation = Utils::getSettingFloat(Anim::AmongUs, "animation");
+        if (m_animation == 0)
+            m_animation = Utils::getRandomInt(1, 4);
         
         CCSize winSize = CCDirector::get()->getWinSize();
         CCArray* animFrames = CCArray::create();
@@ -138,7 +120,7 @@ public:
         
         CCGLProgram* program = new CCGLProgram();
         program->autorelease();
-        program->initWithVertexShaderByteArray(m_vertexShader.c_str(), m_shader.c_str());
+        program->initWithVertexShaderByteArray(vertexShader.c_str(), m_shader.c_str());
         program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
         program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
         program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
@@ -147,10 +129,31 @@ public:
         
         m_animationSprite->setShaderProgram(program);
         
+        GameManager* gm = GameManager::get();
+
+        ccColor4F color1 = ccc4FFromccc3B(gm->colorForIdx(gm->getPlayerColor()));
+        ccColor4F color2 = ccc4FFromccc3B(gm->colorForIdx(gm->getPlayerColor2()));
+        
+        if (static_cast<int>(Utils::getSettingFloat(Anim::AmongUs, "colors") == 1)) {        
+            color1 = {
+                Utils::getSettingFloat(Anim::AmongUs, "r1") / 255.f,
+                Utils::getSettingFloat(Anim::AmongUs, "g1") / 255.f,
+                Utils::getSettingFloat(Anim::AmongUs, "b1") / 255.f,
+                1.f
+            };
+            
+            color2 = {
+                Utils::getSettingFloat(Anim::AmongUs, "r2") / 255.f,
+                Utils::getSettingFloat(Anim::AmongUs, "g2") / 255.f,
+                Utils::getSettingFloat(Anim::AmongUs, "b2") / 255.f,
+                1.f
+            };
+        }
+        
         program->use();
         program->setUniformsForBuiltins();
-        program->setUniformLocationWith3f(glGetUniformLocation(program->getProgram(), "u_color1"), 1.f, 0.f, 1.f);
-        program->setUniformLocationWith3f(glGetUniformLocation(program->getProgram(), "u_color2"), 1.f, 0.f, 1.f);
+        program->setUniformLocationWith3f(glGetUniformLocation(program->getProgram(), "u_color1"), color1.r, color1.g, color1.b);
+        program->setUniformLocationWith3f(glGetUniformLocation(program->getProgram(), "u_color2"), color2.r, color2.g, color2.b);
         
         scheduleOnce(schedule_selector(AmongUs::playSound), m_audioDelays[m_animation - 1] / m_speed);
     }

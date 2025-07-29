@@ -6,9 +6,29 @@ class AnimationDelegate {
   
 public:
 
-    virtual void event() {}
+    virtual CCNodeRGBA* getPlayer() { return nullptr; }
     
 };
+
+static const std::string vertexShader = R"(
+    attribute vec4 a_position;
+    attribute vec2 a_texCoord;
+    attribute vec4 a_color;
+    
+    #ifdef GL_ES
+    varying lowp vec4 v_fragmentColor;
+    varying mediump vec2 v_texCoord;
+    #else
+    varying vec4 v_fragmentColor;
+    varying vec2 v_texCoord;
+    #endif
+    
+    void main() {
+        gl_Position = CC_MVPMatrix * a_position;
+        v_fragmentColor = a_color;
+        v_texCoord = a_texCoord;
+    }
+)";
 
 #define DEFINE_CREATE(CLASS_NAME)                                                 \
     CLASS_NAME(CCNode* parentNode, PlayLayer* playLayer, AnimationDelegate* delegate, float speed) \
@@ -22,9 +42,11 @@ public:
     }
 
 enum SettingType {
-    Toggle = 1,
-    Speed = 2,
-    Percent = 3
+    Toggle,
+    Speed,
+    Percent,
+    AmongUsColor,
+    Select
 };
 
 enum Anim {
@@ -32,7 +54,9 @@ enum Anim {
     Random = 2,
     YouDied = 3,
     Bsod = 4,
-    AmongUs = 5
+    AmongUs = 5,
+    ToBeContinued = 6,
+    Celeste = 7
 };
 
 struct DeathAnimation {
@@ -47,26 +71,63 @@ struct AnimationSetting {
     std::string id;
     std::string name;
     SettingType type;
+    
+    std::vector<std::string> elements;
 };
 
-const std::vector<DeathAnimation> animations = {
-    { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
-    { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
-    { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
-    { .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
-    { .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 6.f }
+static const std::unordered_map<std::string, float> globalFloatDefaults = {
+    { "speed", 0.230769f },
+    { "probabilty", 100.f }
 };
 
-const std::vector<AnimationSetting> defaultSettings = {
-    { "speed", "Speed", SettingType::Speed },
-    { "only-after", "Only After", SettingType::Percent },
-    { "prevent-early-restart", "Prevent Early Restart", SettingType::Toggle },
-    { "stop-auto-restart", "Stop Auto Restart", SettingType::Toggle },
-    { "play-sound-effects", "Play Sound Effects", SettingType::Toggle },
-    { "play-on-practice", "Play On Practice", SettingType::Toggle },
+static const std::unordered_set<std::string> gloalBoolDefaults = {
+    "play-sound-effects"
+};
+
+static const std::unordered_map<int, std::unordered_map<std::string, float>> specificFloatDefaults {
+    { Anim::AmongUs, {
+        { "r1", 273.f },
+        { "g1", 95.f },
+        { "b1", 74.f },
+        { "r2", 14.f },
+        { "g2", 53.f },
+        { "b2", 235.f }
+    } }
+};
+
+static const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
+    { Anim::Celeste, { { "respawn-animation", true } } }
+};
+
+static const std::array<DeathAnimation, 7> animations = {
+    DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
+    DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
+    DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
+    DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
+    DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 6.f },
+    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 6.f, .stopDeathEffect = true },
+    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 6.f }
+};
+
+static const std::array<AnimationSetting, 7> defaultSettings = {
+    AnimationSetting{ .id = "speed", .name = "Speed", .type = SettingType::Speed },
+    AnimationSetting{ .id = "only-after", .name = "Only After", .type = SettingType::Percent },
+    AnimationSetting{ .id = "probabilty", .name = "Probabilty", .type = SettingType::Percent },
+    AnimationSetting{ .id = "prevent-early-restart", .name = "Prevent Early Restart", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "stop-auto-restart", .name = "Stop Auto Restart", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-sound-effects", .name = "Play Sound Effects", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-on-practice", .name = "Play On Practice", .type = SettingType::Toggle }
     // { "play-on-practice", "NEW BEST", SettingType::Toggle }
-    // { "play-on-practice", "CHANCE OF HAPPENING", SettingType::Toggle }
 };
 
-const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
+static const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
+    { Anim::AmongUs, {
+        { .id = "animation", .name = "Kill Animation", .type = SettingType::Select, .elements = { "Random", "Gun", "Knife", "Neck", "Alien" } },
+        { .id = "colors", .name = "Colors", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
+    } },
+    { Anim::Celeste, {
+        { .id = "transition", .name = "Transition", .type = SettingType::Select, .elements = { "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8", "Chapter 9" } },
+        { .id = "respawn-animation", .name = "Respawn Animation", .type = SettingType::Toggle },
+        { .id = "second-player", .name = "Second Player", .type = SettingType::Toggle }
+    } },
 };

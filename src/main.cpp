@@ -46,10 +46,10 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
         
-        if (m_isPracticeMode && !Utils::getSettingBool(animation.name, "play-on-practice", false))
+        if (m_isPracticeMode && !Utils::getSettingBool(animation.id, "play-on-practice"))
             return;
 
-        if (getCurrentPercentInt() < Utils::getSettingFloat(animation.name, "only-after", 0.f))
+        if (getCurrentPercentInt() < Utils::getSettingFloat(animation.id, "only-after"))
             return;
         
         while (anim == Anim::Random)
@@ -57,7 +57,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         auto f = m_fields.self();
         
-        float speed = Utils::getSpeedValue(Utils::getSettingFloat(animation.name, "speed", 0.230769f));
+        float speed = Utils::getSpeedValue(Utils::getSettingFloat(animation.id, "speed"));
         
         f->m_animation = Utils::createAnimation(anim, this, this, nullptr, speed);      
       
@@ -67,7 +67,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         stopActionByTag(16);
         
-        if (Utils::getSettingBool(animation.name, "stop-auto-restart", false))
+        if (Utils::getSettingBool(animation.id, "stop-auto-restart"))
             return;
         
         CCSequence* seq = CCSequence::create(
@@ -121,7 +121,7 @@ class $modify(UILayer) {
         if (
             f->m_animation
             && f->m_animation->isGoing()
-            && Utils::getSettingBool(Utils::getSelectedAnimation().name, "prevent-early-restart", false)
+            && Utils::getSettingBool(Utils::getSelectedAnimation().id, "prevent-early-restart")
         ) {
             return;
         }

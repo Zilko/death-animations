@@ -24,6 +24,9 @@
       ],
       "among-us-death-4": [
         "resources/sprites/animations/among-us/death-4/*.png"
+      ],
+      "celeste-explosion": [
+        "resources/sprites/animations/celeste/explosion/*.png"
       ]
     },
 	  "sprites": [
@@ -32,7 +35,8 @@
 			],
 		"files": [
 		  "resources/sounds/*.mp3",
-		  "resources/sounds/*.ogg"
+		  "resources/sounds/*.ogg",
+		  "resources/sounds/*.wav"
 		],
 		"fonts": {
       "segoe-semilight": {

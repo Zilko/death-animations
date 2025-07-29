@@ -1,7 +1,5 @@
 #include "BaseAnimation.hpp"
 
-#include "../Utils/Utils.hpp"
-
 class YouDied : public BaseAnimation {
 
 private:

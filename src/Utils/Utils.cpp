@@ -3,6 +3,8 @@
 #include "../Animations/YouDied.hpp"
 #include "../Animations/Bsod.hpp"
 #include "../Animations/AmongUs.hpp"
+#include "../Animations/Celeste.hpp"
+#include "../Animations/ToBeContinued.hpp"
 
 #include <random>
 
@@ -15,7 +17,7 @@ int Utils::getRandomInt(int min, int max) {
 }
 
 void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration) {
-        if (!Utils::getSettingBool(getSelectedAnimation(anim).name, "play-sound-effects", true))
+        if (!Utils::getSettingBool(getSelectedAnimation(anim).id, "play-sound-effects"))
             return;
                 
     duration = static_cast<int>(duration / speed / 1000.f) * 1000;
@@ -38,6 +40,8 @@ BaseAnimation* Utils::createAnimation(Anim animation, CCNode* parentNode, PlayLa
         case Anim::YouDied: return YouDied::create(parentNode, playLayer, delegate, speed);
         case Anim::Bsod: return Bsod::create(parentNode, playLayer, delegate, speed);
         case Anim::AmongUs: return AmongUs::create(parentNode, playLayer, delegate, speed);
+        case Anim::Celeste: return Celeste::create(parentNode, playLayer, delegate, speed);
+        case Anim::ToBeContinued: return ToBeContinued::create(parentNode, playLayer, delegate, speed);
         default: return nullptr;
     };
 }
@@ -62,8 +66,15 @@ float Utils::getSpeedValue(float value) {
     return 3.9f * std::clamp(value, 0.f, 1.f) + 0.1f;
 }
 
-float Utils::getSettingFloat(const std::string& animation, const std::string& setting, float defaultValue) {
+float Utils::getSettingFloat(int id, const std::string& setting) {
+    std::string animation = std::to_string(id);
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
+    
+    float defaultValue = globalFloatDefaults.contains(setting) ? globalFloatDefaults.at(setting) : 0.f;
+    
+    if (specificFloatDefaults.contains(id))
+        if (specificFloatDefaults.at(id).contains(setting))
+            defaultValue = specificFloatDefaults.at(id).at(setting);
     
     if (object.contains(animation))
         return object[animation][setting].asDouble().unwrapOr(defaultValue);
@@ -71,8 +82,15 @@ float Utils::getSettingFloat(const std::string& animation, const std::string& se
     return defaultValue;
 }
 
-bool Utils::getSettingBool(const std::string& animation, const std::string& setting, bool defaultValue) {
+bool Utils::getSettingBool(int id, const std::string& setting) {
+    std::string animation = std::to_string(id);
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
+    
+    bool defaultValue = gloalBoolDefaults.contains(setting);
+    
+    if (specificBoolDefaults.contains(id))
+        if (specificBoolDefaults.at(id).contains(setting))
+            defaultValue = specificBoolDefaults.at(id).at(setting);
     
     if (object.contains(animation))
         return object[animation][setting].asBool().unwrapOr(defaultValue);
@@ -80,7 +98,8 @@ bool Utils::getSettingBool(const std::string& animation, const std::string& sett
     return defaultValue;
 }
 
-void Utils::saveSetting(const std::string& animation, const std::string& setting, float value) {
+void Utils::saveSetting(int id, const std::string& setting, float value) {
+    std::string animation = std::to_string(id);
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
     matjson::Value newObject = object[animation];
     
@@ -90,7 +109,8 @@ void Utils::saveSetting(const std::string& animation, const std::string& setting
     Mod::get()->setSavedValue("settings", object);
 }
 
-void Utils::saveSetting(const std::string& animation, const std::string& setting, bool value) {
+void Utils::saveSetting(int id, const std::string& setting, bool value) {
+    std::string animation = std::to_string(id);
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
     matjson::Value newObject = object[animation];
     
@@ -100,10 +120,10 @@ void Utils::saveSetting(const std::string& animation, const std::string& setting
     Mod::get()->setSavedValue("settings", object);
 }
 
-void Utils::setDefaults(const std::string& animation) {
+void Utils::setDefaults(int id) {
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
 
-    object.erase(animation);
+    object.erase(std::to_string(id));
     
     Mod::get()->setSavedValue("settings", object);
 }

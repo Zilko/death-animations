@@ -19,11 +19,11 @@ public:
     static const DeathAnimation& getSelectedAnimation(Anim anim);
     
     static float getSpeedValue(float);
-    static float getSettingFloat(const std::string&, const std::string&, float);
-    static bool getSettingBool(const std::string&, const std::string&, bool);
+    static float getSettingFloat(int, const std::string&);
+    static bool getSettingBool(int, const std::string&);
     
-    static void saveSetting(const std::string&, const std::string&, float);
-    static void saveSetting(const std::string&, const std::string&, bool);
-    static void setDefaults(const std::string&);
+    static void saveSetting(int, const std::string&, float);
+    static void saveSetting(int, const std::string&, bool);
+    static void setDefaults(int);
     
 };

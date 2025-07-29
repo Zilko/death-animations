@@ -32,5 +32,7 @@ private:
 public:
     
     static PreviewLayer* create();
+    
+    CCNodeRGBA* getPlayer() override;
 
 };
