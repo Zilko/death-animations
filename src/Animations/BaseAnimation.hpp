@@ -14,7 +14,6 @@ protected:
     
     CCSize m_size;
     
-    bool m_isGoing = false;
     bool m_isPreview = false;
     
     float m_speed = 1.f;
@@ -33,18 +32,16 @@ public:
     virtual void start() {
         setContentSize(m_size);
         setAnchorPoint({0, 0});
+        setTouchEnabled(true);
+        setKeyboardEnabled(true);
+        registerWithTouchDispatcher();
+        setTouchMode(kCCTouchesOneByOne);
         
         m_parentNode->addChild(this);
-        m_isGoing = true;
     }
 
     virtual void end() {
         removeFromParentAndCleanup(true);
-        m_isGoing = false;
-    }
-    
-    bool isGoing() {
-        return m_isGoing;
     }
   
 };

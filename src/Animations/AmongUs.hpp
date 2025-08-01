@@ -163,9 +163,5 @@ public:
     void playSound(float) {
         Utils::playSound(Anim::AmongUs, fmt::format("death-{}-among-us.ogg", m_animation), m_speed, 0.5f);
     }
-    
-    void end() override {
-        BaseAnimation::end();
-    }
 
 };

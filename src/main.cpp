@@ -5,10 +5,12 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/UILayer.hpp>
+#include <Geode/modify/FMODAudioEngine.hpp>
 
 #include "UI/AnimationsLayer.hpp"
 
 #include "Animations/BaseAnimation.hpp"
+#include "Animations/Celeste.hpp"
 
 $on_mod(Loaded) {
     
@@ -25,10 +27,22 @@ class $modify(MenuLayer) {
     
 };
 
+class $modify(FMODAudioEngine) {
+
+    int playEffect(gd::string path, float speed, float p2, float volume) {
+        if (path == "explode_11.ogg" && Utils::getSelectedAnimation().stopDeathEffect)
+            return 0;
+        
+        return FMODAudioEngine::playEffect(path, speed, p2, volume);
+    }
+
+};
+
 class $modify(ProPlayLayer, PlayLayer) {
     
     struct Fields {
         BaseAnimation* m_animation = nullptr;
+        BaseAnimation* m_transition = nullptr;
     };
     
     static void onModify(auto& self) {
@@ -93,6 +107,22 @@ class $modify(ProPlayLayer, PlayLayer) {
         }
     }
     
+    void delayedResetLevel() {
+        auto f = m_fields.self();
+        
+        if (f->m_transition) {
+            f->m_transition->end();
+            f->m_transition = nullptr;
+        }
+        
+        if (Utils::getSelectedAnimationEnum() == Anim::Celeste && Utils::getSettingBool(Anim::Celeste, "respawn-animation")) {
+            f->m_transition = CelesteRevive::create(this, this, nullptr, Utils::getSpeedValue(Utils::getSettingFloat(Anim::Celeste, "speed")));
+            f->m_transition->start();
+        }
+        
+        PlayLayer::delayedResetLevel();
+    }
+    
 };
 
 class $modify(PlayerObject) {
@@ -110,6 +140,16 @@ class $modify(PlayerObject) {
         stopActionByTag(11);
     }
     
+    void playSpawnEffect() {
+        if (this != m_gameLayer->m_player1 && this != m_gameLayer->m_player2)
+            return PlayerObject::playDeathEffect();
+        
+        if (Utils::getSelectedAnimationEnum() != Anim::Celeste || !Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
+            return PlayerObject::playDeathEffect();
+            
+        stopActionByTag(11);
+    }
+    
 };
 
 class $modify(UILayer) {
@@ -122,7 +162,6 @@ class $modify(UILayer) {
         
         if (
             f->m_animation
-            && f->m_animation->isGoing()
             && Utils::getSettingBool(Utils::getSelectedAnimation().id, "prevent-early-restart")
         ) {
             return;

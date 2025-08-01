@@ -107,10 +107,10 @@ static const std::array<DeathAnimation, 9> animations = {
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
     DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
     DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
-    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 6.f, .stopDeathEffect = true },
-    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 6.f },
+    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 2.f, .stopDeathEffect = true },
+    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .stopDeathEffect = true },
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
-    DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f }
+    DeathAnimation{ .id = Anim::HollowKnight, .thumbnail = "among-us-thumbnail.png", .name = "Hollow Knight", .duration = 621.f }
 };
 
 static const std::array<AnimationSetting, 8> defaultSettings = {

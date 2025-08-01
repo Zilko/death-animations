@@ -66,8 +66,4 @@ public:
         m_title->runAction(CCFadeTo::create(0.35f / m_speed, 0));
     }
     
-    void end() override {
-        BaseAnimation::end();
-    }
-    
 };
