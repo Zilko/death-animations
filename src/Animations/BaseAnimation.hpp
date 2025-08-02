@@ -10,7 +10,9 @@ protected:
 
     PlayLayer* m_playLayer = nullptr;
     
-    AnimationDelegate* m_delegate = nullptr;
+    PreviewEvents* m_delegate = nullptr;
+    
+    ExtraParams m_extras;
     
     CCSize m_size;
     
@@ -18,12 +20,13 @@ protected:
     
     float m_speed = 1.f;
     
-    BaseAnimation(CCNode* parentNode, PlayLayer* playLayer, AnimationDelegate* delegate, float speed) {
-        m_parentNode = parentNode;
-        m_playLayer = playLayer;
-        m_delegate = delegate;
-        m_speed = speed;
-        m_isPreview = delegate != nullptr;
+    BaseAnimation(const AnimationParams& params) {
+        m_extras = params.extras;
+        m_parentNode = params.parentNode;
+        m_playLayer = params.playLayer;
+        m_delegate = params.delegate;
+        m_speed = params.speed;
+        m_isPreview = m_delegate != nullptr;
         m_size = CCDirector::get()->getWinSize();
     }
 
@@ -42,6 +45,10 @@ public:
 
     virtual void end() {
         removeFromParentAndCleanup(true);
+    }
+    
+    bool ccTouchBegan(CCTouch*, CCEvent*) override {
+        return false;
     }
   
 };

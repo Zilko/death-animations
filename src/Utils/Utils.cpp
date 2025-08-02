@@ -19,8 +19,8 @@ int Utils::getRandomInt(int min, int max) {
 }
 
 void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration) {
-        if (!Utils::getSettingBool(anim, "play-sound-effects"))
-            return;
+    if (!Utils::getSettingBool(anim, "play-sound-effects"))
+        return;
                 
     duration = static_cast<int>(duration / speed / 1000.f) * 1000;
     fade /= speed;
@@ -34,20 +34,68 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade
 }
 
 void Utils::playSound(Anim anim, const std::string& sound, float speed, float volume) {
-    FMODAudioEngine::get()->playEffect((Mod::get()->getResourcesDir() / sound).string().c_str(), speed, 1.f, volume);
+    if (Utils::getSettingBool(anim, "play-sound-effects"))
+        FMODAudioEngine::get()->playEffect((Mod::get()->getResourcesDir() / sound).string().c_str(), speed, 1.f, volume);
+}
+ 
+void Utils::playSoundManual(Anim anim, const std::string& sound, float speed, float volume) {
+    if (!Utils::getSettingBool(anim, "play-sound-effects"))
+        return;
+            
+    FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
+    FMOD::Sound* souwnd;
+    FMOD::Channel* channel;
+    
+    system->createSound((Mod::get()->getResourcesDir() / sound).string().c_str(), FMOD_DEFAULT, nullptr, &souwnd);
+    system->playSound(souwnd, nullptr, false, &channel);
+    channel->setVolume(volume);
+    channel->setPitch(speed);
+    
+    class SoundUpdater : public CCObject {
+    
+    private:
+    
+        FMOD::Channel* m_channel = nullptr;
+        FMOD::Sound* m_sound = nullptr;
+        
+        SoundUpdater(FMOD::Channel* channel, FMOD::Sound* sound)
+            : m_channel(channel), m_sound(sound) {}
+        
+        void updateSound(float) {
+            bool isPlaying = true;
+            
+            m_channel->isPlaying(&isPlaying);
+            
+            if (m_channel && !isPlaying) {
+                m_sound->release();
+                this->release();
+                m_channel = nullptr;
+                CCScheduler::get()->unscheduleSelector(schedule_selector(SoundUpdater::updateSound), this);
+            }
+        }
+        
+    public:
+            
+        static void add(FMOD::Channel* channel, FMOD::Sound* sound) {
+            SoundUpdater* updater = new SoundUpdater(channel, sound);
+            updater->retain();
+            CCScheduler::get()->scheduleSelector(schedule_selector(SoundUpdater::updateSound), updater, 0.2f, kCCRepeatForever, 0, false);
+        }
+        
+    };
+    
+    SoundUpdater::add(channel, souwnd);
 }
 
-BaseAnimation* Utils::createAnimation(Anim animation, CCNode* parentNode, PlayLayer* playLayer, AnimationDelegate* delegate, float speed) {
-    switch (animation) {
-        case Anim::YouDied: return YouDied::create(parentNode, playLayer, delegate, speed);
-        case Anim::Bsod: return Bsod::create(parentNode, playLayer, delegate, speed);
-        case Anim::AmongUs: return AmongUs::create(parentNode, playLayer, delegate, speed);
-        case Anim::Celeste: return Celeste::create(parentNode, playLayer, delegate, speed);
-        case Anim::ToBeContinued: return ToBeContinued::create(parentNode, playLayer, delegate, speed);
-        case Anim::Wii: return Wii::create(parentNode, playLayer, delegate, speed);
-        case Anim::HollowKnight: return HollowKnight::create(parentNode, playLayer, delegate, speed);
-        default: return nullptr;
-    };
+BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
+    ANIMATION_CHECK(YouDied)
+    ANIMATION_CHECK(Bsod)
+    ANIMATION_CHECK(AmongUs)
+    ANIMATION_CHECK(Celeste)
+    ANIMATION_CHECK(ToBeContinued)
+    ANIMATION_CHECK(Wii)
+    ANIMATION_CHECK(HollowKnight)
+    return nullptr;
 }
 
 Anim Utils::getSelectedAnimationEnum() {

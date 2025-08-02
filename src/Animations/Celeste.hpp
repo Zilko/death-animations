@@ -253,7 +253,8 @@ private:
     
     void chapter1Transition(float) {
         CCNode* container = CCNode::create();
-        container->setPosition({-m_size.width, 0});
+        container->setPosition({m_reverse ? 0 : -m_size.width, m_reverse ? m_size.height : 0    });
+        container->setScale(m_reverse ? -1 : 1);
         
         addChild(container);
                 
@@ -268,7 +269,7 @@ private:
             container->addChild(layer);
         }
         
-        container->runAction(CCMoveTo::create(0.7f, {m_size.width, 0}));
+        container->runAction(CCMoveTo::create(0.7f, {m_size.width * (m_reverse ? 2 : 1), container->getPositionY()}));
     }
     
     void chapter2Transition(float) {
@@ -297,13 +298,13 @@ private:
         for (int i = 0; i < circlePositions.size(); i++)
             for (const CCPoint& position : circlePositions[i]) {
                 CCSprite* spr = CCSprite::create("circle-celeste.png"_spr);
-                spr->setScale(0.f);
+                spr->setScale(m_reverse ? 3.f : 0.f);
                 spr->setPosition(position);
                  
                 addChild(spr);
                 spr->runAction(CCSequence::create(
                     CCDelayTime::create(i / 60.f / m_speed),
-                    CCScaleTo::create(0.7f / m_speed, 3.f),
+                    CCScaleTo::create(0.4f / m_speed, m_reverse ? 0.f : 3.f),
                     nullptr
                 ));
             }
@@ -437,12 +438,117 @@ public:
 
 };
 
+class CelesteRevive : public BaseAnimation {
+
+private:
+
+    std::vector<CCSprite*> m_animationSprites;
+    std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
+    std::unordered_map<CCNodeRGBA*, GLubyte> m_originalOpacities;
+    
+    ccColor3B m_color = {172, 62, 56};
+    
+    bool m_isWhite = false;
+
+public:
+
+    DEFINE_CREATE(CelesteRevive);
+
+    void start() override {
+        BaseAnimation::start();
+                
+        addChild(CelesteTransition::create(m_extras.transition, m_speed, 0.f, true));
+        
+        log::debug("{}", m_extras.transition);
+        
+        scheduleOnce(schedule_selector(CelesteRevive::playSound), 0.12f);
+        scheduleOnce(schedule_selector(CelesteRevive::startAnimation), 0.25f);
+        schedule(schedule_selector(CelesteRevive::updatePositions), 0, kCCRepeatForever, 0);
+        schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
+    }
+    
+    void startAnimation(float) {
+        addAnimation(m_playLayer->m_player1);
+    }
+    
+    void addAnimation(CCNodeRGBA* player) {
+        CCArray* animFrames = CCArray::create();
+        CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
+        cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
+        
+        for (int i = 1; i <= 22; i++)
+            if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-revive-{}.png"_spr, i)).c_str()))
+                animFrames->addObject(frame);
+        
+        CCSprite* sprite = CCSprite::createWithSpriteFrameName("celeste-revive-1.png"_spr);
+        sprite->setColor(m_color);
+        sprite->setScale(8.75f);
+        sprite->getTexture()->setAliasTexParameters();
+        sprite->runAction(
+            CCSequence::create(
+                CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 60.f / m_speed)),
+                CCDelayTime::create(1.f / 60.f / m_speed),
+                CCCallFunc::create(this, callfunc_selector(CelesteRevive::implosionEnded)),
+                nullptr
+            )
+        );
+        
+        sprite->setPosition(player->getPosition());
+        
+        m_animationSprites.push_back(sprite);
+        m_originalOpacities[player] = player->getOpacity();
+        m_players[sprite] = player;
+        
+        player->setOpacity(0);
+        player->getParent()->addChild(sprite);
+    }
+    
+    void updatePositions(float) {
+        for (CCSprite* sprite : m_animationSprites) {
+            sprite->setPosition(m_players.at(sprite)->getPosition() + ccp(27, 4));
+            m_players.at(sprite)->setOpacity(0);
+        }
+    }
+    
+    void updateColors(float) {
+        m_isWhite = !m_isWhite;
+        
+        for (CCSprite* sprite : m_animationSprites)
+            sprite->setColor(m_isWhite ? ccc3(255, 255, 255) : m_color);
+    }
+    
+    void implosionEnded() {
+        for (CCSprite* sprite : m_animationSprites) {
+            sprite->removeFromParentAndCleanup(true);
+            m_players.at(sprite)->setOpacity(m_originalOpacities.at(m_players.at(sprite)));
+        }
+        
+        m_animationSprites.clear();
+    }
+    
+    void playSound(float) {
+        Utils::playSound(Anim::Celeste, "revive-celeste.wav", m_speed, 1.f);
+    }
+    
+    void end() override {
+        for (CCSprite* sprite : m_animationSprites)
+            sprite->removeFromParentAndCleanup(true);
+        
+        m_animationSprites.clear();
+            
+        BaseAnimation::end();
+    }
+    
+};
+
 class Celeste : public BaseAnimation {
   
 private:
 
     CelesteExplosion* m_explosion1 = nullptr;
     CelesteExplosion* m_explosion2 = nullptr;
+    
+    int m_transition = 0;
     
 public:
     
@@ -451,13 +557,11 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        int transition = Utils::getSettingFloat(Anim::Celeste, "transition");
-        if (transition == 0)
-            transition = Utils::getRandomInt(1, 9);
+        m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
+        if (m_transition == 0)
+            m_transition = Utils::getRandomInt(1, 9);
 
-        Utils::saveSetting(Anim::Celeste, "last-transition", static_cast<float>(transition));
-            
-        addChild(CelesteTransition::create(transition, m_speed, 0.65f, false));
+        addChild(CelesteTransition::create(m_transition, m_speed, 0.65f, false));
         
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
@@ -493,11 +597,17 @@ public:
         
         Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
         scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.41f / m_speed);
+        
+        if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
+            scheduleOnce(schedule_selector(Celeste::transitionOut), Utils::getSelectedAnimation(Anim::Celeste).duration / m_speed);
     }
     
+    void transitionOut(float) {
+        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, m_speed, ExtraParams{ .transition = m_transition }})->start();
+    }
     
     void playDeathSound(float) {
-        Utils::playSound(Anim::AmongUs, "death-celeste.wav", m_speed, 1.f);
+        Utils::playSoundManual(Anim::Celeste, "death-celeste.wav", m_speed, 1.f);
     }
     
     void end() override {
@@ -513,97 +623,4 @@ public:
         
         BaseAnimation::end();
     }
-};
-
-class CelesteRevive : public BaseAnimation {
-
-private:
-
-    std::vector<CCSprite*> m_animationSprites;
-    std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
-    std::unordered_map<CCNodeRGBA*, GLubyte> m_originalOpacities;
-    
-    ccColor3B m_color = {0, 0, 0};
-    
-    bool m_isWhite = false;
-
-public:
-
-    DEFINE_CREATE(CelesteRevive);
-
-    void start() override {
-        BaseAnimation::start();
-        
-        // addChild(CelesteTransition::create(Utils::getSettingFloat(Anim::Celeste, "last-transition"), m_speed, 0.f, true));
-        
-        addAnimation(m_playLayer->m_player1);
-        
-        schedule(schedule_selector(CelesteRevive::updatePositions), 0, kCCRepeatForever, 0);
-        schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
-    }
-    
-    void addAnimation(CCNodeRGBA* player) {
-        CCArray* animFrames = CCArray::create();
-        CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
-        cache->addSpriteFramesWithFile("celeste-explosion.plist"_spr);
-        
-        for (int i = 42; i >= 5; i--)
-            if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-explosion-{}.png"_spr, i)).c_str()))
-                animFrames->addObject(frame);
-        
-        CCSprite* sprite = CCSprite::createWithSpriteFrameName("celeste-explosion-42.png"_spr);
-        sprite->setColor(m_color);
-        sprite->setScale(8.75f);
-        sprite->getTexture()->setAliasTexParameters();
-        sprite->runAction(
-            CCSequence::create(
-                CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 60.f / m_speed)),
-                CCDelayTime::create(1.f / 60.f / m_speed),
-                CCCallFunc::create(this, callfunc_selector(CelesteRevive::implosionEnded)),
-                nullptr
-            )
-        );
-        
-        sprite->setPosition(player->getPosition());
-        
-        m_animationSprites.push_back(sprite);
-        m_originalOpacities[player] = player->getOpacity();
-        m_players[sprite] = player;
-        
-        player->setOpacity(0);
-        player->getParent()->addChild(sprite);
-    }
-    
-    void updatePositions(float) {
-        for (CCSprite* sprite : m_animationSprites) {
-            sprite->setPosition(m_players.at(sprite)->getPosition());
-            m_players.at(sprite)->setOpacity(0);
-        }
-    }
-    
-    void updateColors(float) {
-        m_isWhite = !m_isWhite;
-        
-        for (CCSprite* sprite : m_animationSprites)
-            sprite->setColor(m_isWhite ? ccc3(255, 255, 255) : m_color);
-    }
-    
-    void implosionEnded() {
-        for (CCSprite* sprite : m_animationSprites) {
-            sprite->removeFromParentAndCleanup(true);
-            m_players.at(sprite)->setOpacity(m_originalOpacities.at(m_players.at(sprite)));
-        }
-        
-        m_animationSprites.clear();
-    }
-    
-    void end() override {
-        for (CCSprite* sprite : m_animationSprites)
-            sprite->removeFromParentAndCleanup(true);
-        
-        m_animationSprites.clear();
-            
-        BaseAnimation::end();
-    }
-    
 };

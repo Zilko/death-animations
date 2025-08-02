@@ -2,7 +2,7 @@
 
 #include "../Animations/BaseAnimation.hpp"
 
-class PreviewLayer : public geode::Popup<>, public AnimationDelegate {
+class PreviewLayer : public geode::Popup<>, public PreviewEvents {
   
 private:
 

@@ -6,11 +6,11 @@
 		"mac": "2.2074",
 		"ios": "2.2074"
 	},
-	"id": "zilko.wa",
-	"name": "wa",
+	"id": "zilko.death_animations",
+	"name": "Death Animations",
 	"version": "v1.0.0",
 	"developer": "Zilko",
-	"description": "",
+	"description": "Animates ur deaths",
 	"resources": {
 	  "spritesheets": {
       "among-us-death-1": [
@@ -27,6 +27,9 @@
       ],
       "celeste-explosion": [
         "resources/sprites/animations/celeste/explosion/*.png"
+      ],
+      "celeste-revive": [
+        "resources/sprites/animations/celeste/revive/*.png"
       ]
     },
 	  "sprites": [

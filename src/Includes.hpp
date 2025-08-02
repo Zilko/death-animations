@@ -2,7 +2,7 @@
 
 using namespace geode::prelude;
 
-class AnimationDelegate {
+class PreviewEvents {
   
 public:
 
@@ -30,12 +30,17 @@ static const std::string vertexShader = R"(
     }
 )";
 
-#define DEFINE_CREATE(CLASS_NAME)                                                 \
-    CLASS_NAME(CCNode* parentNode, PlayLayer* playLayer, AnimationDelegate* delegate, float speed) \
-        : BaseAnimation(parentNode, playLayer, delegate, speed) {}  \
+#define ANIMATION_CHECK(ANIMATION) \
+    if (animation == Anim::ANIMATION) \
+        return ANIMATION::create(params);
+
+
+#define DEFINE_CREATE(CLASS)                                                 \
+    CLASS(const AnimationParams& params) \
+        : BaseAnimation(params) {}  \
                                                                     \
-    static CLASS_NAME* create(CCNode* parentNode, PlayLayer* playLayer, AnimationDelegate* delegate, float speed) { \
-        CLASS_NAME* ret = new CLASS_NAME(parentNode, playLayer, delegate, speed); \
+    static CLASS* create(const AnimationParams& params) { \
+        CLASS* ret = new CLASS(params); \
         ret->init();                                                              \
         ret->autorelease();                                                       \
         return ret;                                                               \
@@ -59,6 +64,18 @@ enum Anim {
     Celeste = 7,
     Wii = 8,
     HollowKnight = 9
+};
+
+struct ExtraParams {
+    int transition = 0;
+};
+
+struct AnimationParams {
+    CCNode* parentNode = nullptr;
+    PlayLayer* playLayer = nullptr;
+    PreviewEvents* delegate = nullptr;
+    float speed = 1.f;
+    ExtraParams extras = {};
 };
 
 struct DeathAnimation {
@@ -107,7 +124,7 @@ static const std::array<DeathAnimation, 9> animations = {
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
     DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
     DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
-    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 2.f, .stopDeathEffect = true },
+    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 1.3f, .stopDeathEffect = true },
     DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .stopDeathEffect = true },
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
     DeathAnimation{ .id = Anim::HollowKnight, .thumbnail = "among-us-thumbnail.png", .name = "Hollow Knight", .duration = 621.f }
@@ -130,7 +147,7 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "colors", .name = "Colors", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
     } },
     { Anim::Celeste, {
-        { .id = "transition", .name = "Transition", .type = SettingType::Select, .elements = { "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8", "Chapter 9" } },
+        { .id = "transition", .name = "Transition", .type = SettingType::Select, .elements = { "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8" } },
         { .id = "respawn-animation", .name = "Respawn Animation", .type = SettingType::Toggle },
         { .id = "second-player", .name = "Second Player", .type = SettingType::Toggle }
     } },

@@ -11,8 +11,9 @@ public:
 
     static void playSound(Anim, const std::string&, float, int, int);
     static void playSound(Anim, const std::string&, float, float);
+    static void playSoundManual(Anim, const std::string&, float, float);
     
-    static BaseAnimation* createAnimation(Anim, CCNode*, PlayLayer*, AnimationDelegate*, float);
+    static BaseAnimation* createAnimation(Anim, const AnimationParams&);
     
     static Anim getSelectedAnimationEnum();
     static const DeathAnimation& getSelectedAnimation();

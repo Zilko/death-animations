@@ -42,7 +42,6 @@ class $modify(ProPlayLayer, PlayLayer) {
     
     struct Fields {
         BaseAnimation* m_animation = nullptr;
-        BaseAnimation* m_transition = nullptr;
     };
     
     static void onModify(auto& self) {
@@ -75,7 +74,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
-        f->m_animation = Utils::createAnimation(anim, this, this, nullptr, speed);      
+        f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed});      
       
         if (!f->m_animation) return;
         
@@ -107,22 +106,6 @@ class $modify(ProPlayLayer, PlayLayer) {
         }
     }
     
-    void delayedResetLevel() {
-        auto f = m_fields.self();
-        
-        if (f->m_transition) {
-            f->m_transition->end();
-            f->m_transition = nullptr;
-        }
-        
-        if (Utils::getSelectedAnimationEnum() == Anim::Celeste && Utils::getSettingBool(Anim::Celeste, "respawn-animation")) {
-            f->m_transition = CelesteRevive::create(this, this, nullptr, Utils::getSpeedValue(Utils::getSettingFloat(Anim::Celeste, "speed")));
-            f->m_transition->start();
-        }
-        
-        PlayLayer::delayedResetLevel();
-    }
-    
 };
 
 class $modify(PlayerObject) {
@@ -135,16 +118,6 @@ class $modify(PlayerObject) {
             return PlayerObject::playDeathEffect();
             
         if (!Utils::getSelectedAnimation().stopDeathEffect)
-            return PlayerObject::playDeathEffect();
-            
-        stopActionByTag(11);
-    }
-    
-    void playSpawnEffect() {
-        if (this != m_gameLayer->m_player1 && this != m_gameLayer->m_player2)
-            return PlayerObject::playDeathEffect();
-        
-        if (Utils::getSelectedAnimationEnum() != Anim::Celeste || !Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
             return PlayerObject::playDeathEffect();
             
         stopActionByTag(11);
