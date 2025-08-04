@@ -68,6 +68,7 @@ enum Anim {
 
 struct ExtraParams {
     int transition = 0;
+    bool reverse = false;
 };
 
 struct AnimationParams {
@@ -89,6 +90,7 @@ struct DeathAnimation {
 struct AnimationSetting {
     std::string id;
     std::string name;
+    std::string description;
     SettingType type;
     
     std::vector<std::string> elements;
@@ -105,12 +107,15 @@ static const std::unordered_set<std::string> gloalBoolDefaults = {
 
 static const std::unordered_map<int, std::unordered_map<std::string, float>> specificFloatDefaults {
     { Anim::AmongUs, {
-        { "r1", 273.f },
-        { "g1", 95.f },
-        { "b1", 74.f },
+        { "r1", 243.f },
+        { "g1", 65.f },
+        { "b1", 44.f },
         { "r2", 14.f },
         { "g2", 53.f },
         { "b2", 235.f }
+    } },
+    { Anim::Celeste, {
+        { "transition", 1.f }
     } }
 };
 
@@ -124,31 +129,31 @@ static const std::array<DeathAnimation, 9> animations = {
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
     DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
     DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
-    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 1.3f, .stopDeathEffect = true },
+    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 1.35f, .stopDeathEffect = true },
     DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .stopDeathEffect = true },
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
     DeathAnimation{ .id = Anim::HollowKnight, .thumbnail = "among-us-thumbnail.png", .name = "Hollow Knight", .duration = 621.f }
 };
 
 static const std::array<AnimationSetting, 8> defaultSettings = {
-    AnimationSetting{ .id = "speed", .name = "Speed", .type = SettingType::Speed },
-    AnimationSetting{ .id = "only-after", .name = "Only After", .type = SettingType::Percent },
-    AnimationSetting{ .id = "probability", .name = "Probability", .type = SettingType::Percent },
-    AnimationSetting{ .id = "prevent-early-restart", .name = "Prevent Early Restart", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "stop-auto-restart", .name = "Stop Auto Restart", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "play-sound-effects", .name = "Play Sound Effects", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "play-on-practice", .name = "Play On Practice", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "only-on-new-best", .name = "Only On New Best ", .type = SettingType::Toggle }
+    AnimationSetting{ .id = "speed", .name = "Speed", .description = "The speed at which the animation will play.", .type = SettingType::Speed },
+    AnimationSetting{ .id = "only-after", .name = "Only After", .description = "Only play the animation if you die after a certain percent.", .type = SettingType::Percent },
+    AnimationSetting{ .id = "probability", .name = "Probability", .description = "The chance the animation has to play.", .type = SettingType::Percent },
+    AnimationSetting{ .id = "prevent-early-restart", .name = "Prevent Early Restart", .description = "Stop you from restarting with R while the animation is playing.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "stop-auto-restart", .name = "Stop Auto Restart", .description = "Don't restart automatically after you die.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-sound-effects", .name = "Play Sound Effects", .description = "Play any sound effects the animation might have.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-on-practice", .name = "Play On Practice", .description = "Whether to play the animation on practice or not.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "only-on-new-best", .name = "Only On New Best ", .description = "Only play the animation on a new best.", .type = SettingType::Toggle }
 };
 
 static const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
     { Anim::AmongUs, {
-        { .id = "animation", .name = "Kill Animation", .type = SettingType::Select, .elements = { "Random", "Gun", "Knife", "Neck", "Alien" } },
-        { .id = "colors", .name = "Colors", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
+        { .id = "animation", .name = "Kill Animation", .description = "The among us kill animation that will play on death.", .type = SettingType::Select, .elements = { "Random", "Gun", "Knife", "Neck", "Alien" } },
+        { .id = "colors", .name = "Colors", .description = "The colors that the impostor and victim will be in the animation.", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
     } },
     { Anim::Celeste, {
-        { .id = "transition", .name = "Transition", .type = SettingType::Select, .elements = { "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8" } },
-        { .id = "respawn-animation", .name = "Respawn Animation", .type = SettingType::Toggle },
-        { .id = "second-player", .name = "Second Player", .type = SettingType::Toggle }
+        { .id = "transition", .name = "Transition", .description = "The celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4" } },
+        { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the celeste respawn animation.", .type = SettingType::Toggle },
+        { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player too.", .type = SettingType::Toggle }
     } },
 };

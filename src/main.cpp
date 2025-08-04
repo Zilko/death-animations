@@ -86,7 +86,7 @@ class $modify(ProPlayLayer, PlayLayer) {
             return;
         
         CCSequence* seq = CCSequence::create(
-            CCDelayTime::create(Utils::getSelectedAnimation(anim).duration / speed),
+            CCDelayTime::create(Utils::getSelectedAnimation(anim).duration / speed + 0.05f),
             CCCallFunc::create(this, callfunc_selector(PlayLayer::delayedResetLevel)),
             nullptr
         );

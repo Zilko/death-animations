@@ -55,7 +55,7 @@ private:
                 newColor = vec4(1, 1, 1, 1);
                 
             vec3 grayscale = vec3(dot(newColor.rgb, vec3(0.299, 0.587, 0.114)));
-            vec3 desaturated = mix(newColor.rgb, grayscale, 0.7);
+            vec3 desaturated = mix(newColor.rgb, grayscale, 0.3);
             gl_FragColor = vec4(desaturated, newColor.a);
         }
     )";
@@ -227,31 +227,13 @@ public:
 
 };
 
-class CelesteTransition : public CCNode {
+class CelesteTransition : public BaseAnimation {
 
 private:
     
-    CCSize m_size;
-
-    float m_speed = 1.f;
     bool m_reverse = false;
     
-    CelesteTransition(CCSize size, float speed, bool reverse) {
-        m_size = size;
-        m_speed = speed;
-        m_reverse = reverse;
-    }
-    
-    void init(int transition, float delay) {        
-        switch(transition) {
-            case 1: scheduleOnce(schedule_selector(CelesteTransition::chapter1Transition), delay); break;
-            case 2: scheduleOnce(schedule_selector(CelesteTransition::chapter2Transition), delay); break;
-            case 3: scheduleOnce(schedule_selector(CelesteTransition::chapter3Transition), delay); break;
-            case 4: scheduleOnce(schedule_selector(CelesteTransition::chapter4Transition), delay); break;
-        }
-    }
-    
-    void chapter1Transition(float) {
+    void chapter1Transition() {
         CCNode* container = CCNode::create();
         container->setPosition({m_reverse ? 0 : -m_size.width, m_reverse ? m_size.height : 0    });
         container->setScale(m_reverse ? -1 : 1);
@@ -269,10 +251,10 @@ private:
             container->addChild(layer);
         }
         
-        container->runAction(CCMoveTo::create(0.7f, {m_size.width * (m_reverse ? 2 : 1), container->getPositionY()}));
+        container->runAction(CCMoveTo::create(0.5f / m_speed, {m_size.width * (m_reverse ? 2 : 1), container->getPositionY()}));
     }
     
-    void chapter2Transition(float) {
+    void chapter2Transition() {
         static const std::vector<std::vector<CCPoint>> circlePositions = {
             { { 24.f, 303.f }, { 26.f, 128.f }, { 8.f, 102.f } },
             { { 27.f, 11.f }, { 51.f, 68.f }, { 54.f, 149.f }, { 48.f, 310.f } },
@@ -310,130 +292,160 @@ private:
             }
     }
     
-    void chapter3Transition(float) {
-        float halfWidth = m_size.width / 2.f;
-        float time1 = 20.f / 60.f / m_speed;
-        float time2 = 10.f / 60.f / m_speed;
+    void chapter3Transition() {
+        float time1 = 15.f / 60.f / m_speed;
+        float time2 = 15.f / 60.f / m_speed;
         
         CCSprite* spr = CCSprite::create("keyhole-left-celeste.png"_spr);
-        spr->setScaleX(0);
-        spr->setScaleY(2.275f);
-        spr->setAnchorPoint({1, 0.5f});
-        spr->setPosition({0, m_size.height / 2.f});
+        CCPoint originalLeftPos = ccp(0, m_size.height / 2.f);
         
+        if (m_reverse) {
+            spr->setPosition(m_size / 2.f);
+            spr->setScale(0);
+        } else {
+            spr->setScaleX(0);
+            spr->setScaleY(2.275f);
+            spr->setPosition(originalLeftPos);
+        }
+        spr->setAnchorPoint({1, 0.5f});
         addChild(spr);
         
-        spr->runAction(CCSequence::create(
-            CCSpawn::create(CCMoveTo::create(time1, m_size / 2.f), CCScaleTo::create(time1, 1.5f, 1.5f), nullptr),
-            CCScaleTo::create(time2, 0),
-            nullptr
-        ));
+        CCAction* leftAction = m_reverse ?
+            CCSequence::create(
+                CCScaleTo::create(time2, 1.5f, 1.5f),
+                CCSpawn::create(
+                    CCMoveTo::create(time1, originalLeftPos),
+                    CCScaleTo::create(time1, 0, 2.275f),
+                    nullptr
+                ),
+                nullptr
+            ) :
+            CCSequence::create(
+                CCSpawn::create(
+                    CCMoveTo::create(time1, m_size / 2.f),
+                    CCScaleTo::create(time1, 1.5f, 1.5f),
+                    nullptr
+                ),
+                CCScaleTo::create(time2, 0),
+                nullptr
+            );
+        spr->runAction(leftAction);
         
         spr = CCSprite::create("keyhole-right-celeste.png"_spr);
-        spr->setScaleX(0);
-        spr->setScaleY(2.275f);
-        spr->setAnchorPoint({0, 0.5f});
-        spr->setPosition({m_size.width, m_size.height / 2.f});
+        CCPoint originalRightPos = ccp(m_size.width, m_size.height / 2.f);
         
+        if (m_reverse) {
+            spr->setPosition(m_size / 2.f);
+            spr->setScale(0);
+        } else {
+            spr->setScaleX(0);
+            spr->setScaleY(2.275f);
+            spr->setPosition(originalRightPos);
+        }
+        spr->setAnchorPoint({0, 0.5f});
         addChild(spr);
         
-        spr->runAction(CCSequence::create(
-            CCSpawn::create(CCMoveTo::create(time1, m_size / 2.f), CCScaleTo::create(time1, 1.5f, 1.5f), nullptr),
-            CCScaleTo::create(time2, 0),
-            nullptr
-        ));
+        CCAction* rightAction = m_reverse ?
+            CCSequence::create(
+                CCScaleTo::create(time2, 1.5f, 1.5f),
+                CCSpawn::create(
+                    CCMoveTo::create(time1, originalRightPos),
+                    CCScaleTo::create(time1, 0, 2.275f),
+                    nullptr
+                ),
+                nullptr
+            ) :
+            CCSequence::create(
+                CCSpawn::create(
+                    CCMoveTo::create(time1, m_size / 2.f),
+                    CCScaleTo::create(time1, 1.5f, 1.5f),
+                    nullptr
+                ),
+                CCScaleTo::create(time2, 0),
+                nullptr
+            );
+        spr->runAction(rightAction);
         
         float layerHeight = (m_size.height - spr->getContentHeight() * 1.5f) / 2.f;
         float layerWidth = (m_size.height - spr->getContentHeight() * 2.275f) / 2.f;
-        
-        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, halfWidth, layerHeight);
-        layer->setAnchorPoint({0, 0});
-        layer->setScaleX(0);
-        layer->setScaleY(layerWidth / layer->getContentHeight());
-        layer->runAction(CCSequence::create(
-            CCScaleTo::create(time1, 1, 1),
-            CCScaleTo::create(time2, 1, m_size.height / 2.f / layerHeight),
-            nullptr
-        ));
-        
-        addChild(layer);
-        
-        layer = CCLayerColor::create({0, 0, 0, 255}, halfWidth, layerHeight);
-        layer->setAnchorPoint({0, 1});
-        layer->setScaleX(0);
-        layer->setScaleY(layerWidth / layer->getContentHeight());
-        layer->runAction(CCSequence::create(
-            CCScaleTo::create(time1, 1, 1),
-            CCScaleTo::create(time2, 1, m_size.height / 2.f / layerHeight),
-            nullptr
-        ));
-        layer->setPosition({0, m_size.height - layerHeight});
-        
-        addChild(layer);
-        
-        layer = CCLayerColor::create({0, 0, 0, 255}, halfWidth, layerHeight);
-        layer->setAnchorPoint({1, 1});
-        layer->setScaleX(0);
-        layer->setScaleY(layerWidth / layer->getContentHeight());
-        layer->runAction(CCSequence::create(
-            CCScaleTo::create(time1, 1, 1),
-            CCScaleTo::create(time2, 1, m_size.height / 2.f / layerHeight),
-            nullptr
-        ));
-        layer->setPosition({halfWidth, m_size.height - layerHeight});
-        
-        addChild(layer);
-        
-        layer = CCLayerColor::create({0, 0, 0, 255}, halfWidth, layerHeight);
-        layer->setAnchorPoint({1, 0});
-        layer->setScaleX(0);
-        layer->setScaleY(layerWidth / layer->getContentHeight());
-        layer->runAction(CCSequence::create(
-            CCScaleTo::create(time1, 1, 1),
-            CCScaleTo::create(time2, 1, m_size.height / 2.f / layerHeight),
-            nullptr
-        ));
-        layer->setPosition({halfWidth, 0});
-        
-        addChild(layer);
-        
+        float halfWidth = m_size.width / 2.f;
         float layerWidth2 = halfWidth - spr->getContentWidth() * 1.5f;
         
-        layer = CCLayerColor::create({0, 0, 0, 255}, layerWidth2, m_size.height);
-        layer->setAnchorPoint({0, 0});
-        layer->setScaleX(0);
-        layer->runAction(CCSequence::create(
-            CCScaleTo::create(time1, 1, 1),
-            CCScaleTo::create(time2, halfWidth / layerWidth2, 1),
-            nullptr
-        ));
+        auto createLayer = [this, time1, time2](const CCSize& size, const CCPoint& anchor, const CCPoint& pos, float scaleY, const CCPoint& targetScale) {
+            CCLayerColor* layer = CCLayerColor::create(ccc4(0, 0, 0, 255), size.width, size.height);
+            layer->setAnchorPoint(anchor);
+            
+            if (m_reverse) {
+                layer->setScaleX(targetScale.x);
+                layer->setScaleY(targetScale.y);
+            } else {
+                layer->setScaleX(0);
+                layer->setScaleY(scaleY);
+            }
+            layer->setPosition(pos);
+            
+            CCAction* action = m_reverse ?
+                CCSequence::create(
+                    CCScaleTo::create(time2, 1, 1),
+                    CCScaleTo::create(time1, 0, scaleY),
+                    nullptr
+                ) :
+                CCSequence::create(
+                    CCScaleTo::create(time1, 1, 1),
+                    CCScaleTo::create(time2, targetScale.x, targetScale.y),
+                    nullptr
+                );
+            
+            layer->runAction(action);
+            addChild(layer);
+        };
         
-        addChild(layer);
-        
-        layer = CCLayerColor::create({0, 0, 0, 255}, layerWidth2, m_size.height);
-        layer->setAnchorPoint({1, 0});
-        layer->setScaleX(0);
-        layer->runAction(CCSequence::create(
-            CCScaleTo::create(time1, 1, 1),
-            CCScaleTo::create(time2, halfWidth / layerWidth2, 1),
-            nullptr
-        ));
-        layer->setPositionX(m_size.width - layerWidth2);
-        
-        addChild(layer);
+        createLayer({halfWidth, layerHeight}, ccp(0,0), ccp(0,0), layerWidth / layerHeight, ccp(1, m_size.height / 2.f / layerHeight));
+        createLayer({halfWidth, layerHeight}, ccp(0,1), ccp(0, m_size.height - layerHeight), layerWidth / layerHeight, ccp(1, m_size.height / 2.f / layerHeight));
+        createLayer({halfWidth, layerHeight}, ccp(1,1), ccp(halfWidth, m_size.height - layerHeight), layerWidth / layerHeight, ccp(1, m_size.height / 2.f / layerHeight));
+        createLayer({halfWidth, layerHeight}, ccp(1,0), ccp(halfWidth, 0), layerWidth / layerHeight, ccp(1, m_size.height / 2.f / layerHeight));
+        createLayer({layerWidth2, m_size.height}, ccp(0,0), ccp(0,0), 1, ccp(halfWidth / layerWidth2, 1));
+        createLayer({layerWidth2, m_size.height}, ccp(1,0), ccp(m_size.width - layerWidth2, 0), 1, ccp(halfWidth / layerWidth2, 1));
     }
     
-    void chapter4Transition(float) {
+    void chapter4Transition() {
+        CCNode* container = CCNode::create();
+        container->setScaleX(m_reverse ? -1 : 1);
         
+        addChild(container);
+        
+        CCSprite* spr = nullptr;
+                
+        for (int i = 0; i < 27; i++) {
+            spr = CCSprite::create("spiky-thing-celeste.png"_spr);
+            spr->setScale(m_size.height / 27.f / spr->getContentHeight());
+            spr->setAnchorPoint({0, 1});
+            spr->setPosition({m_size.width, m_size.height - spr->getContentHeight() * spr->getScale() * i});
+            container->addChild(spr);
+            
+            CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height);
+            container->addChild(layer);
+        }
+        
+        container->setPosition({m_reverse ? m_size.width : -m_size.width - spr->getContentWidth() * spr->getScale(), 0});
+        container->runAction(CCMoveTo::create(0.3f / m_speed, {m_reverse ? m_size.width + m_size.width + spr->getContentWidth() * spr->getScale() : 0, 0}));
     }
 
 public:
+
+    DEFINE_CREATE(CelesteTransition)
     
-    static CelesteTransition* create(int transition, float speed, float delay, bool reverse) {
-        CelesteTransition* ret = new CelesteTransition(CCDirector::get()->getWinSize(), speed, reverse);
-        ret->init(transition, delay);
-        ret->autorelease();
-        return ret;
+    void start() override {
+        m_reverse = m_extras.reverse;
+
+        setZOrder(132099);
+        
+        switch(m_extras.transition) {
+            case 2: chapter1Transition(); break;
+            case 3: chapter2Transition(); break;
+            case 4: chapter3Transition(); break;
+            case 5: chapter4Transition(); break;
+        }
     }
 
 };
@@ -456,44 +468,61 @@ public:
 
     void start() override {
         BaseAnimation::start();
-                
-        addChild(CelesteTransition::create(m_extras.transition, m_speed, 0.f, true));
         
-        log::debug("{}", m_extras.transition);
+        setZOrder(10);
         
-        scheduleOnce(schedule_selector(CelesteRevive::playSound), 0.12f);
-        scheduleOnce(schedule_selector(CelesteRevive::startAnimation), 0.25f);
+        if (m_extras.transition != 0) {
+            CelesteTransition* transition = CelesteTransition::create({this, nullptr, nullptr, m_speed, { .transition = m_extras.transition, .reverse = true}});
+            transition->start();
+            addChild(transition);
+        }
+        
+        if (m_isPreview)
+            addAnimation(m_delegate->getPlayer());
+        else {
+            addAnimation(m_playLayer->m_player1);
+            
+            if (m_playLayer->m_gameState.m_isDualMode)
+                addAnimation(m_playLayer->m_player2);
+        }
+        
+        scheduleOnce(schedule_selector(CelesteRevive::playSound), 0.12f / m_speed);
+        scheduleOnce(schedule_selector(CelesteRevive::startAnimations), 0.25f / m_speed);
+        scheduleOnce(schedule_selector(CelesteRevive::transitionEnded), 1.f / m_speed);
         schedule(schedule_selector(CelesteRevive::updatePositions), 0, kCCRepeatForever, 0);
         schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
     }
     
-    void startAnimation(float) {
-        addAnimation(m_playLayer->m_player1);
+    void startAnimations(float) {
+        for (CCSprite* sprite : m_animationSprites) {
+            CCArray* animFrames = CCArray::create();
+            CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
+            cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
+            
+            for (int i = 1; i <= 22; i++)
+                if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-revive-{}.png"_spr, i)).c_str()))
+                    animFrames->addObject(frame);
+            
+            sprite->runAction(
+                CCSequence::create(
+                    CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 60.f / m_speed)),
+                    CCDelayTime::create(1.f / 60.f / m_speed),
+                    CCCallFunc::create(this, callfunc_selector(CelesteRevive::implosionEnded)),
+                    nullptr
+                )
+            );
+
+            sprite->setVisible(true);
+        }
     }
     
     void addAnimation(CCNodeRGBA* player) {
-        CCArray* animFrames = CCArray::create();
-        CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
-        cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
-        
-        for (int i = 1; i <= 22; i++)
-            if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-revive-{}.png"_spr, i)).c_str()))
-                animFrames->addObject(frame);
-        
         CCSprite* sprite = CCSprite::createWithSpriteFrameName("celeste-revive-1.png"_spr);
         sprite->setColor(m_color);
         sprite->setScale(8.75f);
         sprite->getTexture()->setAliasTexParameters();
-        sprite->runAction(
-            CCSequence::create(
-                CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 60.f / m_speed)),
-                CCDelayTime::create(1.f / 60.f / m_speed),
-                CCCallFunc::create(this, callfunc_selector(CelesteRevive::implosionEnded)),
-                nullptr
-            )
-        );
-        
         sprite->setPosition(player->getPosition());
+        sprite->setVisible(false);
         
         m_animationSprites.push_back(sprite);
         m_originalOpacities[player] = player->getOpacity();
@@ -526,6 +555,10 @@ public:
         m_animationSprites.clear();
     }
     
+    void transitionEnded(float) {
+        end();
+    }
+    
     void playSound(float) {
         Utils::playSound(Anim::Celeste, "revive-celeste.wav", m_speed, 1.f);
     }
@@ -545,6 +578,17 @@ class Celeste : public BaseAnimation {
   
 private:
 
+    const std::unordered_map<int, float> m_transitionDelays = {
+        { 2, 0.9f },
+        { 3, 0.65f },
+        { 4, 0.7f },
+        { 5, 0.9f },
+        { 6, 0.9f },
+        { 7, 0.9f },
+        { 8, 0.9f },
+        { 9, 0.9f }
+    };
+
     CelesteExplosion* m_explosion1 = nullptr;
     CelesteExplosion* m_explosion2 = nullptr;
     
@@ -558,56 +602,66 @@ public:
         BaseAnimation::start();
         
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
-        if (m_transition == 0)
-            m_transition = Utils::getRandomInt(1, 9);
-
-        addChild(CelesteTransition::create(m_transition, m_speed, 0.65f, false));
+        if (m_transition == 1)
+            m_transition = Utils::getRandomInt(2, 5);   
+        
+        Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
+        
+        scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.41f / m_speed);
+        
+        if (m_transition != 0)
+            scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelays.at(m_transition) / m_speed);
+        
+        if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
+            scheduleOnce(schedule_selector(Celeste::transitionOut), Utils::getSelectedAnimation(Anim::Celeste).duration / m_speed);
         
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
             m_explosion1->setPosition(m_delegate->getPlayer()->getPosition());
-            addChild(m_explosion1, 100);
-        } else {
-            PlayerObject* player = m_playLayer->m_player1;
+            addChild(m_explosion1, m_isPreview ? 9 : 100);
             
-            m_explosion1 = CelesteExplosion::create(
+            return;
+        }
+        
+        PlayerObject* player = m_playLayer->m_player1;
+        
+        m_explosion1 = CelesteExplosion::create(
+            player,
+            ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
+            {172, 62, 56},
+            m_speed
+        );
+        m_explosion1->setPosition(player->getPosition());
+        player->getParent()->addChild(m_explosion1, 10293823);
+        
+        if (!Utils::getSettingBool(Anim::Celeste, "second-player")) return;
+        
+        player = m_playLayer->m_player2;
+        
+        if (player && m_playLayer->m_gameState.m_isDualMode) {
+            m_explosion2 = CelesteExplosion::create(
                 player,
                 ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
                 {172, 62, 56},
                 m_speed
             );
-            m_explosion1->setPosition(player->getPosition());
-            player->getParent()->addChild(m_explosion1, 10293823);
-            
-            if (Utils::getSettingBool(Anim::Celeste, "second-player")) {
-                player = m_playLayer->m_player2;
-                
-                if (player && m_playLayer->m_gameState.m_isDualMode) {
-                    m_explosion2 = CelesteExplosion::create(
-                        player,
-                        ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
-                        {172, 62, 56},
-                        m_speed
-                    );
-                    m_explosion2->setPosition(player->getPosition());
-                    player->getParent()->addChild(m_explosion2, 10293823);
-                }
-            }
+            m_explosion2->setPosition(player->getPosition());
+            player->getParent()->addChild(m_explosion2, 10293823);
         }
-        
-        Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
-        scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.41f / m_speed);
-        
-        if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
-            scheduleOnce(schedule_selector(Celeste::transitionOut), Utils::getSelectedAnimation(Anim::Celeste).duration / m_speed);
     }
     
     void transitionOut(float) {
-        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, m_speed, ExtraParams{ .transition = m_transition }})->start();
+        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, m_speed, { .transition = m_transition }})->start();
     }
     
     void playDeathSound(float) {
         Utils::playSoundManual(Anim::Celeste, "death-celeste.wav", m_speed, 1.f);
+    }
+    
+    void playTransition(float) {
+        CelesteTransition* transition = CelesteTransition::create({this, nullptr, nullptr, m_speed, { .transition = m_transition }});
+        transition->start();
+        addChild(transition);
     }
     
     void end() override {

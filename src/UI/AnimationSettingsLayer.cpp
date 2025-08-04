@@ -83,6 +83,9 @@ void AnimationSettingsLayer::onSelectorArrow(CCObject* obj) {
     if (m_colorButton1) {
         m_colorButton1->setVisible(static_cast<int>(Utils::getSettingFloat(m_animation.id, "colors")) == 1);
         m_colorButton2->setVisible(static_cast<int>(Utils::getSettingFloat(m_animation.id, "colors")) == 1);
+        
+        CCNode* node = m_colorButton2->isVisible() ? m_colorButton2 : m_amogusArrow;
+        m_amogusInfo->setPositionX(node->getPositionX() + node->getContentWidth() * node->getScaleX() * (1 - node->getAnchorPoint().x) + 10);
     }
 }
 
@@ -94,6 +97,14 @@ void AnimationSettingsLayer::onColorPicker(CCObject* btn) {
     );
     popup->setDelegate(this);
     popup->show();
+}
+
+void AnimationSettingsLayer::onInfo(CCObject* sender) {
+    FLAlertLayer::create(
+        m_descriptions.at(sender).first.c_str(),
+        m_descriptions.at(sender).second,
+        "Ok"
+    )->show();
 }
 
 void AnimationSettingsLayer::textChanged(CCTextInputNode* node) {
@@ -232,10 +243,25 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::AmongUsColor: fartestNode = addAmongUsSetting(y, setting, menu, scroll, lbl); break;
             default: break;
         }
+                
+        if (!setting.description.empty()) {
+            if (!fartestNode) fartestNode = lbl;
         
-        if (!fartestNode) fartestNode = lbl;
+            CCSprite* spr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+            spr->setScale(0.375f);
+            
+            CCMenuItemSpriteExtra* btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(AnimationSettingsLayer::onInfo));
+            btn->setPosition({fartestNode->getPositionX() + fartestNode->getContentWidth() * fartestNode->getScaleX() * (1 - fartestNode->getAnchorPoint().x) + 10, y});
+            
+            menu->addChild(btn);
+            
+            m_descriptions[btn] = std::make_pair(setting.name, setting.description);
+            
+            if (setting.type == SettingType::AmongUsColor) m_amogusInfo = btn;
+        }
         
-        //
+        if (m_amogusInfo && m_colorButton2 && !m_colorButton2->isVisible())
+            m_amogusInfo->setPositionX(m_amogusArrow->getPositionX() + m_amogusArrow->getContentWidth() * m_amogusArrow->getScaleX() * (1 - m_amogusArrow->getAnchorPoint().x) + 10);
         
         y -= separation;
     }
@@ -400,6 +426,8 @@ CCNode* AnimationSettingsLayer::addAmongUsSetting(float y, const AnimationSettin
     
     m_colorButton1->setVisible(static_cast<int>(Utils::getSettingFloat(m_animation.id, "colors")) == 1);
     m_colorButton2->setVisible(static_cast<int>(Utils::getSettingFloat(m_animation.id, "colors")) == 1);
+    
+    m_amogusArrow = node;
     
     return m_colorButton2;
 }

@@ -19,11 +19,15 @@ private:
     
     CCMenuItemSpriteExtra* m_colorButton1 = nullptr;
     CCMenuItemSpriteExtra* m_colorButton2 = nullptr;
+    CCMenuItemSpriteExtra* m_amogusInfo = nullptr;
+    
+    CCNode* m_amogusArrow = nullptr;
     
     std::unordered_map<SliderThumb*, std::string> m_sliderIDs;
     std::unordered_map<CCMenuItemToggler*, std::string> m_toggleIDs;
     std::unordered_map<CCTextInputNode*, std::string> m_inputIDs;
     std::unordered_map<CCObject*, SelectorStuff> m_selectors;
+    std::unordered_map<CCObject*, std::pair<std::string, std::string>> m_descriptions;
 
     DeathAnimation m_animation;
     
@@ -44,6 +48,7 @@ private:
     void onRestore(CCObject*);
     void onSelectorArrow(CCObject*);
     void onColorPicker(CCObject*);
+    void onInfo(CCObject*);
     
     void textChanged(CCTextInputNode*) override;
     virtual void updateColor(const ccColor4B&) override;
