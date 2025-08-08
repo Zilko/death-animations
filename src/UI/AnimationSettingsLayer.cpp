@@ -1,4 +1,4 @@
-#include "../Utils/Utils.hpp"
+#include "../Other/Utils.hpp"
 
 #include "AnimationSettingsLayer.hpp"
 

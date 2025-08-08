@@ -291,7 +291,7 @@ private:
                 ));
             }
     }
-    
+
     void chapter3Transition() {
         float time1 = 15.f / 60.f / m_speed;
         float time2 = 15.f / 60.f / m_speed;
@@ -456,7 +456,6 @@ private:
 
     std::vector<CCSprite*> m_animationSprites;
     std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
-    std::unordered_map<CCNodeRGBA*, GLubyte> m_originalOpacities;
     
     ccColor3B m_color = {172, 62, 56};
     
@@ -469,7 +468,8 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        setZOrder(10);
+        if (m_isPreview)
+            setZOrder(10);
         
         if (m_extras.transition != 0) {
             CelesteTransition* transition = CelesteTransition::create({this, nullptr, nullptr, m_speed, { .transition = m_extras.transition, .reverse = true}});
@@ -482,12 +482,14 @@ public:
         else {
             addAnimation(m_playLayer->m_player1);
             
-            if (m_playLayer->m_gameState.m_isDualMode)
+            if (Utils::getSettingBool(Anim::Celeste, "second-player") && m_playLayer->m_gameState.m_isDualMode)
                 addAnimation(m_playLayer->m_player2);
         }
+
+        bool hasTransition = m_extras.transition != 0;
         
-        scheduleOnce(schedule_selector(CelesteRevive::playSound), 0.12f / m_speed);
-        scheduleOnce(schedule_selector(CelesteRevive::startAnimations), 0.25f / m_speed);
+        scheduleOnce(schedule_selector(CelesteRevive::playSound), (hasTransition ? 0.12f : 0.05f) / m_speed);
+        scheduleOnce(schedule_selector(CelesteRevive::startAnimations), (hasTransition ? 0.25f : 0.18f) / m_speed);
         scheduleOnce(schedule_selector(CelesteRevive::transitionEnded), 1.f / m_speed);
         schedule(schedule_selector(CelesteRevive::updatePositions), 0, kCCRepeatForever, 0);
         schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
@@ -525,7 +527,6 @@ public:
         sprite->setVisible(false);
         
         m_animationSprites.push_back(sprite);
-        m_originalOpacities[player] = player->getOpacity();
         m_players[sprite] = player;
         
         player->setOpacity(0);
@@ -549,7 +550,7 @@ public:
     void implosionEnded() {
         for (CCSprite* sprite : m_animationSprites) {
             sprite->removeFromParentAndCleanup(true);
-            m_players.at(sprite)->setOpacity(m_originalOpacities.at(m_players.at(sprite)));
+            m_players.at(sprite)->setOpacity(255);
         }
         
         m_animationSprites.clear();
@@ -634,20 +635,18 @@ public:
         m_explosion1->setPosition(player->getPosition());
         player->getParent()->addChild(m_explosion1, 10293823);
         
-        if (!Utils::getSettingBool(Anim::Celeste, "second-player")) return;
+        if (!Utils::getSettingBool(Anim::Celeste, "second-player") || !m_playLayer->m_gameState.m_isDualMode) return;
         
         player = m_playLayer->m_player2;
         
-        if (player && m_playLayer->m_gameState.m_isDualMode) {
-            m_explosion2 = CelesteExplosion::create(
-                player,
-                ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
-                {172, 62, 56},
-                m_speed
-            );
-            m_explosion2->setPosition(player->getPosition());
-            player->getParent()->addChild(m_explosion2, 10293823);
-        }
+        m_explosion2 = CelesteExplosion::create(
+            player,
+            ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
+            {172, 62, 56},
+            m_speed
+        );
+        m_explosion2->setPosition(player->getPosition());
+        player->getParent()->addChild(m_explosion2, 10293823);
     }
     
     void transitionOut(float) {

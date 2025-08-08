@@ -3,7 +3,7 @@
 class Wii : public BaseAnimation {
 
 public:
-    
+
     DEFINE_CREATE(Wii)
 
     void start() override {
@@ -13,5 +13,6 @@ public:
     
     void end() override {
         BaseAnimation::end();
+
     }
 };

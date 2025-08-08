@@ -1,4 +1,4 @@
-#include "../Utils/Utils.hpp"
+#include "../Other/Utils.hpp"
 
 #include "PreviewLayer.hpp"
 
@@ -70,7 +70,7 @@ void PreviewLayer::playerDied(float) {
 }
 
 void PreviewLayer::playDeathEffect() {
-    if (Utils::getSelectedAnimation().stopDeathEffect) return;
+    if (Utils::getSelectedAnimation().isNoDeathEffect) return;
     
     FMODAudioEngine::get()->playEffect("explode_11.ogg", 1.f, 0.f, 0.5f);
     

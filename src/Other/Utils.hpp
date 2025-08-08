@@ -27,6 +27,6 @@ public:
     static void saveSetting(int, const std::string&, bool);
     static void setDefaults(int);
     
-    static CCSprite* takeScreenshot();
+    static CCTexture2D* takeScreenshot(CCRenderTexture* = nullptr);
     
 };

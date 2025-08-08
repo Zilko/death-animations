@@ -7,6 +7,7 @@
 #include "../Animations/ToBeContinued.hpp"
 #include "../Animations/Wii.hpp"
 #include "../Animations/HollowKnight.hpp"
+#include "../Animations/GTAV.hpp"
 
 #include <random>
 
@@ -37,7 +38,7 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, float vo
     if (Utils::getSettingBool(anim, "play-sound-effects"))
         FMODAudioEngine::get()->playEffect((Mod::get()->getResourcesDir() / sound).string().c_str(), speed, 1.f, volume);
 }
- 
+
 void Utils::playSoundManual(Anim anim, const std::string& sound, float speed, float volume) {
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
         return;
@@ -95,6 +96,7 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(ToBeContinued)
     ANIMATION_CHECK(Wii)
     ANIMATION_CHECK(HollowKnight)
+    ANIMATION_CHECK(GTAV)
     return nullptr;
 }
 
@@ -110,7 +112,7 @@ const DeathAnimation& Utils::getSelectedAnimation(Anim anim) {
     for (const DeathAnimation& animation : animations)
         if (anim == animation.id)
             return animation;
-           
+        
     return animations.front();
 }
 
@@ -180,28 +182,39 @@ void Utils::setDefaults(int id) {
     Mod::get()->setSavedValue("settings", object);
 }
 
-CCSprite* Utils::takeScreenshot() {
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
+CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres bug with non 16:9 aspect ratios lets hope no one notices
+    CCEGLView* view = CCEGLView::get();
+    CCDirector* director = CCDirector::get();
+
+    CCSize winSize = CCDirector::get()->getWinSize();
+    CCSize ogRes = view->getDesignResolutionSize();
+    CCSize ogScale = { view->m_fScaleX, view->m_fScaleY };
+    CCSize newSize = { roundf(320.f * (winSize.width / winSize.height)), 320.f };
+    CCSize newScale = { winSize.width / newSize.width, winSize.height / newSize.height };
+
+    director->m_obWinSizeInPoints = newSize;
+    view->setDesignResolutionSize(newSize.width, newSize.height, ResolutionPolicy::kResolutionExactFit);
+
+    float scaleMult = director->getContentScaleFactor();
     
-    int width = viewport[2];
-    int height = viewport[3];
-    GLubyte* buffer = new GLubyte[width * height * 3];
+    #ifdef __APPLE__
+    scaleMult /= 2.f;
+    #endif
+
+    view->m_fScaleX = scaleMult * newScale.width;
+    view->m_fScaleY = scaleMult * newScale.height;
+
+    if (!renderTexture)
+        renderTexture = CCRenderTexture::create(winSize.width, winSize.height);
+
+    renderTexture->beginWithClear(0, 0, 0, 1);
+    CCScene::get()->visit();
+    renderTexture->end();
+
+    director->m_obWinSizeInPoints = ogRes;
+    view->setDesignResolutionSize(ogRes.width, ogRes.height, ResolutionPolicy::kResolutionExactFit);
+    view->m_fScaleX = ogScale.width;
+    view->m_fScaleY = ogScale.height;
     
-    glReadBuffer(GL_BACK);
-    glFinish();
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-    
-    for (int y = 0; y < height / 2; ++y)
-        for (int x = 0; x < width * 3; ++x)
-            std::swap(buffer[y * width * 3 + x], buffer[(height - 1 - y) * width * 3 + x]);
-    
-    CCTexture2D* texture = new CCTexture2D();
-    texture->initWithData(buffer, kCCTexture2DPixelFormat_RGB888, width, height, ccp(width, height));
-    texture->autorelease();
-    
-    delete[] buffer;
-    
-    return CCSprite::createWithTexture(texture);
+    return renderTexture->getSprite()->getTexture();
 }

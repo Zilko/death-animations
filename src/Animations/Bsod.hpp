@@ -80,7 +80,8 @@ public:
             return;
         }
                     
-        m_freezeSprite = Utils::takeScreenshot();
+        CCSprite* m_freezeSprite = CCSprite::createWithTexture(Utils::takeScreenshot());
+        m_freezeSprite->setFlipY(true);
         m_freezeSprite->setScale(m_size.width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});
         

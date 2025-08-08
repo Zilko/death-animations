@@ -63,7 +63,8 @@ enum Anim {
     ToBeContinued = 6,
     Celeste = 7,
     Wii = 8,
-    HollowKnight = 9
+    HollowKnight = 9,
+    GTAV = 10
 };
 
 struct ExtraParams {
@@ -84,7 +85,7 @@ struct DeathAnimation {
     std::string thumbnail = "";
     std::string name = "";
     float duration = 1.f;
-    bool stopDeathEffect = false;
+    bool isNoDeathEffect = false;
 };
 
 struct AnimationSetting {
@@ -123,16 +124,17 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } }
 };
 
-static const std::array<DeathAnimation, 9> animations = {
+static const std::array<DeathAnimation, 10> animations = {
     DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - YOU DIED", .duration = 5.f},
     DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
     DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
-    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 1.35f, .stopDeathEffect = true },
-    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .stopDeathEffect = true },
+    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
-    DeathAnimation{ .id = Anim::HollowKnight, .thumbnail = "among-us-thumbnail.png", .name = "Hollow Knight", .duration = 621.f }
+    DeathAnimation{ .id = Anim::HollowKnight, .thumbnail = "among-us-thumbnail.png", .name = "Hollow Knight", .duration = 621.f },
+    DeathAnimation{ .id = Anim::GTAV, .thumbnail = "you-died-thumbnail.png", .name = "GTA V", .duration = 10.f }
 };
 
 static const std::array<AnimationSetting, 8> defaultSettings = {

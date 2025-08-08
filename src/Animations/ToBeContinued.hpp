@@ -33,7 +33,8 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        CCSprite* freezeSprite = Utils::takeScreenshot();
+        CCSprite* freezeSprite = CCSprite::createWithTexture(Utils::takeScreenshot());
+        freezeSprite->setFlipY(true);
         freezeSprite->setScale(m_size.width / freezeSprite->getContentWidth());
         freezeSprite->setAnchorPoint({0, 0});
         
