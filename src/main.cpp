@@ -18,7 +18,12 @@
 #include <Geode/modify/ExplodeItemNode.hpp>
 
 $on_mod(Loaded) {
-    
+
+    Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
+    Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
+    Utils::setHookEnabled("GJBaseGameLayer::update", false);
+    Utils::setHookEnabled("ExplodeItemNode::update", false);
+
     if (!Mod::get()->hasSavedValue("selected-animation"))
         Mod::get()->setSavedValue("selected-animation", 1);
         
@@ -52,13 +57,12 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         bool og = m_gameState.m_unkBool26;
 
-        if (Utils::getSelectedAnimation(anim).isNoDeathEffect)
+        if (Utils::getSelectedAnimation(anim).isNoDeathEffect || Utils::getSelectedAnimation(anim).isNoDeathSound)
             m_gameState.m_unkBool26 = true;
 
         PlayLayer::destroyPlayer(p0, p1);
 
-        if (Utils::getSelectedAnimation(anim).isNoDeathEffect)
-            m_gameState.m_unkBool26 = og;
+        m_gameState.m_unkBool26 = og;
         
         if (p1 == m_anticheatSpike) return;
             
@@ -127,43 +131,35 @@ class $modify(ProPlayLayer, PlayLayer) {
     
 };
 
-// class $modify(ExplodeItemNode) {
+class $modify(ExplodeItemNode) {
 
-//     void update(float dt) {
-//         if (PlayLayer::get() && PlayLayer::get()->m_player1->m_isDead)
-//         return ExplodeItemNode::update(dt * 0.025f);
-//         ExplodeItemNode::update(dt);
-//     }
+    void update(float dt) { // disabled by defolt
+        ExplodeItemNode::update(dt * 0.025f);
+    }
 
-// };
+};
 
-// class $modify(CCParticleSystem) {
+class $modify(CCParticleSystem) {
 
-//     void update(float dt) {
-//         if (PlayLayer::get() && PlayLayer::get()->m_player1->m_isDead)
-//         return CCParticleSystem::update(dt * 0.025f);
-//         CCParticleSystem::update(dt);
-//     }
+    void update(float dt) { // disabled by defolt
+        CCParticleSystem::update(dt * 0.025f);
+    }
 
-// };
+};
 
-// class $modify(CCCircleWave) {
+class $modify(CCCircleWave) {
 
-//     void updateTweenAction(float dt, const char* p1) {
-//         if (PlayLayer::get() && PlayLayer::get()->m_player1->m_isDead)
-//         return CCCircleWave::updateTweenAction(dt * 0.025f, p1);
-//         CCCircleWave::updateTweenAction(dt, p1);
-//     }
+    void updateTweenAction(float dt, const char* p1) { // disabled by defolt
+        CCCircleWave::updateTweenAction(dt * 0.025f, p1);
+    }
 
-// };
+};
 
 class $modify(GJBaseGameLayer) {
 
-    // void update(float dt) {
-    //     if (m_player1->m_isDead)
-    //     return GJBaseGameLayer::update(dt * 0.025f);
-    //     GJBaseGameLayer::update(dt);
-    // }
+    void update(float dt) { // disabled by defolt
+        GJBaseGameLayer::update(dt * 0.025f);
+    }
 
     void shakeCamera(float duration, float strength, float interval) {
         if (!Utils::getSelectedAnimation().isNoDeathEffect)

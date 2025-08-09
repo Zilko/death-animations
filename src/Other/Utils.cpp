@@ -182,6 +182,15 @@ void Utils::setDefaults(int id) {
     Mod::get()->setSavedValue("settings", object);
 }
 
+void Utils::setHookEnabled(const std::string& name, bool enabled) {
+    for (Hook* hook : Mod::get()->getHooks()) {
+        if (hook->getDisplayName() == name) {
+            (void)(enabled ? hook->enable() : hook->disable());
+            break;
+        }
+    }
+}
+
 CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres bug with non 16:9 aspect ratios lets hope no one notices
     CCEGLView* view = CCEGLView::get();
     CCDirector* director = CCDirector::get();

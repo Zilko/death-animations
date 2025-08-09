@@ -86,6 +86,7 @@ struct DeathAnimation {
     std::string name = "";
     float duration = 1.f;
     bool isNoDeathEffect = false;
+    bool isNoDeathSound = false;
 };
 
 struct AnimationSetting {
@@ -134,7 +135,7 @@ static const std::array<DeathAnimation, 10> animations = {
     DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
     DeathAnimation{ .id = Anim::HollowKnight, .thumbnail = "among-us-thumbnail.png", .name = "Hollow Knight", .duration = 621.f },
-    DeathAnimation{ .id = Anim::GTAV, .thumbnail = "you-died-thumbnail.png", .name = "GTA V", .duration = 10.f }
+    DeathAnimation{ .id = Anim::GTAV, .thumbnail = "you-died-thumbnail.png", .name = "GTA V", .duration = 10.f, .isNoDeathSound = true }
 };
 
 static const std::array<AnimationSetting, 8> defaultSettings = {
