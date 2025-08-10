@@ -6,8 +6,14 @@
 #include "../Animations/Celeste.hpp"
 #include "../Animations/ToBeContinued.hpp"
 #include "../Animations/Wii.hpp"
-#include "../Animations/HollowKnight.hpp"
-#include "../Animations/GTAV.hpp"
+#include "../Animations/Jumpscare.hpp"
+#include "../Animations/Wasted.hpp"
+#include "../Animations/Maro.hpp"
+#include "../Animations/Ghost.hpp"
+#include "../Animations/Undertale.hpp"
+#include "../Animations/Minecraft.hpp"
+#include "../Animations/Terraria.hpp"
+#include "../Animations/CBFDetected.hpp"
 
 #include <random>
 
@@ -95,8 +101,14 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(Celeste)
     ANIMATION_CHECK(ToBeContinued)
     ANIMATION_CHECK(Wii)
-    ANIMATION_CHECK(HollowKnight)
-    ANIMATION_CHECK(GTAV)
+    ANIMATION_CHECK(Wasted)
+    ANIMATION_CHECK(Jumpscare)
+    ANIMATION_CHECK(Maro)
+    ANIMATION_CHECK(Ghost)
+    ANIMATION_CHECK(Undertale)
+    ANIMATION_CHECK(Minecraft)
+    ANIMATION_CHECK(Terraria)
+    ANIMATION_CHECK(CBFDetected)
     return nullptr;
 }
 

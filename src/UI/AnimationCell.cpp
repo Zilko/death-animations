@@ -51,7 +51,6 @@ bool AnimationCell::init() {
     container->addChild(m_selectSprite, 1);
     
     CCSprite* thumbnail = CCSprite::create((""_spr + m_animation.thumbnail).c_str());
-    thumbnail->setScale(0.22f);
     container->addChild(thumbnail);
     
     setAnchorPoint({0.5f, 0.5f});

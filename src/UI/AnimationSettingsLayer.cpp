@@ -107,6 +107,17 @@ void AnimationSettingsLayer::onInfo(CCObject* sender) {
     )->show();
 }
 
+void AnimationSettingsLayer::onFolder(CCObject* sender) {
+    // std::filesystem::path folder = Mod::get()->getResourcesDir()
+    //     / (static_cast<CCNode*>(sender)->getTag()
+    //     ? "jumpscare-images" : "jumpscare-sounds");
+
+    // if (!std::filesystem::exists(path))
+    //     utils::file::createDirectoryAll(folder);
+
+
+}
+
 void AnimationSettingsLayer::textChanged(CCTextInputNode* node) {
     if (m_inputIDs.contains(node)) {
         std::string id = m_inputIDs.at(node);
@@ -241,6 +252,7 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::Percent: fartestNode = addPercentSetting(y, setting, scroll); break;
             case SettingType::Select: fartestNode = addSelectSetting(y, setting, menu, scroll, lbl); break;
             case SettingType::AmongUsColor: fartestNode = addAmongUsSetting(y, setting, menu, scroll, lbl); break;
+            case SettingType::JumpscareFolder: fartestNode = addJumpscareSetting(y, setting, menu); break;
             default: break;
         }
                 
@@ -430,4 +442,17 @@ CCNode* AnimationSettingsLayer::addAmongUsSetting(float y, const AnimationSettin
     m_amogusArrow = node;
     
     return m_colorButton2;
+}
+
+CCNode* AnimationSettingsLayer::addJumpscareSetting(float y, const AnimationSetting& setting, CCMenu* menu) {
+    ButtonSprite* spr = ButtonSprite::create("Open Folder");
+    spr->setScale(0.5f);
+
+    CCMenuItemSpriteExtra* btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(AnimationSettingsLayer::onFolder));
+    btn->setPosition({142, y});
+    btn->setTag(setting.id == "images-folder");
+
+    menu->addChild(btn);
+
+    return btn;
 }

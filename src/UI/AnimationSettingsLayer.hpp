@@ -42,6 +42,7 @@ private:
     CCNode* addPercentSetting(float, const AnimationSetting&, ScrollLayer*);
     CCNode* addSelectSetting(float, const AnimationSetting&, CCMenu*, ScrollLayer*, CCLabelBMFont*);
     CCNode* addAmongUsSetting(float, const AnimationSetting&, CCMenu*, ScrollLayer*, CCLabelBMFont*);
+    CCNode* addJumpscareSetting(float, const AnimationSetting&, CCMenu*);
     
     void onSlider(CCObject*);
     void onToggle(CCObject*);
@@ -49,6 +50,7 @@ private:
     void onSelectorArrow(CCObject*);
     void onColorPicker(CCObject*);
     void onInfo(CCObject*);
+    void onFolder(CCObject*);
     
     void textChanged(CCTextInputNode*) override;
     virtual void updateColor(const ccColor4B&) override;

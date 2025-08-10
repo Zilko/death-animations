@@ -1,6 +1,6 @@
 #include "BaseAnimation.hpp"
 
-class GTAV : public BaseAnimation {
+class Wasted : public BaseAnimation {
 
 private:
 
@@ -63,7 +63,7 @@ private:
 
     float m_time = 0.f;
 
-    ~GTAV() {
+    ~Wasted() {
         if (m_renderTexture)
             m_renderTexture->release();
         
@@ -78,12 +78,12 @@ private:
 
 public:
 
-    DEFINE_CREATE(GTAV)
+    DEFINE_CREATE(Wasted)
 
     void start() override {
         BaseAnimation::start();
 
-        Utils::playSound(Anim::GTAV, "death-sound-gtav.wav", m_speed, 1.f);
+        Utils::playSound(Anim::Wasted, "wasted.wav", m_speed, 1.f);
 
         Utils::setHookEnabled("cocos2d::CCParticleSystem::update", true);
         Utils::setHookEnabled("CCCircleWave::updateTweenAction", true);
@@ -113,7 +113,7 @@ public:
 
         addChild(m_frameSprite);
 
-        schedule(schedule_selector(GTAV::update), 1.f / 240.f, kCCRepeatForever, 1.f / 240.f); // papi
+        schedule(schedule_selector(Wasted::update), 1.f / 240.f, kCCRepeatForever, 1.f / 240.f); // papi
 
         CCPoint pos = m_frameSprite->getPosition();
 
