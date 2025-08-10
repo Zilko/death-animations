@@ -109,6 +109,7 @@ public:
         m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
         m_frameSprite->setFlipY(true);
         m_frameSprite->setPosition(m_size / 2.f);
+        m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         m_frameSprite->setShaderProgram(m_program);
 
         addChild(m_frameSprite);

@@ -37,6 +37,7 @@ public:
         freezeSprite->setFlipY(true);
         freezeSprite->setScale(m_size.width / freezeSprite->getContentWidth());
         freezeSprite->setAnchorPoint({0, 0});
+        freezeSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         
         CCGLProgram* program = new CCGLProgram();
         program->autorelease();

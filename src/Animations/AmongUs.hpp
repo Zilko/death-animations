@@ -94,7 +94,7 @@ public:
         for (int i = 1; i <= 115; ++i) {
             CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("among-us-death-{}-{}.png"_spr, m_animation, i)).c_str());
     
-            if (frame)
+            if (frame && frame->getTag() != 105871529)
                 lastValidFrame = frame;
             
             if (lastValidFrame)

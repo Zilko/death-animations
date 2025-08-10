@@ -28,6 +28,8 @@ private:
     std::unordered_map<CCTextInputNode*, std::string> m_inputIDs;
     std::unordered_map<CCObject*, SelectorStuff> m_selectors;
     std::unordered_map<CCObject*, std::pair<std::string, std::string>> m_descriptions;
+    
+    std::unordered_set<CCTextInputNode*> m_percentInputs;
 
     DeathAnimation m_animation;
     

@@ -654,7 +654,7 @@ public:
     }
     
     void playDeathSound(float) {
-        Utils::playSoundManual(Anim::Celeste, "death-celeste.wav", m_speed, 1.f);
+        Utils::playSoundManual(Anim::Celeste, "death-celeste.wav", m_speed, FMODAudioEngine::get()->m_sfxVolume);
     }
     
     void playTransition(float) {

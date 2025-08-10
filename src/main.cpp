@@ -26,7 +26,26 @@ $on_mod(Loaded) {
 
     if (!Mod::get()->hasSavedValue("selected-animation"))
         Mod::get()->setSavedValue("selected-animation", 1);
+    
+    if (!Mod::get()->setSavedValue("created-jumpscare-folders", true)) {
+        std::filesystem::path soundsFolder = Mod::get()->getSaveDir() / "jumpscare-sounds";
+        std::filesystem::path imagesFolder = Mod::get()->getSaveDir() / "jumpscare-images";
         
+        if (!utils::file::createDirectoryAll(soundsFolder).isErr())
+            std::filesystem::copy_file(
+                Mod::get()->getResourcesDir() / "jumpscare.mp3",
+                soundsFolder / "jumpscare.mp3",
+                std::filesystem::copy_options::overwrite_existing
+            );
+
+        if (!utils::file::createDirectoryAll(imagesFolder).isErr())
+            std::filesystem::copy_file(
+                Mod::get()->getResourcesDir() / "jumpscare.png",
+                imagesFolder / "jumpscare.png",
+                std::filesystem::copy_options::overwrite_existing
+            );
+    }
+                
 }
 
 class $modify(MenuLayer) {
@@ -46,11 +65,12 @@ class $modify(ProPlayLayer, PlayLayer) {
     };
     
     static void onModify(auto& self) {
-        (void)self.setHookPriorityPost("PlayLayer::destroyPlayer", Priority::Last);
+        (void)self.setHookPriorityPre("PlayLayer::destroyPlayer", Priority::Last);
     }
 
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
         Anim anim = Utils::getSelectedAnimationEnum();
+        log::debug("1 {}", m_level->m_personalBests);
 
         if (anim == Anim::None)
             return PlayLayer::destroyPlayer(p0, p1);
@@ -59,6 +79,8 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         if (Utils::getSelectedAnimation(anim).isNoDeathEffect || Utils::getSelectedAnimation(anim).isNoDeathSound)
             m_gameState.m_unkBool26 = true;
+
+        std::string oldBests = m_level->m_personalBests;
 
         PlayLayer::destroyPlayer(p0, p1);
 
@@ -69,10 +91,16 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (Utils::getRandomInt(1, 100) > static_cast<int>(Utils::getSettingFloat(anim, "probability")))
             return;
         
-        if (m_isPracticeMode && !Utils::getSettingBool(anim, "play-on-practice"))
+        if (m_isPracticeMode && !Utils::getSettingBool(anim, "play-in-practice"))
+            return;
+
+        if (m_isTestMode && !Utils::getSettingBool(anim, "play-in-testmode"))
             return;
 
         if (getCurrentPercentInt() < Utils::getSettingFloat(anim, "only-after"))
+            return;
+
+        if (Utils::getSettingBool(anim, "only-on-new-best") && oldBests == m_level->m_personalBests)
             return;
         
         while (anim == Anim::Random)

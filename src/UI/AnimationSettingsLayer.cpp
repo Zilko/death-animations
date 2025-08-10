@@ -125,7 +125,7 @@ void AnimationSettingsLayer::textChanged(CCTextInputNode* node) {
         
         int number = numFromString<int>(node->getString()).unwrapOr(0);
         
-        if (id == "only-after") {
+        if (m_percentInputs.contains(node)) {
             number = std::clamp(number, 0, 100);
             node->setDelegate(nullptr);
             node->setString(std::to_string(number).c_str());
@@ -351,6 +351,8 @@ CCNode* AnimationSettingsLayer::addPercentSetting(float y, const AnimationSettin
     scroll->m_contentLayer->addChild(lbl);
     
     m_inputIDs[input->getInputNode()] = setting.id;
+
+    m_percentInputs.insert(input->getInputNode());
     
     return lbl;
 }

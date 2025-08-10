@@ -84,6 +84,7 @@ public:
         m_freezeSprite->setFlipY(true);
         m_freezeSprite->setScale(m_size.width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});
+        m_freezeSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         
         addChild(m_freezeSprite);
                 

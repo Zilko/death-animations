@@ -125,6 +125,9 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
     } },
     { Anim::Celeste, {
         { "transition", 1.f }
+    } },
+    { Anim::Jumpscare, {
+        { "probability", 10.f }
     } }
 };
 
@@ -151,31 +154,34 @@ static const std::array<DeathAnimation, 16> animations = {
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true }
 };
 
-static const std::array<AnimationSetting, 8> defaultSettings = {
-    AnimationSetting{ .id = "speed", .name = "Speed", .description = "The speed at which the animation will play.", .type = SettingType::Speed },
-    AnimationSetting{ .id = "only-after", .name = "Only After", .description = "Only play the animation if you die after a certain percent.", .type = SettingType::Percent },
-    AnimationSetting{ .id = "probability", .name = "Probability", .description = "The chance the animation has to play.", .type = SettingType::Percent },
-    AnimationSetting{ .id = "prevent-early-restart", .name = "Prevent Early Restart", .description = "Stop you from restarting with R while the animation is playing.", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "stop-auto-restart", .name = "Stop Auto Restart", .description = "Don't restart automatically after you die.", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "play-sound-effects", .name = "Play Sound Effects", .description = "Play any sound effects the animation might have.", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "play-on-practice", .name = "Play On Practice", .description = "Whether to play the animation on practice or not.", .type = SettingType::Toggle },
-    AnimationSetting{ .id = "only-on-new-best", .name = "Only On New Best ", .description = "Only play the animation on a new best.", .type = SettingType::Toggle }
+static const std::array<AnimationSetting, 9> defaultSettings = {
+    AnimationSetting{ .id = "speed", .name = "Speed", .description = "The speed at which the animation plays.", .type = SettingType::Speed },
+    AnimationSetting{ .id = "only-after", .name = "Only After", .description = "Play the animation only if you die after a certain percentage.", .type = SettingType::Percent },
+    AnimationSetting{ .id = "probability", .name = "Probability", .description = "The probability that the animation will play.", .type = SettingType::Percent },
+    AnimationSetting{ .id = "prevent-early-restart", .name = "Prevent Early Restart", .description = "Prevent restarting the level while the animation is playing.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "stop-auto-restart", .name = "Stop Auto Restart", .description = "Prevent automatic restart after you die.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-sound-effects", .name = "Play Sound Effects", .description = "Play any sound effects associated with the animation.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-in-practice", .name = "Play in Practice", .description = "Play the animation in practice mode.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "play-in-testmode", .name = "Play in Testmode", .description = "Play the animation in test mode.", .type = SettingType::Toggle },
+    AnimationSetting{ .id = "only-on-new-best", .name = "Only on New Best", .description = "Play the animation only when achieving a new best.", .type = SettingType::Toggle }
 };
 
 static const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
     { Anim::AmongUs, {
-        { .id = "animation", .name = "Kill Animation", .description = "The among us kill animation that will play on death.", .type = SettingType::Select, .elements = { "Random", "Gun", "Knife", "Neck", "Alien" } },
-        { .id = "colors", .name = "Colors", .description = "The colors that the impostor and victim will be in the animation.", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
+        { .id = "animation", .name = "Kill Animation", .description = "The Among Us kill animation that plays on death.", .type = SettingType::Select, .elements = { "Random", "Gun", "Knife", "Neck", "Alien" } },
+        { .id = "colors", .name = "Colors", .description = "The colors of the impostor and victim in the animation.", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
     } },
     { Anim::Celeste, {
-        { .id = "transition", .name = "Transition", .description = "The celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4" } },
-        { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the celeste respawn animation.", .type = SettingType::Toggle },
-        { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player too.", .type = SettingType::Toggle }
+        { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4" } },
+        { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the Celeste respawn animation.", .type = SettingType::Toggle },
+        { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player as well.", .type = SettingType::Toggle }
     } },
     { Anim::Jumpscare, {
-        { .id = "static", .name = "Static", .description = "Make the image appear instantly.", .type = SettingType::Toggle },
-        { .id = "ignore-volume", .name = "Ignore Volume", .description = "Ignores the game's SFX volume.", .type = SettingType::Toggle },
-        { .id = "images-folder", .name = "Images Folder", .description = "The folder where the jumpscare images will be taken from, a random one will be chosen.", .type = SettingType::JumpscareFolder },
-        { .id = "sounds-folder", .name = "Sounds Folder", .description = "The folder where the jumpscare sounds will be taken from, a random one will be chosen.", .type = SettingType::JumpscareFolder }
+        { .id = "static", .name = "Static", .description = "Stop the image from zooming in.", .type = SettingType::Toggle },
+        { .id = "disable-flashing", .name = "Disable Flashing", .description = "Stop the image from flashing repeatedly.", .type = SettingType::Toggle },
+        { .id = "ignore-volume", .name = "Ignore Volume", .description = "Ignore the game's SFX volume.", .type = SettingType::Toggle },
+        { .id = "fill-screen", .name = "Fill Screen", .description = "Make the image fill the screen (may crop the image).", .type = SettingType::Toggle },
+        { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the jumpscare images; one will be chosen at random.", .type = SettingType::JumpscareFolder },
+        { .id = "sounds-folder", .name = "Sounds Folder", .description = "Folder containing the jumpscare sounds; one will be chosen at random.", .type = SettingType::JumpscareFolder }
     } }
 };
