@@ -108,14 +108,15 @@ void AnimationSettingsLayer::onInfo(CCObject* sender) {
 }
 
 void AnimationSettingsLayer::onFolder(CCObject* sender) {
-    // std::filesystem::path folder = Mod::get()->getResourcesDir()
-    //     / (static_cast<CCNode*>(sender)->getTag()
-    //     ? "jumpscare-images" : "jumpscare-sounds");
+    std::filesystem::path folder = Mod::get()->getSaveDir()
+        / (static_cast<CCNode*>(sender)->getTag()
+        ? "jumpscare-images" : "jumpscare-sounds");
 
-    // if (!std::filesystem::exists(path))
-    //     utils::file::createDirectoryAll(folder);
+    if (!std::filesystem::exists(folder))
+        if (utils::file::createDirectoryAll(folder).isErr())
+            return;
 
-
+    file::openFolder(folder);
 }
 
 void AnimationSettingsLayer::textChanged(CCTextInputNode* node) {

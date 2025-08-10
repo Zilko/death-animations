@@ -1,6 +1,30 @@
 #include "AnimationCell.hpp"
 #include "AnimationsLayer.hpp"
 
+ProMenu::ProMenu(AnimationsLayer* layer) {
+    m_layer = layer;
+}
+
+ProMenu* ProMenu::create(AnimationsLayer* layer) {
+    ProMenu* ret = new ProMenu(layer);
+
+    if (ret->init()) {
+        ret->autorelease();
+        return ret;
+    }
+
+    delete ret;
+    return nullptr;
+}
+
+bool ProMenu::ccTouchBegan(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) {
+    cocos2d::CCPoint pos = m_layer->getList()->convertToNodeSpace(touch->getLocation());
+
+    if (pos.x < 0 || pos.y < 0 || pos.x > 289 || pos.y > 153) return false;
+
+    return CCMenu::ccTouchBegan(touch, event);
+}
+
 AnimationCell::AnimationCell(const DeathAnimation& animation, AnimationsLayer* parentLayer) {
     m_animation = animation;
     m_parentLayer = parentLayer;
@@ -34,7 +58,7 @@ const DeathAnimation& AnimationCell::getAnimation() {
 bool AnimationCell::init() {
     CCNode::init();
     
-    CCMenu* menu = CCMenu::create();
+    ProMenu* menu = ProMenu::create(m_parentLayer);
     menu->setPosition({0, 0});
     addChild(menu);
     

@@ -129,8 +129,7 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
 };
 
 static const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
-    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } },
-    { Anim::Jumpscare, { { "flashing", true } } }
+    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } }
 };
 
 static const std::array<DeathAnimation, 16> animations = {
@@ -139,17 +138,17 @@ static const std::array<DeathAnimation, 16> animations = {
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f},
     DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
     DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
-    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "among-us-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "among-us-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::Wii, .thumbnail = "among-us-thumbnail.png", .name = "Wii", .duration = 621.f },
+    DeathAnimation{ .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "to-be-continued-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::Wii, .thumbnail = "none-thumbnail.png", .name = "Wii", .duration = 621.f },
     DeathAnimation{ .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Wasted, .thumbnail = "you-died-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Maro, .thumbnail = "among-us-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Ghost, .thumbnail = "you-died-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "among-us-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "among-us-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Terraria, .thumbnail = "among-us-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "among-us-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true }
+    DeathAnimation{ .id = Anim::Wasted, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Maro, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Ghost, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true }
 };
 
 static const std::array<AnimationSetting, 8> defaultSettings = {
@@ -174,9 +173,9 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player too.", .type = SettingType::Toggle }
     } },
     { Anim::Jumpscare, {
-        { .id = "flashing", .name = "Flashing", .description = "Make the image flash repeatedly.", .type = SettingType::Toggle },
+        { .id = "static", .name = "Static", .description = "Make the image appear instantly.", .type = SettingType::Toggle },
         { .id = "ignore-volume", .name = "Ignore Volume", .description = "Ignores the game's SFX volume.", .type = SettingType::Toggle },
-        { .id = "images-folder", .name = "Images Folder", .description = "Ignores the game's SFX volume.", .type = SettingType::JumpscareFolder },
-        { .id = "sounds-folder", .name = "Sounds Folder", .description = "Ignores the game's SFX volume.", .type = SettingType::JumpscareFolder }
+        { .id = "images-folder", .name = "Images Folder", .description = "The folder where the jumpscare images will be taken from, a random one will be chosen.", .type = SettingType::JumpscareFolder },
+        { .id = "sounds-folder", .name = "Sounds Folder", .description = "The folder where the jumpscare sounds will be taken from, a random one will be chosen.", .type = SettingType::JumpscareFolder }
     } }
 };

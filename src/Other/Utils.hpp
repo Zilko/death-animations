@@ -8,10 +8,13 @@ class Utils {
 public:
 
     static int getRandomInt(int, int);
+    static std::filesystem::path getRandomFile(const std::filesystem::path&, const std::unordered_set<std::string>);
 
-    static void playSound(Anim, const std::string&, float, int, int);
     static void playSound(Anim, const std::string&, float, float);
+    static void playSound(Anim, float, float, const std::filesystem::path&);
+    static void playSound(Anim, const std::string&, float, int, int);
     static void playSoundManual(Anim, const std::string&, float, float);
+    static void playSoundManual(Anim, float, float, const std::filesystem::path&);
     
     static BaseAnimation* createAnimation(Anim, const AnimationParams&);
     
@@ -30,5 +33,4 @@ public:
     static void setHookEnabled(const std::string&, bool);
     
     static CCTexture2D* takeScreenshot(CCRenderTexture* = nullptr);
-    
 };

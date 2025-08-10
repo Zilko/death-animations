@@ -38,12 +38,38 @@ void AnimationsLayer::createdCell(AnimationCell* cell) {
     m_animationCells[cell->getAnimation().id] = cell;
 }
 
+GJCommentListLayer* AnimationsLayer::getList() {
+    return m_list;
+}
+
 void AnimationsLayer::onPreview(CCObject*) {
     PreviewLayer::create()->show();
 }
 
 void AnimationsLayer::onSettings(CCObject*) {
     AnimationSettingsLayer::create(m_selectedAnimation->getAnimation())->show();
+}
+
+void AnimationsLayer::updateTableView(float) {
+	if (!m_tableView || !m_contentLayer || !m_scrollbar) return;
+
+	float scale = m_mainLayer->getScale();
+	
+	if (scale >= 1.f) {
+		m_tableView->setContentSize(m_list->getContentSize() * scale);
+		m_contentLayer->setPosition(m_contentLayer->getPosition());
+		m_scrollbar->setScaleY(1.f / scale);
+		m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(1.f / scale * 0.4f);
+	}
+
+	if (m_mainLayer->numberOfRunningActions() == 0) {
+        unschedule(schedule_selector(AnimationsLayer::updateTableView));
+
+		m_tableView->setContentSize(m_list->getContentSize());
+		m_contentLayer->setPosition(m_contentLayer->getPosition());
+		m_scrollbar->setScaleY(1);
+		m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(0.4f);
+	}
 }
 
 bool AnimationsLayer::setup() {
@@ -100,15 +126,17 @@ bool AnimationsLayer::setup() {
         array->addObject(ListRow::create(row, this));
         
     ListView* listView = ListView::create(array, 50, 289, 153);
-    CCNode* m_contentLayer = static_cast<CCNode*>(listView->m_tableView->getChildren()->objectAtIndex(0));
     
     listView->setPrimaryCellColor(ccc3(138, 77, 46));
     listView->setSecondaryCellColor(ccc3(138, 77, 46));
     listView->setCellBorderColor(ccc4(0, 0, 0, 0));
     
-    GJCommentListLayer* m_list = GJCommentListLayer::create(listView, "", ccc4(255, 255, 255, 0), 289, 153, false);
+    m_list = GJCommentListLayer::create(listView, "", ccc4(255, 255, 255, 0), 289, 153, false);
     m_list->setPosition((m_size - m_list->getContentSize()) / 2.f);
     m_mainLayer->addChild(m_list, 2);
+
+    m_tableView = listView->m_tableView;
+    m_contentLayer = m_tableView->m_contentLayer;
     
     bg->setPosition(m_list->getPosition());
     
@@ -118,17 +146,17 @@ bool AnimationsLayer::setup() {
     topBorder->setScale(0.85f);
     bottomBorder->setScale(0.85f);
     
-    if (m_contentLayer->getContentSize().height >= 175) {
-        Scrollbar* scrollbar = Scrollbar::create(listView->m_tableView);
-        scrollbar->setPosition(m_list->getPosition() + ccp(m_list->getContentSize().width + 6, 0));
-        scrollbar->setAnchorPoint({0, 0});
-        m_mainLayer->addChild(scrollbar);
-    }
+    m_scrollbar = Scrollbar::create(listView->m_tableView);
+    m_scrollbar->setPosition(m_list->getPosition() + ccp(m_list->getContentSize().width + 6, 0));
+    m_scrollbar->setAnchorPoint({0, 0});
+    m_mainLayer->addChild(m_scrollbar);
     
     int selected = Mod::get()->getSavedValue<int>("selected-animation");
     
     if (m_animationCells.contains(selected))
         selectAnimation(m_animationCells.at(selected));
+
+    schedule(schedule_selector(AnimationsLayer::updateTableView), 0, kCCRepeatForever, 1.f / 240.f);
     
     return true;
 }   

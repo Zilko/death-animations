@@ -4,6 +4,22 @@
 
 class AnimationsLayer;
 
+class ProMenu : public CCMenu {
+
+private:
+
+    AnimationsLayer* m_layer = nullptr;
+
+    ProMenu(AnimationsLayer*);
+
+    bool ccTouchBegan(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override;
+
+public:
+
+    static ProMenu* create(AnimationsLayer*);
+
+};
+
 class AnimationCell : public CCNode {
     
 private:

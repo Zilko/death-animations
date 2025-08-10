@@ -25,6 +25,23 @@ int Utils::getRandomInt(int min, int max) {
     return dis(gen);
 }
 
+std::filesystem::path Utils::getRandomFile(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
+    std::vector<std::filesystem::path> files;
+    std::error_code ec;
+
+    for (const auto& entry : std::filesystem::directory_iterator(folder, ec)) {
+        if (ec) return std::filesystem::path{};
+
+        if (std::filesystem::is_regular_file(entry.status(ec)) && !ec)
+            if (validExtensions.contains(entry.path().extension().string()))
+                files.push_back(entry.path());
+    }
+
+    if (files.empty()) return std::filesystem::path{};
+
+    return files[getRandomInt(0, static_cast<int>(files.size()) - 1)];
+}
+
 void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration) {
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
         return;
@@ -41,11 +58,19 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade
 }
 
 void Utils::playSound(Anim anim, const std::string& sound, float speed, float volume) {
+    playSound(anim, speed, volume, Mod::get()->getResourcesDir() / sound);
+}
+
+void Utils::playSound(Anim anim, float speed, float volume, const std::filesystem::path& sound) {
     if (Utils::getSettingBool(anim, "play-sound-effects"))
-        FMODAudioEngine::get()->playEffect((Mod::get()->getResourcesDir() / sound).string().c_str(), speed, 1.f, volume);
+        FMODAudioEngine::get()->playEffect(sound.string().c_str(), speed, 1.f, volume);
 }
 
 void Utils::playSoundManual(Anim anim, const std::string& sound, float speed, float volume) {
+    playSoundManual(anim, speed, volume, Mod::get()->getResourcesDir() / sound);
+}
+
+void Utils::playSoundManual(Anim anim, float speed, float volume, const std::filesystem::path& sound) {
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
         return;
             
@@ -53,7 +78,7 @@ void Utils::playSoundManual(Anim anim, const std::string& sound, float speed, fl
     FMOD::Sound* souwnd;
     FMOD::Channel* channel;
     
-    system->createSound((Mod::get()->getResourcesDir() / sound).string().c_str(), FMOD_DEFAULT, nullptr, &souwnd);
+    system->createSound(sound.string().c_str(), FMOD_DEFAULT, nullptr, &souwnd);
     system->playSound(souwnd, nullptr, false, &channel);
     channel->setVolume(volume);
     channel->setPitch(speed);
@@ -216,14 +241,10 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
     director->m_obWinSizeInPoints = newSize;
     view->setDesignResolutionSize(newSize.width, newSize.height, ResolutionPolicy::kResolutionExactFit);
 
-    float scaleMult = director->getContentScaleFactor();
+    float scale = director->getContentScaleFactor() / utils::getDisplayFactor();
     
-    #ifdef __APPLE__
-    scaleMult /= 2.f;
-    #endif
-
-    view->m_fScaleX = scaleMult * newScale.width;
-    view->m_fScaleY = scaleMult * newScale.height;
+    view->m_fScaleX = scale * newScale.width;
+    view->m_fScaleY = scale * newScale.height;
 
     if (!renderTexture)
         renderTexture = CCRenderTexture::create(winSize.width, winSize.height);
@@ -236,6 +257,8 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
     view->setDesignResolutionSize(ogRes.width, ogRes.height, ResolutionPolicy::kResolutionExactFit);
     view->m_fScaleX = ogScale.width;
     view->m_fScaleY = ogScale.height;
+
+    renderTexture->getSprite()->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
     
     return renderTexture->getSprite()->getTexture();
 }

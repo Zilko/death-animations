@@ -8,6 +8,14 @@ class AnimationsLayer : public geode::Popup<> {
   
 private:
 
+    GJCommentListLayer* m_list = nullptr;
+
+    CCNode* m_contentLayer = nullptr;
+
+    Scrollbar* m_scrollbar = nullptr;
+
+    TableView* m_tableView = nullptr;
+
     AnimationCell* m_selectedAnimation = nullptr;
     
     CCLabelBMFont* m_nameLabel = nullptr;
@@ -21,6 +29,8 @@ private:
     
     void onPreview(CCObject*);
     void onSettings(CCObject*);
+
+    void updateTableView(float);
     
 public:
 
@@ -29,5 +39,7 @@ public:
     void selectAnimation(AnimationCell*);
     
     void createdCell(AnimationCell*);
+
+    GJCommentListLayer* getList();
         
 };
