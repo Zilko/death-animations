@@ -42,8 +42,8 @@ private:
             color.rgb = mix(color.rgb * shadowBoost, color.rgb, smoothstep(0.4, 1.0, color.rgb));
 
             vec3 saturated = u_time < 0.1
-                ? mix(vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))), color.rgb, 0.3 - min(u_time / 0.1, 1.0) * 0.1)
-                : mix(color.rgb, vec3(dot(color.rgb, vec3(0.299, 0.587, 0.114))), 0.7 + min(u_time / 1.85, 1.0) * 0.2);
+                ? mix(vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.4))), color.rgb, 0.3 - min(u_time / 0.1, 1.0) * 0.1)
+                : mix(color.rgb, vec3(dot(color.rgb, vec3(0.299, 0.587, 0.4))), 0.7 + min(u_time / 1.85, 1.0) * 0.3);
 
             vec2 uv = v_texCoord * 2.0 - 1.0;
             float vignette = 1.0 - dot(uv, uv) * 0.3;

@@ -146,12 +146,12 @@ static const std::array<DeathAnimation, 16> animations = {
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "none-thumbnail.png", .name = "Wii", .duration = 621.f },
     DeathAnimation{ .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Wasted, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Maro, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Ghost, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true }
+    DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 8.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::Ghost, .thumbnail = "none-thumbnail.png", .name = "Ghost", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "none-thumbnail.png", .name = "Undertale", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f, .isNoDeathSound = true },
+    DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "none-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 10.f, .isNoDeathSound = true }
 };
 
 static const std::array<AnimationSetting, 9> defaultSettings = {
@@ -183,5 +183,9 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "fill-screen", .name = "Fill Screen", .description = "Make the image fill the screen (may crop the image).", .type = SettingType::Toggle },
         { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the jumpscare images; one will be chosen at random.", .type = SettingType::JumpscareFolder },
         { .id = "sounds-folder", .name = "Sounds Folder", .description = "Folder containing the jumpscare sounds; one will be chosen at random.", .type = SettingType::JumpscareFolder }
+    } },
+    { Anim::Maro, {
+        { .id = "use-nes-colors", .name = "Use NES Colors", .description = "", .type = SettingType::Toggle },
+        { .id = "use-maro-sprite", .name = "Use Mario Sprite", .description = "", .type = SettingType::Toggle }
     } }
 };

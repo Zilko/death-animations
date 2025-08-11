@@ -87,19 +87,22 @@ private:
         m_program->updateUniforms();
         
         CCRenderTexture* texture = CCRenderTexture::create(100, 100);
-        CCPoint ogPos = player->getPosition();
-        bool ogVisibility = player->isVisible();
+
+        CCPoint ogPosition = player->getPosition();
         GLubyte ogOpacity = player->getOpacity();
+        bool ogVisibility = player->isVisible();
         
         texture->begin();
         
+        player->setPosition({50, 50});
         player->setOpacity(255);
         player->setVisible(true);
-        player->setPosition({50, 50});
+
         player->visit();
-        player->setPosition(ogPos);
-        player->setVisible(ogVisibility);
+        
+        player->setPosition(ogPosition);
         player->setOpacity(ogOpacity);
+        player->setVisible(ogVisibility);
         
         texture->end();
 

@@ -70,7 +70,6 @@ class $modify(ProPlayLayer, PlayLayer) {
 
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
         Anim anim = Utils::getSelectedAnimationEnum();
-        log::debug("1 {}", m_level->m_personalBests);
 
         if (anim == Anim::None)
             return PlayLayer::destroyPlayer(p0, p1);
