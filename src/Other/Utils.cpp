@@ -234,12 +234,14 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
 
     CCSize winSize = director->getWinSize();
     CCSize ogRes = view->getDesignResolutionSize();
-    CCSize ogScale = { view->m_fScaleX, view->m_fScaleY };
     CCSize size = { roundf(320.f * (winSize.width / winSize.height)), 320.f };
     CCSize newScale = { winSize.width / size.width, winSize.height / size.height };
+    CCPoint ogScale = { view->m_fScaleX, view->m_fScaleY };
 
     float scale = director->getContentScaleFactor() / utils::getDisplayFactor();
 
+    director->m_obWinSizeInPoints = size;
+    view->setDesignResolutionSize(size.width, size.height, ResolutionPolicy::kResolutionExactFit);
     view->m_fScaleX = scale * newScale.width;
     view->m_fScaleY = scale * newScale.height;
 
@@ -252,8 +254,8 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
 
     director->m_obWinSizeInPoints = ogRes;
     view->setDesignResolutionSize(ogRes.width, ogRes.height, ResolutionPolicy::kResolutionExactFit);
-    view->m_fScaleX = ogScale.width;
-    view->m_fScaleY = ogScale.height;
+    view->m_fScaleX = ogScale.x;
+    view->m_fScaleY = ogScale.y;
 
     return renderTexture->getSprite()->getTexture();
 }

@@ -132,7 +132,9 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
 };
 
 static const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
-    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } }
+    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } },
+    { Anim::CBFDetected, { { "use-level-name", true } } },
+    { Anim::Maro, { { "second-player", true } } },
 };
 
 static const std::array<DeathAnimation, 16> animations = {
@@ -151,7 +153,7 @@ static const std::array<DeathAnimation, 16> animations = {
     DeathAnimation{ .id = Anim::Undertale, .thumbnail = "none-thumbnail.png", .name = "Undertale", .duration = 10.f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "none-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 10.f, .isNoDeathSound = true }
+    DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 10.f, .isNoDeathSound = true }
 };
 
 static const std::array<AnimationSetting, 9> defaultSettings = {
@@ -186,6 +188,10 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
     } },
     { Anim::Maro, {
         { .id = "use-nes-colors", .name = "Use NES Colors", .description = "", .type = SettingType::Toggle },
-        { .id = "use-maro-sprite", .name = "Use Mario Sprite", .description = "", .type = SettingType::Toggle }
+        { .id = "use-maro-sprite", .name = "Use Mario Sprite", .description = "", .type = SettingType::Toggle },
+        { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
+    } },
+    { Anim::CBFDetected, {
+        { .id = "use-level-name", .name = "Use Level Name", .description = "",. type = SettingType::Toggle }
     } }
 };

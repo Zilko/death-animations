@@ -74,13 +74,14 @@ public:
                     channel->getPosition(&pos, FMOD_TIMEUNIT_MS);
                     m_diePositions[channel] = pos;
                 }
-                
+
             schedule(schedule_selector(Bsod::setChannelTime), 0, kCCRepeatForever, 0.01f);
             
             return;
         }
+
                     
-        CCSprite* m_freezeSprite = CCSprite::createWithTexture(Utils::takeScreenshot());
+        m_freezeSprite = CCSprite::createWithTexture(Utils::takeScreenshot());
         m_freezeSprite->setFlipY(true);
         m_freezeSprite->setScale(m_size.width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});

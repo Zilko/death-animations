@@ -127,6 +127,7 @@ private:
     CCGLProgram* m_program = nullptr;
 
     std::vector<std::pair<CCNodeRGBA*, GLubyte>> m_playerOpacities;
+    std::vector<CCSprite*> m_sprites;
 
 public:
     
@@ -153,16 +154,20 @@ public:
         else {
             playForPlayer(m_playLayer->m_player1);
             
-            if (m_playLayer->m_gameState.m_isDualMode)
+            if (Utils::getSettingBool(Anim::Maro, "second-player") && m_playLayer->m_gameState.m_isDualMode)
                 playForPlayer(m_playLayer->m_player2);
         }
     }
 
     void playForPlayer(CCNodeRGBA* player) {
+        CCNode* parent = m_isPreview ? this : player->getParent()->getParent();
+        CCPoint position = m_isPreview ? player->getPosition() : parent->convertToNodeSpaceAR(player->convertToWorldSpaceAR({0, 0}));
+        float scale = m_isPreview ? 1.f : m_playLayer->m_objectLayer->getScale();
+
         if (!m_program) {
             CCSprite* spr = CCSprite::create("maro.png"_spr);
-            spr->setPosition(player->getPosition());
-            spr->setScale(7.f);
+            spr->setPosition(position);
+            spr->setScale(7.f * scale);
             spr->getTexture()->setAliasTexParameters();
             spr->runAction(
                 CCSequence::create(
@@ -174,8 +179,10 @@ public:
 
             m_playerOpacities.push_back(std::make_pair(player, player->getOpacity()));
 
-            player->getParent()->addChild(spr, 21738127);
+            player->getParent()->getParent()->addChild(spr, 21738127);
             player->setOpacity(0);
+
+            m_sprites.push_back(spr);
 
             return;
         }
@@ -207,7 +214,8 @@ public:
 
         CCSprite* spr = CCSprite::createWithTexture(texture->getSprite()->getTexture());
         spr->setFlipY(true);
-        spr->setPosition(ogPosition);
+        spr->setPosition(position);
+        spr->setScale(scale);
         spr->setShaderProgram(m_program);
         spr->runAction(
             CCSequence::create(
@@ -217,14 +225,19 @@ public:
             )
         );
 
-        player->getParent()->addChild(spr, 21738127);
+        m_sprites.push_back(spr);
+
+        parent->addChild(spr, 21738127);
     }
 
     void end() override {
-        BaseAnimation::end();
-
         for (const auto& [player, opacity] : m_playerOpacities)
             player->setOpacity(opacity);
+
+        for (CCSprite* spr : m_sprites)
+            spr->removeFromParentAndCleanup(true);
+
+        BaseAnimation::end();
     }
 
     };

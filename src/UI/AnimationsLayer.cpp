@@ -133,6 +133,8 @@ bool AnimationsLayer::setup() {
     
     m_list = GJCommentListLayer::create(listView, "", ccc4(255, 255, 255, 0), 289, 153, false);
     m_list->setPosition((m_size - m_list->getContentSize()) / 2.f);
+    m_list->setUserObject("dont-correct-borders", CCBool::create(true));
+
     m_mainLayer->addChild(m_list, 2);
 
     m_tableView = listView->m_tableView;

@@ -24,8 +24,7 @@ public:
             Utils::playSound(Anim::Jumpscare, m_speed, 1.f, sound);
 
         CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height);
-        layer->setAnchorPoint({0, 0});
-
+        
         addChild(layer);
         
         CCSprite* spr = CCSprite::create(image.string().c_str());
@@ -50,4 +49,4 @@ public:
 
         addChild(spr);
     }
-    };
+};
