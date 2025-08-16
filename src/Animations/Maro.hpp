@@ -173,6 +173,8 @@ public:
                 )
             );
 
+            Utils::fixSprite(spr);
+
             m_playerOpacities.push_back(std::make_pair(player, player->getOpacity()));
 
             parent->addChild(spr);

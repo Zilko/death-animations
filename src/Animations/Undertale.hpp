@@ -23,6 +23,8 @@ private:
         spr->setScale(3.f * m_scale);
         spr->getTexture()->setAliasTexParameters();
 
+        Utils::fixSprite(spr);
+
         addChild(spr);
 
         CCSprite* spr2 = CCSprite::create("broken-heart-undertale.png"_spr);
@@ -30,6 +32,8 @@ private:
         spr2->setScale(3.f * m_scale);
         spr2->getTexture()->setAliasTexParameters();
         spr2->setVisible(false);
+
+        Utils::fixSprite(spr2);
 
         addChild(spr2);
 
@@ -63,6 +67,8 @@ private:
         shard->setColor(m_color);
         shard->setScale(3.225f);
         shard->getTexture()->setAliasTexParameters();
+
+        Utils::fixSprite(shard);
 
         shard->runAction(CCRepeatForever::create(CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 15.f / m_speed))));
         shard->runAction(CCJumpBy::create(2.3f, {0, -320}, velocity.y + Utils::getRandomInt(-30, 30), 1));
@@ -127,6 +133,8 @@ private:
         m_gameOver->getTexture()->setAliasTexParameters();
         m_gameOver->setOpacity(0);
         m_gameOver->runAction(CCFadeTo::create(1.f, 255));
+
+        Utils::fixSprite(m_gameOver);
 
         addChild(m_gameOver);
 

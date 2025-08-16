@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>frames</key>
+	<dict>
+		<key>zilko.death_animations/heart-shard-1-undertale.png</key>
+		<dict>
+			<key>spriteOffset</key>
+			<string>{0,0}</string>
+			<key>spriteSize</key>
+			<string>{7,6}</string>
+			<key>spriteSourceSize</key>
+			<string>{20,20}</string>
+			<key>textureRect</key>
+			<string>{{0,0},{7,6}}</string>
+			<key>textureRotated</key>
+			<false/>
+		</dict>
+		<key>zilko.death_animations/heart-shard-2-undertale.png</key>
+		<dict>
+			<key>spriteOffset</key>
+			<string>{0,0}</string>
+			<key>spriteSize</key>
+			<string>{6,5}</string>
+			<key>spriteSourceSize</key>
+			<string>{20,20}</string>
+			<key>textureRect</key>
+			<string>{{9,0},{6,5}}</string>
+			<key>textureRotated</key>
+			<false/>
+		</dict>
+		<key>zilko.death_animations/heart-shard-3-undertale.png</key>
+		<dict>
+			<key>spriteOffset</key>
+			<string>{-1,0}</string>
+			<key>spriteSize</key>
+			<string>{7,8}</string>
+			<key>spriteSourceSize</key>
+			<string>{20,20}</string>
+			<key>textureRect</key>
+			<string>{{17,0},{7,8}}</string>
+			<key>textureRotated</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>metadata</key>
+	<dict>
+		<key>format</key>
+		<integer>3</integer>
+		<key>realTextureFileName</key>
+		<string>zilko.death_animations/heart-shard-undertale.png</string>
+		<key>size</key>
+		<string>{25,7}</string>
+		<key>textureFileName</key>
+		<string>zilko.death_animations/heart-shard-undertale.png</string>
+	</dict>
+</dict>
+</plist>

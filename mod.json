@@ -24,25 +24,28 @@
       ],
       "among-us-death-4": [
         "resources/sprites/animations/among-us/death-4/*.png"
-      ],
-      "celeste-explosion": [
-        "resources/sprites/animations/celeste/explosion/*.png"
-      ],
-      "celeste-revive": [
-        "resources/sprites/animations/celeste/revive/*.png"
-      ],
-      "heart-shard-undertale": [
-        "resources/sprites/animations/undertale/heart-shard-undertale/*.png"
       ]
     },
 	  "sprites": [
-			"resources/sprites/*/*.png",
-			"resources/sprites/*/*/*.png"
+			"resources/sprites/ui/*.png",
+			"resources/sprites/ui/thumbnails/*.png",
+			"resources/sprites/animations/among-us/*.png",
+			"resources/sprites/animations/bsod/*.png",
+			"resources/sprites/animations/jumpscare/*.png",
+			"resources/sprites/animations/to-be-continued/*.png",
+			"resources/sprites/animations/you-died/*.png"
 			],
 		"files": [
 		  "resources/sounds/*.mp3",
 		  "resources/sounds/*.ogg",
-		  "resources/sounds/*.wav"
+		  "resources/sounds/*.wav",
+			"resources/sprites/animations/celeste/*.png",
+			"resources/sprites/animations/maro/*.png",
+			"resources/sprites/animations/undertale/*.png",
+			"resources/sprites/animations/celeste/spritesheets/*.png",
+			"resources/sprites/animations/celeste/spritesheets/*.plist",
+			"resources/sprites/animations/undertale/spritesheets/*.png",
+			"resources/sprites/animations/undertale/spritesheets/*.plist"
 		],
 		"fonts": {
       "segoe-semilight": {

@@ -248,6 +248,18 @@ void Utils::setHighestZ(CCNode* node) {
     node->setZOrder(highest);
 }
 
+void Utils::fixSprite(CCSprite* sprite) {
+    float mult = 1.f;
+
+    switch (GameManager::get()->m_texQuality) {
+        case 1: mult = 0.25f; break;
+        case 2: mult = 0.5f; break;
+        default: mult = 1.f;
+    };
+
+    sprite->setScale(sprite->getScale() * mult);
+}
+
 CCGLProgram* Utils::createShader(const std::string& shader, bool autorelease) {
     CCGLProgram* ret = new CCGLProgram();
     ret->initWithVertexShaderByteArray(vertexShader.c_str(), shader.c_str());

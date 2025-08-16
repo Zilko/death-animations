@@ -166,6 +166,8 @@ private:
                 nullptr
             )
         );
+
+        Utils::fixSprite(m_animationSprite);
         
         m_animationSprite->setPosition(m_playerSprite->getPosition());
         m_playerSprite->setVisible(false);
@@ -472,6 +474,8 @@ public:
     
     void startAnimations(float) {
         for (CCSprite* sprite : m_animationSprites) {
+            Utils::fixSprite(sprite);
+
             CCArray* animFrames = CCArray::create();
             CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
             cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
@@ -494,7 +498,10 @@ public:
     }
     
     void addAnimation(CCNodeRGBA* player) {
-        CCSprite* sprite = CCSprite::createWithSpriteFrameName("celeste-revive-1.png"_spr);
+        CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
+        cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
+
+        CCSprite* sprite = CCSprite::createWithSpriteFrame(cache->spriteFrameByName("celeste-revive-1.png"_spr));
         sprite->setColor(m_color);
         sprite->setScale(8.75f);
         sprite->getTexture()->setAliasTexParameters();
