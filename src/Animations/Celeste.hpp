@@ -77,37 +77,9 @@ private:
     }
 
     bool init(CCNodeRGBA* player, const CCPoint& velocity) {
-        m_program = new CCGLProgram();
-        m_program->autorelease();
-        m_program->initWithVertexShaderByteArray(vertexShader.c_str(), m_shader.c_str());
-        m_program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
-        m_program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
-        m_program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
-        m_program->link();
-        m_program->updateUniforms();
-        
-        CCRenderTexture* texture = CCRenderTexture::create(100, 100);
+        m_program = Utils::createShader(m_shader, true);
 
-        CCPoint ogPosition = player->getPosition();
-        GLubyte ogOpacity = player->getOpacity();
-        bool ogVisibility = player->isVisible();
-        
-        texture->begin();
-        
-        player->setPosition({50, 50});
-        player->setOpacity(255);
-        player->setVisible(true);
-
-        player->visit();
-        
-        player->setPosition(ogPosition);
-        player->setOpacity(ogOpacity);
-        player->setVisible(ogVisibility);
-        
-        texture->end();
-
-        m_playerSprite = CCSprite::createWithTexture(texture->getSprite()->getTexture());
-        m_playerSprite->setFlipY(true);
+        m_playerSprite = Utils::renderPlayer(player, false);
         m_playerSprite->setShaderProgram(m_program);
         
         setShaderState("u_white", 0);
@@ -441,7 +413,7 @@ public:
     void start() override {
         m_reverse = m_extras.reverse;
 
-        setZOrder(132099);
+        Utils::setHighestZ(this);
         
         switch(m_extras.transition) {
             case 2: chapter1Transition(); break;
@@ -636,7 +608,8 @@ public:
             m_speed
         );
         m_explosion1->setPosition(player->getPosition());
-        player->getParent()->addChild(m_explosion1, 10293823);
+        player->getParent()->addChild(m_explosion1);
+        Utils::setHighestZ(m_explosion1);
         
         if (!Utils::getSettingBool(Anim::Celeste, "second-player") || !m_playLayer->m_gameState.m_isDualMode) return;
         
@@ -649,7 +622,8 @@ public:
             m_speed
         );
         m_explosion2->setPosition(player->getPosition());
-        player->getParent()->addChild(m_explosion2, 10293823);
+        player->getParent()->addChild(m_explosion2);
+        Utils::setHighestZ(m_explosion2);
     }
     
     void transitionOut(float) {

@@ -142,16 +142,8 @@ public:
 
         Utils::playSound(Anim::Maro, "maro-death.mp3", m_speed, 1.f);
 
-        if (!m_isMarioSprite) {
-            m_program = new CCGLProgram();
-            m_program->autorelease();
-            m_program->initWithVertexShaderByteArray(vertexShader.c_str(), (Utils::getSettingBool(Anim::Maro, "use-nes-colors") ? m_shaderNES : m_shader).c_str());
-            m_program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
-            m_program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
-            m_program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
-            m_program->link();
-            m_program->updateUniforms();
-        }
+        if (!m_isMarioSprite)
+            m_program = Utils::createShader(Utils::getSettingBool(Anim::Maro, "use-nes-colors") ? m_shaderNES : m_shader, true);
 
         if (m_isPreview)
             playForPlayer(m_delegate->getPlayer());
@@ -183,41 +175,17 @@ public:
 
             m_playerOpacities.push_back(std::make_pair(player, player->getOpacity()));
 
-            player->getParent()->getParent()->addChild(spr, 21738127);
+            parent->addChild(spr);
             player->setOpacity(0);
+            Utils::setHighestZ(spr);
 
             m_sprites.push_back(spr);
 
             return;
         }
-    
-        CCRenderTexture* texture = CCRenderTexture::create(100, 100);
+            
 
-        CCPoint ogPosition = player->getPosition();
-        GLubyte ogOpacity = player->getOpacity();
-        float ogRotation = player->getRotation();
-        bool ogVisibility = player->isVisible();
-        
-        texture->begin();
-        
-        player->setPosition({50, 50});
-        player->setOpacity(255);
-        player->setRotation(0);
-        player->setVisible(true);
-
-        player->visit();
-
-        player->setPosition(ogPosition);
-        player->setVisible(ogVisibility);
-        player->setRotation(ogRotation);
-        player->setOpacity(0);
-        
-        texture->end();
-
-        m_playerOpacities.push_back(std::make_pair(player, ogOpacity));
-
-        CCSprite* spr = CCSprite::createWithTexture(texture->getSprite()->getTexture());
-        spr->setFlipY(true);
+        CCSprite* spr = Utils::renderPlayer(player, true);
         spr->setPosition(position);
         spr->setScale(scale);
         spr->setShaderProgram(m_program);
@@ -229,9 +197,12 @@ public:
             )
         );
 
+        m_playerOpacities.push_back(std::make_pair(player, player->getOpacity()));
         m_sprites.push_back(spr);
 
-        parent->addChild(spr, 21738127);
+        parent->addChild(spr);
+        player->setOpacity(0);
+        Utils::setHighestZ(spr);
     }
 
     void end() override {

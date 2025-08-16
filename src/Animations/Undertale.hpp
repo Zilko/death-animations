@@ -130,7 +130,7 @@ private:
 
         addChild(m_gameOver);
 
-        Utils::playSound(Anim::Undertale, "determination.mp3", m_speed, 100, 1000, 13000, 0.5f);
+        Utils::playSound(Anim::Undertale, "determination.mp3", m_speed, 100, 1000, 13000, 0.22f);
 
         scheduleOnce(schedule_selector(Undertale::secondStep), 12.f / m_speed);
     }
@@ -149,7 +149,7 @@ public:
         scheduleOnce(schedule_selector(Undertale::playSound), 0.15f / m_speed);
         scheduleOnce(schedule_selector(Undertale::firstStep), 2.5f / m_speed);
 
-        setZOrder(120983917);
+        Utils::setHighestZ(this);
 
         addChild(CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height));
 

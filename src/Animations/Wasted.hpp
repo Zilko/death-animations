@@ -90,16 +90,9 @@ public:
         Utils::setHookEnabled("GJBaseGameLayer::update", true);
         Utils::setHookEnabled("ExplodeItemNode::update", true);
 
-        setZOrder(12933);
+        Utils::setHighestZ(this);
 
-        m_program = new CCGLProgram();
-        m_program->retain();
-        m_program->initWithVertexShaderByteArray(vertexShader.c_str(), m_shader.c_str());
-        m_program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
-        m_program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
-        m_program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
-        m_program->link();
-        m_program->updateUniforms();
+        m_program = Utils::createShader(m_shader, false);
 
         m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
         m_renderTexture->retain();

@@ -39,16 +39,7 @@ public:
         freezeSprite->setAnchorPoint({0, 0});
         freezeSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         
-        CCGLProgram* program = new CCGLProgram();
-        program->autorelease();
-        program->initWithVertexShaderByteArray(vertexShader.c_str(), m_shader.c_str());
-        program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
-        program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
-        program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
-        program->link();
-        program->updateUniforms();
-        
-        freezeSprite->setShaderProgram(program);
+        freezeSprite->setShaderProgram(Utils::createShader(m_shader, true));
         
         addChild(freezeSprite);
         

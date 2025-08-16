@@ -136,7 +136,8 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } },
     { Anim::CBFDetected, { { "use-level-name", true } } },
     { Anim::Maro, { { "second-player", true } } },
-    { Anim::Undertale, { { "second-player", true } } }
+    { Anim::Undertale, { { "second-player", true } } },
+    { Anim::Ghost, { { "second-player", true } } }
 };
 
 static const std::array<DeathAnimation, 16> animations = {
@@ -151,8 +152,8 @@ static const std::array<DeathAnimation, 16> animations = {
     DeathAnimation{ .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Wasted, .thumbnail = "none-thumbnail.png", .name = "GTA V - Wasted", .duration = 10.f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 8.f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::Ghost, .thumbnail = "none-thumbnail.png", .name = "Ghost", .duration = 10.f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "none-thumbnail.png", .name = "Undertale", .duration = 30.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::Ghost, .thumbnail = "none-thumbnail.png", .name = "Ghost", .duration = 10.f },
+    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 30.f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 10.f, .isNoDeathSound = true }
@@ -197,6 +198,9 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "use-level-name", .name = "Use Level Name", .description = "",. type = SettingType::Toggle }
     } },
     { Anim::Undertale, {
+        { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
+    } },
+    { Anim::Ghost, {
         { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
     } }
 };

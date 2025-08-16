@@ -233,6 +233,36 @@ void Utils::setHookEnabled(const std::string& name, bool enabled) {
     }
 }
 
+void Utils::setHighestZ(CCNode* node) {
+    if (!node->getParent()) return;
+
+    int highest = 0;
+
+    for (CCNode* brother : CCArrayExt<CCNode*>(node->getParent()->getChildren()))
+        if (brother->getZOrder() > highest && brother != node)
+            highest = brother->getZOrder();
+
+    if (highest < std::numeric_limits<int>::max())
+        highest++;
+
+    node->setZOrder(highest);
+}
+
+CCGLProgram* Utils::createShader(const std::string& shader, bool autorelease) {
+    CCGLProgram* ret = new CCGLProgram();
+    ret->initWithVertexShaderByteArray(vertexShader.c_str(), shader.c_str());
+    ret->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
+    ret->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
+    ret->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
+    ret->link();
+    ret->updateUniforms();
+
+    if (autorelease)
+        ret->autorelease();
+
+    return ret;
+}
+
 CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres bug with non 16:9 aspect ratios lets hope no one notices
     CCEGLView* view = CCEGLView::get();
     CCDirector* director = CCDirector::get();
@@ -263,4 +293,36 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
     view->m_fScaleY = ogScale.y;
 
     return renderTexture->getSprite()->getTexture();
+}
+
+CCSprite* Utils::renderPlayer(CCNodeRGBA* player, bool rotation0) {
+    CCRenderTexture* texture = CCRenderTexture::create(100, 100);
+
+    CCPoint ogPosition = player->getPosition();
+    GLubyte ogOpacity = player->getOpacity();
+    float ogRotation = player->getRotation();
+    bool ogVisibility = player->isVisible();
+    
+    texture->begin();
+    
+    player->setPosition({50, 50});
+    player->setOpacity(255);
+    player->setVisible(true);
+    
+    if (rotation0)
+        player->setRotation(0);
+
+    player->visit();
+
+    player->setPosition(ogPosition);
+    player->setVisible(ogVisibility);
+    player->setRotation(ogRotation);
+    
+    texture->end();
+
+
+    CCSprite* spr = CCSprite::createWithTexture(texture->getSprite()->getTexture());
+    spr->setFlipY(true);
+
+    return spr;
 }

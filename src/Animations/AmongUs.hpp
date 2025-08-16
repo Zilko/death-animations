@@ -46,7 +46,7 @@ public:
     void start() override {
         BaseAnimation::start();
         
-        setZOrder(1000);
+        Utils::setHighestZ(this);
         
         Utils::playSound(Anim::AmongUs, "scary-among-us.ogg", m_speed, 0.5f);
 
@@ -114,15 +114,8 @@ public:
         );
         
         addChild(m_animationSprite);
-        
-        CCGLProgram* program = new CCGLProgram();
-        program->autorelease();
-        program->initWithVertexShaderByteArray(vertexShader.c_str(), m_shader.c_str());
-        program->addAttribute(kCCAttributeNamePosition, kCCVertexAttrib_Position);
-        program->addAttribute(kCCAttributeNameColor, kCCVertexAttrib_Color);
-        program->addAttribute(kCCAttributeNameTexCoord, kCCVertexAttrib_TexCoords);
-        program->link();
-        program->updateUniforms();
+
+        CCGLProgram* program = Utils::createShader(m_shader, true);
         
         m_animationSprite->setShaderProgram(program);
         

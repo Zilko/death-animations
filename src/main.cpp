@@ -108,6 +108,9 @@ class $modify(ProPlayLayer, PlayLayer) {
         auto f = m_fields.self();
         
         float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
+
+        if (f->m_animation)
+            f->m_animation->end();
         
         f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed});      
       

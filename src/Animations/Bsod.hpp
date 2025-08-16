@@ -39,7 +39,7 @@ public:
         BaseAnimation::start();
         
         if (!m_isPreview)
-            setZOrder(10000);
+            Utils::setHighestZ(this);
         
         scheduleOnce(schedule_selector(Bsod::firstStep), 2.2f / m_speed);
         scheduleOnce(schedule_selector(Bsod::freeze), 0.05f / m_speed);
