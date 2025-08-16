@@ -12,7 +12,8 @@ public:
 
     static void playSound(Anim, const std::string&, float, float);
     static void playSound(Anim, float, float, const std::filesystem::path&);
-    static void playSound(Anim, const std::string&, float, int, int);
+    static void playSound(Anim, const std::string&, float, int, int, int, float = 1.f, bool = false);
+    static void playSound(Anim, const std::string&, float, int, int, float = 1.f, bool = false);
     static void playSoundManual(Anim, const std::string&, float, float);
     static void playSoundManual(Anim, float, float, const std::filesystem::path&);
     

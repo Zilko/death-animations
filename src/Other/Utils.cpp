@@ -42,18 +42,23 @@ std::filesystem::path Utils::getRandomFile(const std::filesystem::path& folder, 
     return files[getRandomInt(0, static_cast<int>(files.size()) - 1)];
 }
 
-void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration) {
+void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration, float volume, bool loop) {
+    playSound(anim, sound, speed, fade, fade, duration, volume, loop);
+}
+
+void Utils::playSound(Anim anim, const std::string& sound, float speed, int fadeIn, int fadeOut, int duration, float volume, bool loop) {
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
         return;
                 
     duration = static_cast<int>(duration / speed / 1000.f) * 1000;
-    fade /= speed;
+    fadeIn /= speed;
+    fadeOut /= speed;
     
     if (duration < 1000) duration = 1000;
             
     FMODAudioEngine::get()->playEffectAdvanced(
         (Mod::get()->getResourcesDir() / sound).string().c_str(),
-        1.f, 1.f, 1.f, speed, 1.f, 1.f, 0, duration, fade, fade, false, 1, false, false, 1, 1, 0, 1
+        1.f, 1.f, volume, speed, 1.f, 1.f, 0, duration, fadeIn, fadeOut, loop, 1, false, false, 1, 1, 0, 1
     );
 }
 

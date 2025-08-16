@@ -129,6 +129,8 @@ private:
     std::vector<std::pair<CCNodeRGBA*, GLubyte>> m_playerOpacities;
     std::vector<CCSprite*> m_sprites;
 
+    bool m_isMarioSprite = false;
+
 public:
     
     DEFINE_CREATE(Maro)
@@ -136,9 +138,11 @@ public:
     void start() override {
         BaseAnimation::start();
 
+        m_isMarioSprite = Utils::getSettingBool(Anim::Maro, "use-maro-sprite");
+
         Utils::playSound(Anim::Maro, "maro-death.mp3", m_speed, 1.f);
 
-        if (!Utils::getSettingBool(Anim::Maro, "use-maro-sprite")) {
+        if (!m_isMarioSprite) {
             m_program = new CCGLProgram();
             m_program->autorelease();
             m_program->initWithVertexShaderByteArray(vertexShader.c_str(), (Utils::getSettingBool(Anim::Maro, "use-nes-colors") ? m_shaderNES : m_shader).c_str());
@@ -164,7 +168,7 @@ public:
         CCPoint position = m_isPreview ? player->getPosition() : parent->convertToNodeSpaceAR(player->convertToWorldSpaceAR({0, 0}));
         float scale = m_isPreview ? 1.f : m_playLayer->m_objectLayer->getScale();
 
-        if (!m_program) {
+        if (m_isMarioSprite) {
             CCSprite* spr = CCSprite::create("maro.png"_spr);
             spr->setPosition(position);
             spr->setScale(7.f * scale);
