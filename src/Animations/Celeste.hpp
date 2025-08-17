@@ -152,7 +152,8 @@ private:
         
         for (int i = 1; i <= 43; i++)
             if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-explosion-{}.png"_spr, i)).c_str()))
-                animFrames->addObject(frame);
+                if (frame->getTag() != 105871529)
+                    animFrames->addObject(frame);
         
         m_animationSprite = CCSprite::createWithSpriteFrameName("celeste-explosion-1.png"_spr);
         m_animationSprite->setColor(m_color);
@@ -167,7 +168,7 @@ private:
             )
         );
 
-        Utils::fixSprite(m_animationSprite);
+        Utils::fixScaleTextureSizexd(m_animationSprite);
         
         m_animationSprite->setPosition(m_playerSprite->getPosition());
         m_playerSprite->setVisible(false);
@@ -415,7 +416,10 @@ public:
     void start() override {
         m_reverse = m_extras.reverse;
 
-        Utils::setHighestZ(this);
+        if (m_isPreview)
+            setZOrder(10);
+        else
+            Utils::setHighestZ(this);
         
         switch(m_extras.transition) {
             case 2: chapter1Transition(); break;
@@ -438,43 +442,9 @@ private:
     
     bool m_isWhite = false;
 
-public:
-
-    DEFINE_CREATE(CelesteRevive);
-
-    void start() override {
-        BaseAnimation::start();
-        
-        if (m_isPreview)
-            setZOrder(10);
-        
-        if (m_extras.transition != 0) {
-            CelesteTransition* transition = CelesteTransition::create({this, nullptr, nullptr, m_speed, { .transition = m_extras.transition, .reverse = true}});
-            transition->start();
-            addChild(transition);
-        }
-        
-        if (m_isPreview)
-            addAnimation(m_delegate->getPlayer());
-        else {
-            addAnimation(m_playLayer->m_player1);
-            
-            if (Utils::getSettingBool(Anim::Celeste, "second-player") && m_playLayer->m_gameState.m_isDualMode)
-                addAnimation(m_playLayer->m_player2);
-        }
-
-        bool hasTransition = m_extras.transition != 0;
-        
-        scheduleOnce(schedule_selector(CelesteRevive::playSound), (hasTransition ? 0.12f : 0.05f) / m_speed);
-        scheduleOnce(schedule_selector(CelesteRevive::startAnimations), (hasTransition ? 0.25f : 0.18f) / m_speed);
-        scheduleOnce(schedule_selector(CelesteRevive::transitionEnded), 1.f / m_speed);
-        schedule(schedule_selector(CelesteRevive::updatePositions), 0, kCCRepeatForever, 0);
-        schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
-    }
-    
     void startAnimations(float) {
         for (CCSprite* sprite : m_animationSprites) {
-            Utils::fixSprite(sprite);
+            Utils::fixScaleTextureSizexd(sprite);
 
             CCArray* animFrames = CCArray::create();
             CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
@@ -482,7 +452,8 @@ public:
             
             for (int i = 1; i <= 22; i++)
                 if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-revive-{}.png"_spr, i)).c_str()))
-                    animFrames->addObject(frame);
+                    if (frame->getTag() != 105871529)
+                        animFrames->addObject(frame);
             
             sprite->runAction(
                 CCSequence::create(
@@ -545,6 +516,42 @@ public:
     void playSound(float) {
         Utils::playSound(Anim::Celeste, "revive-celeste.wav", m_speed, 1.f);
     }
+
+public:
+
+    DEFINE_CREATE(CelesteRevive);
+
+    void start() override {
+        BaseAnimation::start();
+        
+        if (m_isPreview)
+            setZOrder(10);
+        else
+            Utils::setHighestZ(this);
+        
+        if (m_extras.transition != 0) {
+            CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, m_speed, { .transition = m_extras.transition, .reverse = true}});
+            transition->start();
+            addChild(transition);
+        }
+        
+        if (m_isPreview)
+            addAnimation(m_delegate->getPlayer());
+        else {
+            addAnimation(m_playLayer->m_player1);
+            
+            if (Utils::getSettingBool(Anim::Celeste, "second-player") && m_playLayer->m_gameState.m_isDualMode)
+                addAnimation(m_playLayer->m_player2);
+        }
+
+        bool hasTransition = m_extras.transition != 0;
+        
+        scheduleOnce(schedule_selector(CelesteRevive::playSound), (hasTransition ? 0.12f : 0.05f) / m_speed);
+        scheduleOnce(schedule_selector(CelesteRevive::startAnimations), (hasTransition ? 0.25f : 0.18f) / m_speed);
+        scheduleOnce(schedule_selector(CelesteRevive::transitionEnded), 1.f / m_speed);
+        schedule(schedule_selector(CelesteRevive::updatePositions), 0, kCCRepeatForever, 0);
+        schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
+    }
     
     void end() override {
         for (CCSprite* sprite : m_animationSprites)
@@ -576,6 +583,20 @@ private:
     CelesteExplosion* m_explosion2 = nullptr;
     
     int m_transition = 0;
+
+    void transitionOut(float) {
+        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, m_speed, { .transition = m_transition }})->start();
+    }
+    
+    void playDeathSound(float) {
+        Utils::playSoundManual(Anim::Celeste, "death-celeste.wav", m_speed, FMODAudioEngine::get()->m_sfxVolume);
+    }
+    
+    void playTransition(float) {
+        CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, m_speed, { .transition = m_transition }});
+        transition->start();
+        addChild(transition);
+    }
     
 public:
     
@@ -601,7 +622,7 @@ public:
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
             m_explosion1->setPosition(m_delegate->getPlayer()->getPosition());
-            addChild(m_explosion1, m_isPreview ? 9 : 100);
+            addChild(m_explosion1, 9);
             
             return;
         }
@@ -616,6 +637,7 @@ public:
         );
         m_explosion1->setPosition(player->getPosition());
         player->getParent()->addChild(m_explosion1);
+
         Utils::setHighestZ(m_explosion1);
         
         if (!Utils::getSettingBool(Anim::Celeste, "second-player") || !m_playLayer->m_gameState.m_isDualMode) return;
@@ -631,20 +653,6 @@ public:
         m_explosion2->setPosition(player->getPosition());
         player->getParent()->addChild(m_explosion2);
         Utils::setHighestZ(m_explosion2);
-    }
-    
-    void transitionOut(float) {
-        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, m_speed, { .transition = m_transition }})->start();
-    }
-    
-    void playDeathSound(float) {
-        Utils::playSoundManual(Anim::Celeste, "death-celeste.wav", m_speed, FMODAudioEngine::get()->m_sfxVolume);
-    }
-    
-    void playTransition(float) {
-        CelesteTransition* transition = CelesteTransition::create({this, nullptr, nullptr, m_speed, { .transition = m_transition }});
-        transition->start();
-        addChild(transition);
     }
     
     void end() override {

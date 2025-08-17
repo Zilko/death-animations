@@ -1,4 +1,5 @@
 #include "Utils.hpp"
+#include "SoundManager.hpp"
 
 #include "../Animations/YouDied.hpp"
 #include "../Animations/Bsod.hpp"
@@ -79,7 +80,7 @@ void Utils::playSoundManual(Anim anim, float speed, float volume, const std::fil
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
         return;
             
-    FMOD::System* system = FMODAudioEngine::sharedEngine()->m_system;
+    FMOD::System* system = FMODAudioEngine::get()->m_system;
     FMOD::Sound* souwnd;
     FMOD::Channel* channel;
     
@@ -88,40 +89,7 @@ void Utils::playSoundManual(Anim anim, float speed, float volume, const std::fil
     channel->setVolume(volume);
     channel->setPitch(speed);
     
-    class SoundUpdater : public CCObject {
-    
-    private:
-    
-        FMOD::Channel* m_channel = nullptr;
-        FMOD::Sound* m_sound = nullptr;
-        
-        SoundUpdater(FMOD::Channel* channel, FMOD::Sound* sound)
-            : m_channel(channel), m_sound(sound) {}
-        
-        void updateSound(float) {
-            bool isPlaying = true;
-            
-            m_channel->isPlaying(&isPlaying);
-            
-            if (m_channel && !isPlaying) {
-                m_sound->release();
-                this->release();
-                m_channel = nullptr;
-                CCScheduler::get()->unscheduleSelector(schedule_selector(SoundUpdater::updateSound), this);
-            }
-        }
-        
-    public:
-            
-        static void add(FMOD::Channel* channel, FMOD::Sound* sound) {
-            SoundUpdater* updater = new SoundUpdater(channel, sound);
-            updater->retain();
-            CCScheduler::get()->scheduleSelector(schedule_selector(SoundUpdater::updateSound), updater, 0.2f, kCCRepeatForever, 0, false);
-        }
-        
-    };
-    
-    SoundUpdater::add(channel, souwnd);
+    SoundManager::add(channel, souwnd);
 }
 
 BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
@@ -248,7 +216,7 @@ void Utils::setHighestZ(CCNode* node) {
     node->setZOrder(highest);
 }
 
-void Utils::fixSprite(CCSprite* sprite) {
+void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     float mult = 1.f;
 
     switch (GameManager::get()->m_texQuality) {

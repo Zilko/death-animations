@@ -34,7 +34,7 @@ public:
     static void setHookEnabled(const std::string&, bool);
     static void setHighestZ(CCNode*);
 
-    static void fixSprite(CCSprite*);
+    static void fixScaleTextureSizexd(CCNode*);
 
     static CCGLProgram* createShader(const std::string&, bool);
     static CCTexture2D* takeScreenshot(CCRenderTexture* = nullptr);

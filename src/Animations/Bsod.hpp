@@ -19,8 +19,6 @@ private:
     int m_currentPercent = 0;
     bool m_wasFPSVisible = false;
     bool m_didFreeze = false;
-    
-public:
 
     ~Bsod() {
         if (m_fpsLabel) {
@@ -33,32 +31,6 @@ public:
                 lbl->setVisible(true);
     }
 
-    DEFINE_CREATE(Bsod)
-    
-    void start() override {
-        BaseAnimation::start();
-        
-        if (!m_isPreview)
-            Utils::setHighestZ(this);
-        
-        scheduleOnce(schedule_selector(Bsod::firstStep), 2.2f / m_speed);
-        scheduleOnce(schedule_selector(Bsod::freeze), 0.05f / m_speed);
-        
-        if (CCLabelBMFont* lbl = CCDirector::get()->m_pFPSNode) {
-            m_fpsLabel = CCLabelBMFont::create(lbl->getString(), "chatFont.fnt");
-            m_fpsLabel->setAnchorPoint(lbl->getAnchorPoint());
-            m_fpsLabel->setPosition(lbl->getPosition());
-            m_fpsLabel->setScale(lbl->getScale());
-            
-            CCScene* scene = CCDirector::get()->getRunningScene();
-            
-            scene->addChild(m_fpsLabel, scene->getHighestChildZ() + 1);
-            
-            lbl->setVisible(false);
-            m_wasFPSVisible = true;
-        }
-    }
-    
     void freeze(float dt) {
         if (m_freezeSprite) {
             m_freezeSprite->removeFromParentAndCleanup(true);
@@ -222,6 +194,34 @@ public:
             
             if (isPlaying && m_diePositions.contains(channel))
                 channel->setPosition(m_diePositions.at(channel) - 16, FMOD_TIMEUNIT_MS);
+        }
+    }
+    
+public:
+
+    DEFINE_CREATE(Bsod)
+    
+    void start() override {
+        BaseAnimation::start();
+        
+        if (!m_isPreview)
+            Utils::setHighestZ(this);
+        
+        scheduleOnce(schedule_selector(Bsod::firstStep), 2.2f / m_speed);
+        scheduleOnce(schedule_selector(Bsod::freeze), 0.05f / m_speed);
+        
+        if (CCLabelBMFont* lbl = CCDirector::get()->m_pFPSNode) {
+            m_fpsLabel = CCLabelBMFont::create(lbl->getString(), "chatFont.fnt");
+            m_fpsLabel->setAnchorPoint(lbl->getAnchorPoint());
+            m_fpsLabel->setPosition(lbl->getPosition());
+            m_fpsLabel->setScale(lbl->getScale());
+            
+            CCScene* scene = CCDirector::get()->getRunningScene();
+            
+            scene->addChild(m_fpsLabel, scene->getHighestChildZ() + 1);
+            
+            lbl->setVisible(false);
+            m_wasFPSVisible = true;
         }
     }
     

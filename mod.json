@@ -39,6 +39,8 @@
 		  "resources/sounds/*.mp3",
 		  "resources/sounds/*.ogg",
 		  "resources/sounds/*.wav",
+		  "resources/fonts/*/*.fnt",
+		  "resources/fonts/*/*.png",
 			"resources/sprites/animations/celeste/*.png",
 			"resources/sprites/animations/maro/*.png",
 			"resources/sprites/animations/undertale/*.png",
@@ -54,10 +56,6 @@
       },
       "segoe-light": {
           "path": "resources/fonts/segoe-light.ttf",
-          "size": 100
-      },
-      "8bitoperator": {
-          "path": "resources/fonts/8bitoperator.ttf",
           "size": 100
       }
     }

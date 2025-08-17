@@ -39,6 +39,9 @@ public:
         setKeyboardEnabled(true);
         registerWithTouchDispatcher();
         setTouchMode(kCCTouchesOneByOne);
+
+        if (!m_isPreview)
+            setID("death-animation"_spr);
         
         m_parentNode->addChild(this);
     }

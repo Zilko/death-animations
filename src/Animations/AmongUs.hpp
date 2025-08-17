@@ -1,6 +1,5 @@
 #include "BaseAnimation.hpp"
 
-
 class AmongUs : public BaseAnimation {
 
 private:
@@ -38,33 +37,7 @@ private:
     
     int m_currentFrame = 0;
     int m_animation = 3;
-    
-public:
 
-    DEFINE_CREATE(AmongUs)
-
-    void start() override {
-        BaseAnimation::start();
-        
-        Utils::setHighestZ(this);
-        
-        Utils::playSound(Anim::AmongUs, "scary-among-us.ogg", m_speed, 0.5f);
-
-        m_bg = CCSprite::create("bg-among-us.png"_spr);
-        m_bg->setScaleX(2.98f);
-        m_bg->setScaleY(0.88f);
-        m_bg->setRotation(-25);
-        m_bg->setPosition(m_size / 2.f);
-        
-        addChild(m_bg);
-        
-        m_redLayer = CCLayerColor::create({255, 1, 0, 255}, m_size.width, m_size.height);
-        
-        addChild(m_redLayer);
-        
-        scheduleOnce(schedule_selector(AmongUs::firstStep), 0.09f / m_speed);
-    }
-    
     void firstStep(float) {
         m_redLayer->setVisible(false);
         
@@ -155,6 +128,32 @@ public:
     
     void playSound(float) {
         Utils::playSound(Anim::AmongUs, fmt::format("death-{}-among-us.ogg", m_animation), m_speed, 0.5f);
+    }
+    
+public:
+
+    DEFINE_CREATE(AmongUs)
+
+    void start() override {
+        BaseAnimation::start();
+        
+        Utils::setHighestZ(this);
+        
+        Utils::playSound(Anim::AmongUs, "scary-among-us.ogg", m_speed, 0.5f);
+
+        m_bg = CCSprite::create("bg-among-us.png"_spr);
+        m_bg->setScaleX(2.98f);
+        m_bg->setScaleY(0.88f);
+        m_bg->setRotation(-25);
+        m_bg->setPosition(m_size / 2.f);
+        
+        addChild(m_bg);
+        
+        m_redLayer = CCLayerColor::create({255, 1, 0, 255}, m_size.width, m_size.height);
+        
+        addChild(m_redLayer);
+        
+        scheduleOnce(schedule_selector(AmongUs::firstStep), 0.09f / m_speed);
     }
 
 };

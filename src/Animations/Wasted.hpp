@@ -76,6 +76,19 @@ private:
         Utils::setHookEnabled("ExplodeItemNode::update", false);
     }
 
+    void update(float dt) override {
+        if (m_frameSprite) m_frameSprite->setVisible(false);
+        
+        (void)Utils::takeScreenshot(m_renderTexture);
+
+        if (m_frameSprite) m_frameSprite->setVisible(true);
+    
+        m_time += dt;
+
+        m_program->use();
+        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time);
+    }
+
 public:
 
     DEFINE_CREATE(Wasted)
@@ -128,16 +141,4 @@ public:
         );
     }
 
-    void update(float dt) override {
-        if (m_frameSprite) m_frameSprite->setVisible(false);
-        
-        (void)Utils::takeScreenshot(m_renderTexture);
-
-        if (m_frameSprite) m_frameSprite->setVisible(true);
-    
-        m_time += dt;
-
-        m_program->use();
-        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time);
-    }
 };

@@ -131,28 +131,8 @@ private:
 
     bool m_isMarioSprite = false;
 
-public:
-    
-    DEFINE_CREATE(Maro)
-
-    void start() override {
-        BaseAnimation::start();
-
-        m_isMarioSprite = Utils::getSettingBool(Anim::Maro, "use-maro-sprite");
-
-        Utils::playSound(Anim::Maro, "maro-death.mp3", m_speed, 1.f);
-
-        if (!m_isMarioSprite)
-            m_program = Utils::createShader(Utils::getSettingBool(Anim::Maro, "use-nes-colors") ? m_shaderNES : m_shader, true);
-
-        if (m_isPreview)
-            playForPlayer(m_delegate->getPlayer());
-        else {
-            playForPlayer(m_playLayer->m_player1);
-            
-            if (Utils::getSettingBool(Anim::Maro, "second-player") && m_playLayer->m_gameState.m_isDualMode)
-                playForPlayer(m_playLayer->m_player2);
-        }
+    ~Maro() {
+        Utils::setHookEnabled("GJBaseGameLayer::update", false);
     }
 
     void playForPlayer(CCNodeRGBA* player) {
@@ -168,12 +148,12 @@ public:
             spr->runAction(
                 CCSequence::create(
                     CCDelayTime::create(0.35f),
-                    CCJumpBy::create(2.f, {0, -320}, 220, 1),
+                    CCJumpBy::create(2.f / m_speed, {0, -320}, 220, 1),
                     nullptr
                 )
             );
 
-            Utils::fixSprite(spr);
+            Utils::fixScaleTextureSizexd(spr);
 
             m_playerOpacities.push_back(std::make_pair(player, player->getOpacity()));
 
@@ -194,7 +174,7 @@ public:
         spr->runAction(
             CCSequence::create(
                 CCDelayTime::create(0.35f),
-                CCJumpBy::create(2.f, {0, -320}, 220, 1),
+                CCJumpBy::create(2.f / m_speed, {0, -320}, 220, 1),
                 nullptr
             )
         );
@@ -205,6 +185,31 @@ public:
         parent->addChild(spr);
         player->setOpacity(0);
         Utils::setHighestZ(spr);
+    }
+
+public:
+    
+    DEFINE_CREATE(Maro)
+
+    void start() override {
+        BaseAnimation::start();
+
+        m_isMarioSprite = Utils::getSettingBool(Anim::Maro, "use-maro-sprite");
+
+        Utils::playSound(Anim::Maro, "maro-death.mp3", m_speed, 1.f);
+        Utils::setHookEnabled("GJBaseGameLayer::update", true);
+
+        if (!m_isMarioSprite)
+            m_program = Utils::createShader(Utils::getSettingBool(Anim::Maro, "use-nes-colors") ? m_shaderNES : m_shader, true);
+
+        if (m_isPreview)
+            playForPlayer(m_delegate->getPlayer());
+        else {
+            playForPlayer(m_playLayer->m_player1);
+            
+            if (Utils::getSettingBool(Anim::Maro, "second-player") && m_playLayer->m_gameState.m_isDualMode)
+                playForPlayer(m_playLayer->m_player2);
+        }
     }
 
     void end() override {

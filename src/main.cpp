@@ -1,6 +1,7 @@
 #include "Includes.hpp"
 
 #include "Other/Utils.hpp"
+#include "Other/SoundManager.hpp"
 
 #include "UI/AnimationsLayer.hpp"
 
@@ -16,6 +17,7 @@
 #include <Geode/modify/CCCircleWave.hpp>
 #include <Geode/modify/CCParticleSystem.hpp>
 #include <Geode/modify/ExplodeItemNode.hpp>
+#include <Geode/modify/FMODAudioEngine.hpp>
 
 $on_mod(Loaded) {
 
@@ -68,10 +70,19 @@ class $modify(ProPlayLayer, PlayLayer) {
         (void)self.setHookPriorityPre("PlayLayer::destroyPlayer", Priority::Last);
     }
 
+    bool shouldReturn(Anim anim) {
+        return anim == Anim::None
+            || Utils::getRandomInt(1, 100) > static_cast<int>(Utils::getSettingFloat(anim, "probability"))
+            || (m_isPracticeMode && !Utils::getSettingBool(anim, "play-in-practice"))
+            || (m_isTestMode && !Utils::getSettingBool(anim, "play-in-testmode"))
+            || getCurrentPercentInt() < Utils::getSettingFloat(anim, "only-after")
+            || (getCurrentPercentInt() <= m_level->m_normalPercent && Utils::getSettingBool(anim, "only-on-new-best"));
+    }
+
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
         Anim anim = Utils::getSelectedAnimationEnum();
 
-        if (anim == Anim::None)
+        if (shouldReturn(anim))
             return PlayLayer::destroyPlayer(p0, p1);
 
         bool og = m_gameState.m_unkBool26;
@@ -79,38 +90,20 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (Utils::getSelectedAnimation(anim).isNoDeathEffect || Utils::getSelectedAnimation(anim).isNoDeathSound)
             m_gameState.m_unkBool26 = true;
 
-        std::string oldBests = m_level->m_personalBests;
-
         PlayLayer::destroyPlayer(p0, p1);
 
         m_gameState.m_unkBool26 = og;
         
         if (p1 == m_anticheatSpike) return;
-            
-        if (Utils::getRandomInt(1, 100) > static_cast<int>(Utils::getSettingFloat(anim, "probability")))
-            return;
-        
-        if (m_isPracticeMode && !Utils::getSettingBool(anim, "play-in-practice"))
-            return;
-
-        if (m_isTestMode && !Utils::getSettingBool(anim, "play-in-testmode"))
-            return;
-
-        if (getCurrentPercentInt() < Utils::getSettingFloat(anim, "only-after"))
-            return;
-
-        if (Utils::getSettingBool(anim, "only-on-new-best") && oldBests == m_level->m_personalBests)
-            return;
         
         while (anim == Anim::Random)
             anim = static_cast<Anim>(Utils::getRandomInt(1, animations.size()));
         
         auto f = m_fields.self();
-        
-        float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
 
-        if (f->m_animation)
-            f->m_animation->end();
+        if (f->m_animation) return;
+
+        float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
         f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed});      
       
@@ -158,6 +151,16 @@ class $modify(ProPlayLayer, PlayLayer) {
             f->m_animation = nullptr;
         }
     }
+
+    void pauseGame(bool p0) {
+        PlayLayer::pauseGame(p0);
+        SoundManager::pause(true);
+    }
+
+    void resume() {
+        PlayLayer::resume();
+        SoundManager::pause(false);
+    }
     
 };
 
@@ -188,11 +191,12 @@ class $modify(CCCircleWave) {
 class $modify(GJBaseGameLayer) {
 
     void update(float dt) { // disabled by defolt
-        GJBaseGameLayer::update(dt * 0.025f);
+        if (!Utils::getSelectedAnimation().isFreezeGameLayer)
+            GJBaseGameLayer::update(dt * 0.025f);
     }
 
     void shakeCamera(float duration, float strength, float interval) {
-        if (!Utils::getSelectedAnimation().isNoDeathEffect)
+        if (!Utils::getSelectedAnimation().isNoDeathEffect && !Utils::getSelectedAnimation().isNoShakeEffect)
             GJBaseGameLayer::shakeCamera(duration, strength, interval);
     }
 

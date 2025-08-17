@@ -42,7 +42,11 @@ private:
 
     CCGLProgram* m_program = nullptr;
     
+    float m_speed = 0.f;
     float m_time = 0.f;
+
+    GhostNode(float speed)
+        : m_speed(speed) {}
 
     void init(CCNodeRGBA* player) {
         (void)CCNode::init();
@@ -54,7 +58,7 @@ private:
 
         addChild(spr);
 
-        spr->runAction(CCMoveBy::create(2.3f, {0, 500}));
+        spr->runAction(CCMoveBy::create(2.3f / m_speed, {0, 500}));
 
         scheduleOnce(schedule_selector(GhostNode::setHighestZ), 0.05f);
         schedule(schedule_selector(GhostNode::update));
@@ -72,8 +76,8 @@ private:
 
 public:
 
-    static GhostNode* create(CCNodeRGBA* player) {
-        GhostNode* ret = new GhostNode();
+    static GhostNode* create(CCNodeRGBA* player, float speed) {
+        GhostNode* ret = new GhostNode(speed);
 
         ret->init(player);
         ret->autorelease();
@@ -91,7 +95,7 @@ private:
     std::vector<GhostNode*> m_ghosts;
 
     void addGhost(CCNodeRGBA* player) {
-        GhostNode* ghost = GhostNode::create(player);
+        GhostNode* ghost = GhostNode::create(player, m_speed);
         ghost->setPosition(player->getPosition());
 
         Utils::setHighestZ(ghost);
