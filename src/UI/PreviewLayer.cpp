@@ -1,6 +1,15 @@
 #include "../Other/Utils.hpp"
+#include "../Other/SoundManager.hpp"
 
 #include "PreviewLayer.hpp"
+
+PreviewLayer::~PreviewLayer() {
+    if (m_circleWave)
+        m_circleWave->release();
+
+    FMODAudioEngine::get()->stopAllEffects();
+    SoundManager::stop();
+}
 
 PreviewLayer* PreviewLayer::create() {
     PreviewLayer* ret = new PreviewLayer();
@@ -27,14 +36,16 @@ void PreviewLayer::spawnPlayer(float) {
         m_animation = nullptr;
     }
     
+    unschedule(schedule_selector(PreviewLayer::playerDied));
     scheduleOnce(schedule_selector(PreviewLayer::playerDied), m_time);
     
     m_player->setPosition({m_size.width / 2.f - 100, 95.5f});
+    m_player->stopAllActions();
     m_player->runAction(CCMoveTo::create(m_time, {m_spike->getPositionX() - 17.5f, 95.5f}));
     m_player->runAction(CCSequence::create(CCBlink::create(0.4f, 4), CCShow::create(), nullptr));
     
     if (m_circleWave)
-        m_circleWave->release();
+        m_circleWave->removeFromParentAndCleanup(true);
     
     m_circleWave = CCCircleWave::create(70.0,2.0,0.3,true,true);
     m_circleWave->m_color.r = 255;
@@ -72,7 +83,8 @@ void PreviewLayer::playerDied(float) {
 void PreviewLayer::playDeathEffect() {
     if (Utils::getSelectedAnimation().isNoDeathEffect) return;
     
-    FMODAudioEngine::get()->playEffect("explode_11.ogg", 1.f, 0.f, 0.5f);
+    if (!Utils::getSelectedAnimation().isNoDeathSound)
+        FMODAudioEngine::get()->playEffect("explode_11.ogg", 1.f, 0.f, 0.5f);
     
     CCParticleSystemQuad* particles = CCParticleSystemQuad::create("explodeEffect.plist", false);
     particles->setScale(0.7f);    
@@ -94,13 +106,11 @@ void PreviewLayer::playDeathEffect() {
     m_player->setVisible(false);
 }
 
-void PreviewLayer::onClose(CCObject*) {
-    geode::Popup<>::onClose(nullptr);
-    
-    FMODAudioEngine::get()->stopAllEffects();
-    
-    if (m_circleWave)
-        m_circleWave->release();
+void PreviewLayer::keyDown(enumKeyCodes key) {
+    if (key == enumKeyCodes::KEY_R)
+        spawnPlayer(0.f);
+
+    geode::Popup<>::keyDown(key);
 }
 
 bool PreviewLayer::setup() {
@@ -110,6 +120,7 @@ bool PreviewLayer::setup() {
     m_closeBtn->setVisible(false);
     
     setOpacity(0);
+    setKeyboardEnabled(true);
     runAction(CCEaseInOut::create(CCFadeTo::create(0.22f, 200), 2.f));
     
     CCSprite* spr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");

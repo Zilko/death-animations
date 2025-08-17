@@ -59,7 +59,7 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade
             
     FMODAudioEngine::get()->playEffectAdvanced(
         (Mod::get()->getResourcesDir() / sound).string().c_str(),
-        1.f, 1.f, volume, speed, 1.f, 1.f, 0, duration, fadeIn, fadeOut, loop, 1, false, false, 1, 1, 0, 1
+        1.f, 1.f, volume, speed, 1.f, 1.f, 0, duration, fadeIn, fadeOut, loop, 0, false, false, 0, 0, 0, 0
     );
 }
 

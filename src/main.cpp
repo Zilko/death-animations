@@ -67,7 +67,7 @@ class $modify(ProPlayLayer, PlayLayer) {
     };
     
     static void onModify(auto& self) {
-        (void)self.setHookPriorityPre("PlayLayer::destroyPlayer", Priority::Last);
+        (void)self.setHookPriorityPre("PlayLayer::destroyPlayer", Priority::Last + 21903809);
     }
 
     bool shouldReturn(Anim anim) {

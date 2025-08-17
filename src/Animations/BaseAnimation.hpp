@@ -36,7 +36,6 @@ public:
         setContentSize(m_size);
         setAnchorPoint({0, 0});
         setTouchEnabled(true);
-        setKeyboardEnabled(true);
         registerWithTouchDispatcher();
         setTouchMode(kCCTouchesOneByOne);
 
@@ -50,8 +49,6 @@ public:
         removeFromParentAndCleanup(true);
     }
     
-    bool ccTouchBegan(CCTouch*, CCEvent*) override {
-        return false;
-    }
+    virtual bool ccTouchBegan(CCTouch*, CCEvent*) override { return false; }
   
 };

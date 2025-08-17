@@ -20,15 +20,17 @@ private:
     float m_speed = 1.f;
     float m_duration = 0.f;
 
+    ~PreviewLayer();
+
     bool setup() override;
     
     void updateCircle(float);
     void spawnPlayer(float = 0.f);
     void playerDied(float);
     void playDeathEffect();
-    
-    void onClose(CCObject*) override;
 
+    virtual void keyDown(enumKeyCodes) override;
+    
 public:
     
     static PreviewLayer* create();
