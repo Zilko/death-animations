@@ -39,4 +39,5 @@ public:
     static CCGLProgram* createShader(const std::string&, bool);
     static CCTexture2D* takeScreenshot(CCRenderTexture* = nullptr);
     static CCSprite* renderPlayer(CCNodeRGBA*, bool);
+    
 };

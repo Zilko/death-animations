@@ -33,7 +33,8 @@
 			"resources/sprites/animations/bsod/*.png",
 			"resources/sprites/animations/jumpscare/*.png",
 			"resources/sprites/animations/to-be-continued/*.png",
-			"resources/sprites/animations/you-died/*.png"
+			"resources/sprites/animations/you-died/*.png",
+			"resources/sprites/animations/wasted/*.png"
 			],
 		"files": [
 		  "resources/sounds/*.mp3",

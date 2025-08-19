@@ -82,6 +82,8 @@ class $modify(ProPlayLayer, PlayLayer) {
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
         Anim anim = Utils::getSelectedAnimationEnum();
 
+        //  m_level->m_normalPercent = 0;
+
         if (shouldReturn(anim))
             return PlayLayer::destroyPlayer(p0, p1);
 
