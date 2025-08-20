@@ -15,6 +15,7 @@
 #include "../Animations/Minecraft.hpp"
 #include "../Animations/Terraria.hpp"
 #include "../Animations/CBFDetected.hpp"
+#include "../Animations/Pop.hpp"
 
 #include <random>
 
@@ -107,6 +108,7 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(Minecraft)
     ANIMATION_CHECK(Terraria)
     ANIMATION_CHECK(CBFDetected)
+    ANIMATION_CHECK(Pop)
     return nullptr;
 }
 

@@ -12,24 +12,9 @@
 	"developer": "Zilko",
 	"description": "Animates ur deaths",
 	"resources": {
-	  "spritesheets": {
-      "among-us-death-1": [
-        "resources/sprites/animations/among-us/death-1/*.png"
-      ],
-      "among-us-death-2": [
-        "resources/sprites/animations/among-us/death-2/*.png"
-      ],
-      "among-us-death-3": [
-        "resources/sprites/animations/among-us/death-3/*.png"
-      ],
-      "among-us-death-4": [
-        "resources/sprites/animations/among-us/death-4/*.png"
-      ]
-    },
 	  "sprites": [
 			"resources/sprites/ui/*.png",
 			"resources/sprites/ui/thumbnails/*.png",
-			"resources/sprites/animations/among-us/*.png",
 			"resources/sprites/animations/bsod/*.png",
 			"resources/sprites/animations/jumpscare/*.png",
 			"resources/sprites/animations/to-be-continued/*.png",
@@ -42,6 +27,7 @@
 		  "resources/sounds/*.wav",
 		  "resources/fonts/*/*.fnt",
 		  "resources/fonts/*/*.png",
+		  "resources/sprites/animations/among-us/*.png",
 			"resources/sprites/animations/celeste/*.png",
 			"resources/sprites/animations/maro/*.png",
 			"resources/sprites/animations/undertale/*.png",

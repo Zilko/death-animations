@@ -17,11 +17,14 @@
 #include <Geode/modify/CCCircleWave.hpp>
 #include <Geode/modify/CCParticleSystem.hpp>
 #include <Geode/modify/ExplodeItemNode.hpp>
-#include <Geode/modify/FMODAudioEngine.hpp>
+#include <Geode/modify/CCAnimation.hpp>
+#include <Geode/modify/CCFadeOut.hpp>
 
 $on_mod(Loaded) {
 
     Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
+    Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+    Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
     Utils::setHookEnabled("GJBaseGameLayer::update", false);
     Utils::setHookEnabled("ExplodeItemNode::update", false);
@@ -82,17 +85,27 @@ class $modify(ProPlayLayer, PlayLayer) {
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
         Anim anim = Utils::getSelectedAnimationEnum();
 
-        //  m_level->m_normalPercent = 0;
-
         if (shouldReturn(anim))
             return PlayLayer::destroyPlayer(p0, p1);
 
+        const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
+
         bool og = m_gameState.m_unkBool26;
 
-        if (Utils::getSelectedAnimation(anim).isNoDeathEffect || Utils::getSelectedAnimation(anim).isNoDeathSound)
+        if (animation.isNoDeathEffect || animation.isNoDeathSound)
             m_gameState.m_unkBool26 = true;
 
+        if (animation.isSlowDown) {
+            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);
+            Utils::setHookEnabled("cocos2d::CCFadeOut::create", true);
+        }
+
         PlayLayer::destroyPlayer(p0, p1);
+
+        if (animation.isSlowDown) {
+            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+            Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
+        }
 
         m_gameState.m_unkBool26 = og;
         
@@ -119,7 +132,7 @@ class $modify(ProPlayLayer, PlayLayer) {
             return;
         
         CCSequence* seq = CCSequence::create(
-            CCDelayTime::create(Utils::getSelectedAnimation(anim).duration / speed + 0.05f),
+            CCDelayTime::create(animation.duration / speed + 0.05f),
             CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedResetLevelReal)),
             nullptr
         );
@@ -154,6 +167,16 @@ class $modify(ProPlayLayer, PlayLayer) {
         }
     }
 
+    void dialogClosed(DialogLayer* wa) {
+        if (!m_fields->m_animation)
+            PlayLayer::dialogClosed(wa);
+    }
+
+    void currencyWillExit(CurrencyRewardLayer* wa) {
+        if (!m_fields->m_animation)
+            PlayLayer::currencyWillExit(wa);
+    }
+
     void pauseGame(bool p0) {
         PlayLayer::pauseGame(p0);
         SoundManager::pause(true);
@@ -164,6 +187,22 @@ class $modify(ProPlayLayer, PlayLayer) {
         SoundManager::pause(false);
     }
     
+};
+
+class $modify(CCAnimation) {
+
+    static CCAnimation* createWithSpriteFrames(CCArray* a, float time) { // disabled by defolt
+        return CCAnimation::createWithSpriteFrames(a, time / 0.07f);
+    }
+
+};
+
+class $modify(CCFadeOut) {
+
+    static CCFadeOut* create(float time) { // disabled by defolt
+        return CCFadeOut::create(time / 0.07f);
+    }
+
 };
 
 class $modify(ExplodeItemNode) {

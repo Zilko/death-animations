@@ -85,6 +85,7 @@ private:
     CCRenderTexture* m_renderTexture = nullptr;
 
     CCSprite* m_frameSprite = nullptr;
+    CCSprite* m_wastedSprite = nullptr;
 
     CCNode* m_wastedContainer = nullptr;
 
@@ -115,7 +116,7 @@ private:
         m_time += dt;
 
         m_program->use();
-        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time);
+        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time / m_speed);
     }
 
     void addWasted(float) {
@@ -157,14 +158,24 @@ private:
         layer2->removeFromParentAndCleanup(true);
         layer3->removeFromParentAndCleanup(true);
 
-        CCSprite* spr = CCSprite::create("wasted.png"_spr);
-        spr->setColor({187, 57, 57});
-        spr->setOpacity(230);
-        spr->setScale(1.06f);
-        spr->setPosition(m_size / 2.f - ccp(0, 2));
+        m_wastedSprite = CCSprite::create("wasted.png"_spr);
+        m_wastedSprite->setColor({187, 57, 57});
+        m_wastedSprite->setOpacity(230);
+        m_wastedSprite->setScale(1.06f);
+        m_wastedSprite->setPosition(m_size / 2.f - ccp(0, 2));
 
-        m_wastedContainer->addChild(spr);
+        m_wastedContainer->addChild(m_wastedSprite);
         m_wastedContainer->setPositionY(8);
+    }
+
+    void startFadeOut(float) {
+        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height);
+        layer->setOpacity(0);
+        layer->runAction(CCFadeIn::create(2.5f / m_speed));
+     
+        addChild(layer, 10);
+
+        m_wastedSprite->runAction(CCFadeTo::create(2.5f / m_speed, 0));
     }
 
 public:
@@ -236,65 +247,68 @@ public:
 
         CCPoint pos = m_frameSprite->getPosition();
 
-        scheduleOnce(schedule_selector(Wasted::addWasted), 2.17f);
+        scheduleOnce(schedule_selector(Wasted::addWasted), 2.17f / m_speed);
+        scheduleOnce(schedule_selector(Wasted::startFadeOut), 5.2f / m_speed);
 
         m_frameSprite->runAction(
             CCSpawn::create(
                 CCSequence::create(
-                    CCEaseSineOut::create(CCScaleTo::create(0.25f, 1.12f)),
-                    CCEaseSineInOut::create(CCScaleTo::create(0.2f, 1.115f)),
-                    CCEaseSineInOut::create(CCScaleTo::create(1.72f, 1.13f)),
-                    CCEaseSineInOut::create(CCScaleTo::create(0.03f, 1.12f)),
-                    CCEaseSineInOut::create(CCScaleTo::create(7.f, 1.f)),
+                    CCEaseSineOut::create(CCScaleTo::create(0.25f / m_speed, 1.12f)),
+                    CCEaseSineInOut::create(CCScaleTo::create(0.2f / m_speed, 1.115f)),
+                    CCEaseSineInOut::create(CCScaleTo::create(1.72f / m_speed, 1.13f)),
+                    CCEaseSineInOut::create(CCScaleTo::create(0.03f / m_speed, 1.12f)),
+                    CCEaseSineInOut::create(CCScaleTo::create(7.f / m_speed, 1.f)),
                     nullptr
                 ),
                 CCSequence::create(
-                    CCDelayTime::create(0.05f),
-                    CCEaseSineInOut::create(CCRotateBy::create(2.12f, 5.02857f)),
+                    CCDelayTime::create(0.05f / m_speed),
+                    CCEaseSineInOut::create(CCRotateBy::create(2.12f / m_speed, 5.02857f)),
                     CCRotateBy::create(0.f, 5),
+                    CCDelayTime::create(0.5f / m_speed),
+                    CCEaseSineInOut::create(CCRotateBy::create(4.f / m_speed, -5.02857f)),
                     nullptr
                 ),
                 CCSequence::create(
-                    CCDelayTime::create(0.05f),
-                    CCEaseSineOut::create(CCMoveTo::create(1.8f, pos - ccp(10, -8))),
+                    CCDelayTime::create(0.05f / m_speed),
+                    CCEaseSineOut::create(CCMoveTo::create(1.8f / m_speed, pos - ccp(10, -8))),
                     nullptr
                 ),
                 CCSequence::create(
-                    CCDelayTime::create(0.3f),
-                    CCEaseSineOut::create(CCMoveTo::create(2.4f, pos - ccp(3, -8))),
+                    CCDelayTime::create(0.3f / m_speed),
+                    CCEaseSineOut::create(CCMoveTo::create(2.4f / m_speed, pos - ccp(3, -8))),
                     nullptr
                 ),
                 CCSequence::create(
-                    CCDelayTime::create(0.5f),
-                    CCEaseSineInOut::create(CCMoveTo::create(2.4f, pos - ccp(7, 23))),
+                    CCDelayTime::create(0.5f / m_speed),
+                    CCEaseSineInOut::create(CCMoveTo::create(2.4f / m_speed, pos - ccp(7, 23))),
                     nullptr
                 ),
                 CCSequence::create(
-                    CCDelayTime::create(1.5f),
-                    CCEaseSineInOut::create(CCMoveBy::create(2.4f, ccp(13, -5))),
+                    CCDelayTime::create(1.5f / m_speed),
+                    CCEaseSineInOut::create(CCMoveBy::create(2.4f / m_speed, ccp(13, -5))),
                     nullptr
                 ),
                 CCSequence::create(
-                    CCDelayTime::create(3.9f),
+                    CCDelayTime::create(3.9f / m_speed),
                     CCSpawn::create(
                         CCSequence::create(
-                            CCDelayTime::create(0.05f),
-                            CCEaseSineOut::create(CCMoveBy::create(1.8f, ccp(0, 3))),
+                            CCDelayTime::create(0.05f / m_speed),
+                            CCEaseSineOut::create(CCMoveBy::create(1.8f / m_speed, ccp(0, 3))),
                             nullptr
                         ),
                         CCSequence::create(
-                            CCDelayTime::create(0.3f),
-                            CCEaseSineOut::create(CCMoveBy::create(2.4f, ccp(-3, 3))),
+                            CCDelayTime::create(0.3f / m_speed),
+                            CCEaseSineOut::create(CCMoveBy::create(2.4f / m_speed, ccp(-3, 3))),
                             nullptr
                         ),
                         CCSequence::create(
-                            CCDelayTime::create(0.5f),
-                            CCEaseSineInOut::create(CCMoveBy::create(2.4f, ccp(-7, 12))),
+                            CCDelayTime::create(0.5f / m_speed),
+                            CCEaseSineInOut::create(CCMoveBy::create(2.4f / m_speed, ccp(-7, 12))),
                             nullptr
                         ),
                         CCSequence::create(
-                            CCDelayTime::create(1.5f),
-                            CCEaseSineInOut::create(CCMoveBy::create(2.4f, ccp(-13, 5))),
+                            CCDelayTime::create(1.5f / m_speed),
+                            CCEaseSineInOut::create(CCMoveBy::create(2.4f / m_speed, ccp(-13, 5))),
                             nullptr
                         ),
                         nullptr
