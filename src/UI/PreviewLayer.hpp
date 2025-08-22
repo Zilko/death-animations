@@ -6,6 +6,8 @@ class PreviewLayer : public geode::Popup<>, public PreviewEvents {
   
 private:
 
+    CCMenuItemSpriteExtra* m_backButton = nullptr;
+
     CCSprite* m_spike = nullptr;
 
     SimplePlayer* m_player = nullptr;
@@ -36,5 +38,6 @@ public:
     static PreviewLayer* create();
     
     CCNodeRGBA* getPlayer() override;
+    CCNode* getBackButton() override;
 
 };

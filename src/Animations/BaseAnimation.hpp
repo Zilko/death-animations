@@ -30,6 +30,10 @@ protected:
         m_size = CCDirector::get()->getWinSize();
     }
 
+    virtual void setAnimationID() {
+        setID("death-animation"_spr);
+    }
+
 public:
 
     virtual void start() {
@@ -38,9 +42,7 @@ public:
         setTouchEnabled(true);
         registerWithTouchDispatcher();
         setTouchMode(kCCTouchesOneByOne);
-
-        if (!m_isPreview)
-            setID("death-animation"_spr);
+        setAnimationID();
         
         m_parentNode->addChild(this);
     }

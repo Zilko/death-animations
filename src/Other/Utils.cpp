@@ -18,6 +18,7 @@
 #include "../Animations/Pop.hpp"
 
 #include <random>
+#include <Geode/cocos/support/data_support/uthash.h>
 
 int Utils::getRandomInt(int min, int max) {
     static std::mt19937 gen(std::random_device{}());

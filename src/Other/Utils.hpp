@@ -22,7 +22,7 @@ public:
     static Anim getSelectedAnimationEnum();
     static const DeathAnimation& getSelectedAnimation();
     static const DeathAnimation& getSelectedAnimation(Anim anim);
-    
+
     static float getSpeedValue(float);
     static float getSettingFloat(int, const std::string&);
     static bool getSettingBool(int, const std::string&);

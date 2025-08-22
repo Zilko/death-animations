@@ -221,7 +221,21 @@ private:
         m_label1->removeFromParentAndCleanup(true);
         m_label2->removeFromParentAndCleanup(true);
 
-        m_label1 = createLabel("E r i m a n t u s !", 100);
+        std::string name = GJAccountManager::get()->m_username;
+
+        if (name.empty())
+            name = "Player";
+
+        std::string newName;
+
+        for (char c : name) {
+            newName += c;
+            newName += " ";
+        }
+
+        newName += "!";
+
+        m_label1 = createLabel(newName.c_str(), 100);
         m_label2 = createLabel("S t a y    d e t e r m i n e d .  .  .", 76);
 
         loadLabel(m_label1);

@@ -7,6 +7,8 @@ class PreviewEvents {
 public:
 
     virtual CCNodeRGBA* getPlayer() { return nullptr; }
+
+    virtual CCNode* getBackButton() { return nullptr; }
     
 };
 
@@ -79,6 +81,8 @@ struct ExtraParams {
     int transition = 0;
     bool reverse = false;
     CCPoint position = {0, 0};
+    DashRingObject* dashOrb1 = nullptr;
+    DashRingObject* dashOrb2 = nullptr;
 };
 
 struct AnimationParams {
@@ -193,7 +197,7 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "ignore-volume", .name = "Ignore Volume", .description = "Ignore the game's SFX volume.", .type = SettingType::Toggle },
         { .id = "fill-screen", .name = "Fill Screen", .description = "Make the image fill the screen (may crop the image).", .type = SettingType::Toggle },
         { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the jumpscare images; one will be chosen at random.", .type = SettingType::JumpscareFolder },
-        { .id = "sounds-folder", .name = "Sounds Folder", .description = "Folder containing the jumpscare sounds; one will be chosen at random.", .type = SettingType::JumpscareFolder }
+        { .id = "sounds-folder", .name = "Sounds Folder", .description = "Folder containing the jumpscare sounds; one will be chosen at random.", .type = SettingType::JumpscareFolder },
     } },
     { Anim::Maro, {
         { .id = "use-nes-colors", .name = "Use NES Colors", .description = "", .type = SettingType::Toggle },
@@ -201,7 +205,9 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
     } },
     { Anim::CBFDetected, {
-        { .id = "use-level-name", .name = "Use Level Name", .description = "",. type = SettingType::Toggle }
+        { .id = "use-level-name", .name = "Use Level Name", .description = "",. type = SettingType::Toggle },
+        { .id = "include-loser", .name = "Include Loser! text", .description = "",. type = SettingType::Toggle },
+        { .id = "yellow-color", .name = "Yellow Color", .description = "",. type = SettingType::Toggle }
     } },
     { Anim::Undertale, {
         { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }

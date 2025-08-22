@@ -88,8 +88,9 @@ private:
     CCSprite* m_wastedSprite = nullptr;
 
     CCNode* m_wastedContainer = nullptr;
+    CCNode* m_explosionSprite = nullptr;
 
-    float m_time = 0.f;
+     float m_time = 0.f;
 
     ~Wasted() {
         if (m_renderTexture)
@@ -107,13 +108,18 @@ private:
     void update(float dt) override {
         if (m_frameSprite) m_frameSprite->setVisible(false);
         if (m_wastedContainer) m_wastedContainer->setVisible(false);
+        if (m_isPreview) m_delegate->getBackButton()->setVisible(false);
         
         (void)Utils::takeScreenshot(m_renderTexture);
 
         if (m_frameSprite) m_frameSprite->setVisible(true);
         if (m_wastedContainer) m_wastedContainer->setVisible(true);
+        if (m_isPreview) m_delegate->getBackButton()->setVisible(true);
     
         m_time += dt;
+
+        if (m_explosionSprite && static_cast<CCNodeRGBA*>(m_explosionSprite)->getOpacity() < 50)
+            m_explosionSprite = nullptr;
 
         m_program->use();
         m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time / m_speed);
@@ -194,6 +200,9 @@ public:
 
         Utils::setHighestZ(this);
 
+        if (!m_isPreview)
+            m_explosionSprite = m_playLayer->m_player1->m_parentLayer->getChildByType<CCSprite>(-1);
+
         m_program = Utils::createShader(m_shader, false);
 
         m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
@@ -243,7 +252,8 @@ public:
 
         m_frameSprite->addChild(copy);
 
-        schedule(schedule_selector(Wasted::update), 1.f / 240.f, kCCRepeatForever, 1.f / 240.f); // papi
+        float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
+        schedule(schedule_selector(Wasted::update), 1.f / fps, kCCRepeatForever, 1.f / fps);
 
         CCPoint pos = m_frameSprite->getPosition();
 
@@ -318,6 +328,13 @@ public:
                 nullptr
             )
         );
+    }
+
+    void end() override {
+        if (m_explosionSprite)
+            m_explosionSprite->removeFromParentAndCleanup(true);
+
+        BaseAnimation::end();
     }
 
 };

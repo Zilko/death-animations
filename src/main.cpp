@@ -17,14 +17,14 @@
 #include <Geode/modify/CCCircleWave.hpp>
 #include <Geode/modify/CCParticleSystem.hpp>
 #include <Geode/modify/ExplodeItemNode.hpp>
-#include <Geode/modify/CCAnimation.hpp>
 #include <Geode/modify/CCFadeOut.hpp>
+#include <Geode/modify/CCAnimation.hpp>
 
 $on_mod(Loaded) {
 
-    Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
-    Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
     Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
+    Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+    Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
     Utils::setHookEnabled("GJBaseGameLayer::update", false);
     Utils::setHookEnabled("ExplodeItemNode::update", false);
@@ -83,44 +83,41 @@ class $modify(ProPlayLayer, PlayLayer) {
     }
 
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
+        auto f = m_fields.self();
+
         Anim anim = Utils::getSelectedAnimationEnum();
 
-        if (shouldReturn(anim))
+        if (shouldReturn(anim) || p1 == m_anticheatSpike || f->m_animation)
             return PlayLayer::destroyPlayer(p0, p1);
 
         const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
-
         bool og = m_gameState.m_unkBool26;
+        DashRingObject* dashOrb1 = m_player1->m_isDashing ? m_player1->m_dashRing : nullptr;
+        DashRingObject* dashOrb2 = m_player2->m_isDashing && m_gameState.m_isDualMode ? m_player2->m_dashRing : nullptr;
 
         if (animation.isNoDeathEffect || animation.isNoDeathSound)
             m_gameState.m_unkBool26 = true;
 
         if (animation.isSlowDown) {
-            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);
             Utils::setHookEnabled("cocos2d::CCFadeOut::create", true);
+            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);
         }
 
         PlayLayer::destroyPlayer(p0, p1);
 
         if (animation.isSlowDown) {
-            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
             Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
+            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
         }
 
         m_gameState.m_unkBool26 = og;
         
-        if (p1 == m_anticheatSpike) return;
-        
         while (anim == Anim::Random)
             anim = static_cast<Anim>(Utils::getRandomInt(1, animations.size()));
-        
-        auto f = m_fields.self();
-
-        if (f->m_animation) return;
 
         float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
-        f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed});      
+        f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed, { .dashOrb1 = dashOrb1, .dashOrb2 = dashOrb2 }});      
       
         if (!f->m_animation) return;
         
@@ -189,18 +186,18 @@ class $modify(ProPlayLayer, PlayLayer) {
     
 };
 
-class $modify(CCAnimation) {
-
-    static CCAnimation* createWithSpriteFrames(CCArray* a, float time) { // disabled by defolt
-        return CCAnimation::createWithSpriteFrames(a, time / 0.07f);
-    }
-
-};
-
 class $modify(CCFadeOut) {
 
     static CCFadeOut* create(float time) { // disabled by defolt
         return CCFadeOut::create(time / 0.07f);
+    }
+
+};
+
+class $modify(CCAnimation) {
+
+    static CCAnimation* createWithSpriteFrames(CCArray* array, float time) { // disabled by defolt
+        return CCAnimation::createWithSpriteFrames(array, time / 0.07f);
     }
 
 };

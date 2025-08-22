@@ -126,10 +126,10 @@ bool PreviewLayer::setup() {
     CCSprite* spr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
     spr->setScale(0.8f);
     
-    CCMenuItemSpriteExtra* btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(PreviewLayer::onClose));
-    btn->setPosition({20, m_size.height - 20});
+    m_backButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(PreviewLayer::onClose));
+    m_backButton->setPosition({20, m_size.height - 20});
     
-    m_buttonMenu->addChild(btn);
+    m_buttonMenu->addChild(m_backButton);
     m_buttonMenu->setZOrder(11);
     
     CCSprite* line = CCSprite::createWithSpriteFrameName("floorLine_01_001.png");
@@ -176,4 +176,8 @@ bool PreviewLayer::setup() {
 
 CCNodeRGBA* PreviewLayer::getPlayer() {
     return m_player;
+}
+
+CCNode* PreviewLayer::getBackButton() {
+    return m_backButton;
 }

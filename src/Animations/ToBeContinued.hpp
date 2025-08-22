@@ -43,7 +43,7 @@ public:
         
         addChild(freezeSprite);
         
-        Utils::playSound(Anim::ToBeContinued, "roundabout.mp3", m_speed, 1.f);
+        Utils::playSound(Anim::ToBeContinued, "roundabout.mp3", m_speed, 0.7f);
         
         CCSprite* spr = CCSprite::create("to-be-continued.png"_spr);
         spr->setPosition({m_size.width, 16});

@@ -77,6 +77,8 @@ private:
     }
 
     bool init(CCNodeRGBA* player, const CCPoint& velocity) {
+        setID("celeste-explosion"_spr);
+
         m_program = Utils::createShader(m_shader, true);
 
         m_playerSprite = Utils::renderPlayer(player, false);
@@ -409,11 +411,17 @@ private:
         container->runAction(CCMoveTo::create(0.3f / m_speed, {m_reverse ? m_size.width + m_size.width + spr->getContentWidth() * spr->getScale() : 0, 0}));
     }
 
+    void setAnimationID() override {
+        setID("celeste-transition"_spr);
+    }
+
 public:
 
     DEFINE_CREATE(CelesteTransition)
     
     void start() override {
+        BaseAnimation::start();
+
         m_reverse = m_extras.reverse;
 
         if (m_isPreview)
@@ -437,8 +445,6 @@ private:
 
     std::vector<CCSprite*> m_animationSprites;
     std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
-    
-    ccColor3B m_color = {172, 62, 56};
     
     bool m_isWhite = false;
 
@@ -473,7 +479,7 @@ private:
         cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
 
         CCSprite* sprite = CCSprite::createWithSpriteFrame(cache->spriteFrameByName("celeste-revive-1.png"_spr));
-        sprite->setColor(m_color);
+        sprite->setColor({172, 62, 56});
         sprite->setScale(8.75f);
         sprite->getTexture()->setAliasTexParameters();
         sprite->setPosition(player->getPosition());
@@ -497,7 +503,7 @@ private:
         m_isWhite = !m_isWhite;
         
         for (CCSprite* sprite : m_animationSprites)
-            sprite->setColor(m_isWhite ? ccc3(255, 255, 255) : m_color);
+            sprite->setColor(m_isWhite ? ccc3(255, 255, 255) : ccc3(172, 62, 56));
     }
     
     void implosionEnded() {
@@ -517,6 +523,10 @@ private:
         Utils::playSound(Anim::Celeste, "revive-celeste.wav", m_speed, 1.f);
     }
 
+    void setAnimationID() override {
+        setID("celeste-revive"_spr);
+    }
+
 public:
 
     DEFINE_CREATE(CelesteRevive);
@@ -526,13 +536,10 @@ public:
         
         if (m_isPreview)
             setZOrder(10);
-        else
-            Utils::setHighestZ(this);
         
         if (m_extras.transition != 0) {
             CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, m_speed, { .transition = m_extras.transition, .reverse = true}});
             transition->start();
-            addChild(transition);
         }
         
         if (m_isPreview)
@@ -568,6 +575,31 @@ class Celeste : public BaseAnimation {
   
 private:
 
+    const std::string m_shader = R"(
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+
+        varying vec2 v_texCoord;
+        uniform sampler2D u_texture;
+        uniform float u_time;
+
+        void main() {
+            vec4 c = texture2D(u_texture, v_texCoord);
+            c.r = 1.0;
+            gl_FragColor = c;
+        }
+    )";
+
+    CCGLProgram* m_program = nullptr;
+
+    CCRenderTexture* m_renderTexture = nullptr;
+
+    CCSprite* m_frameSprite = nullptr;
+
+    CelesteExplosion* m_explosion1 = nullptr;
+    CelesteExplosion* m_explosion2 = nullptr;
+
     const std::unordered_map<int, float> m_transitionDelays = {
         { 2, 0.9f },
         { 3, 0.65f },
@@ -579,8 +611,7 @@ private:
         { 9, 0.9f }
     };
 
-    CelesteExplosion* m_explosion1 = nullptr;
-    CelesteExplosion* m_explosion2 = nullptr;
+    float m_time = 0.f;
     
     int m_transition = 0;
 
@@ -595,7 +626,19 @@ private:
     void playTransition(float) {
         CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, m_speed, { .transition = m_transition }});
         transition->start();
-        addChild(transition);
+    }
+
+    void update(float dt) override {
+        if (m_frameSprite) m_frameSprite->setVisible(false);
+        
+        (void)Utils::takeScreenshot(m_renderTexture);
+
+        if (m_frameSprite) m_frameSprite->setVisible(true);
+    
+        m_time += dt;
+
+        m_program->use();
+        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time / m_speed);
     }
     
 public:
@@ -604,21 +647,44 @@ public:
 
     void start() override {
         BaseAnimation::start();
-        
+
+        if (!m_isPreview)
+            Utils::setHighestZ(this);
+
+        // if (Utils::getSettingBool(Anim::Celeste, "shockwave")) {
+            m_program = Utils::createShader(m_shader, false);
+
+            m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
+            m_renderTexture->retain();
+
+            update(0.f);
+
+            m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+            m_frameSprite->setFlipY(true);
+            m_frameSprite->setPosition(m_size / 2.f);
+            m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
+            m_frameSprite->setShaderProgram(m_program);
+
+            addChild(m_frameSprite);
+
+            float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
+            schedule(schedule_selector(Celeste::update), 1.f / fps, kCCRepeatForever, 1.f / fps);
+        // }
+
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
             m_transition = Utils::getRandomInt(2, 5);   
         
         Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
         
-        scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.41f / m_speed);
-        
+        scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.45f / m_speed);
+
         if (m_transition != 0)
             scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelays.at(m_transition) / m_speed);
         
         if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
             scheduleOnce(schedule_selector(Celeste::transitionOut), Utils::getSelectedAnimation(Anim::Celeste).duration / m_speed);
-        
+
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
             m_explosion1->setPosition(m_delegate->getPlayer()->getPosition());
@@ -628,11 +694,12 @@ public:
         }
         
         PlayerObject* player = m_playLayer->m_player1;
-        
+        ccColor3B color = m_extras.dashOrb1 ? (m_extras.dashOrb1->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
+
         m_explosion1 = CelesteExplosion::create(
             player,
             ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
-            {172, 62, 56},
+            color,
             m_speed
         );
         m_explosion1->setPosition(player->getPosition());
@@ -643,11 +710,12 @@ public:
         if (!Utils::getSettingBool(Anim::Celeste, "second-player") || !m_playLayer->m_gameState.m_isDualMode) return;
         
         player = m_playLayer->m_player2;
+        color = m_extras.dashOrb2 ? (m_extras.dashOrb2->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
         
         m_explosion2 = CelesteExplosion::create(
             player,
             ccp(player->m_isPlatformer ? player->m_platformerXVelocity : 15, player->m_yVelocity),
-            {172, 62, 56},
+            color,
             m_speed
         );
         m_explosion2->setPosition(player->getPosition());
