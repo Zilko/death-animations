@@ -166,7 +166,7 @@ static const std::array<DeathAnimation, 17> animations = {
     DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
     DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
-    DeathAnimation{ .id = Anim::Pop, .thumbnail = "none-thumbnail.png", .name = "Pop", .duration = 1.f, .isNoDeathEffect = true }
+    DeathAnimation{ .id = Anim::Pop, .thumbnail = "none-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true }
 };
 
 static const std::array<AnimationSetting, 9> defaultSettings = {

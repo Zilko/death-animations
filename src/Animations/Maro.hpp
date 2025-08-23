@@ -142,6 +142,7 @@ private:
 
         if (m_isMarioSprite) {
             CCSprite* spr = CCSprite::create("maro.png"_spr);
+            spr->setID("maro-sprite"_spr);
             spr->setPosition(position);
             spr->setScale(7.f * scale);
             spr->getTexture()->setAliasTexParameters();
@@ -168,6 +169,7 @@ private:
             
 
         CCSprite* spr = Utils::renderPlayer(player, true);
+        spr->setID("player-pixel-sprite"_spr);
         spr->setPosition(position);
         spr->setScale(scale);
         spr->setShaderProgram(m_program);

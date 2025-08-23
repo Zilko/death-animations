@@ -51,6 +51,8 @@ private:
     void init(CCNodeRGBA* player) {
         (void)CCNode::init();
 
+        setID("player-ghost"_spr);
+
         m_program = Utils::createShader(m_shader, true);
 
         CCSprite* spr = Utils::renderPlayer(player, true);
