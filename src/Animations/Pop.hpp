@@ -40,10 +40,10 @@ private:
     float m_delay = 0.f;
 
     PlayerBalloon(float speed)
-    : m_speed(speed) {
-        m_program = Utils::createShader(m_shader, true);
-        m_delay = Utils::getRandomInt(0, 10) / 100.f;
-    }
+        : m_speed(speed) {
+            m_program = Utils::createShader(m_shader, true);
+            m_delay = Utils::getRandomInt(0, 10) / 100.f;
+        }
 
     void update(float dt) {
         m_time += dt;

@@ -157,7 +157,7 @@ static const std::array<DeathAnimation, 17> animations = {
     DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
     DeathAnimation{ .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "to-be-continued-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::Wii, .thumbnail = "none-thumbnail.png", .name = "Wii", .duration = 621.f },
+    DeathAnimation{ .id = Anim::Wii, .thumbnail = "none-thumbnail.png", .name = "Wii", .duration = 621.f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true },
     DeathAnimation{ .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .isNoDeathSound = true, .isNoShakeEffect = true, .isSlowDown = true },
     DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true },
