@@ -4,7 +4,7 @@ class AmongUs : public BaseAnimation {
 
 private:
     
-    const std::string m_shader = R"(
+    inline static const std::string m_shader = R"(
         #ifdef GL_ES
         precision mediump float;
         #endif

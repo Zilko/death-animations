@@ -9,6 +9,7 @@ public:
 
     static int getRandomInt(int, int);
     static std::filesystem::path getRandomFile(const std::filesystem::path&, const std::unordered_set<std::string>);
+    static CCPoint getPlayerScreenPos(PlayLayer*, CCNode*, bool);
 
     static void playSound(Anim, const std::string&, float, float);
     static void playSound(Anim, float, float, const std::filesystem::path&);

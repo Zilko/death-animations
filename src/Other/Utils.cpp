@@ -45,6 +45,33 @@ std::filesystem::path Utils::getRandomFile(const std::filesystem::path& folder, 
     return files[getRandomInt(0, static_cast<int>(files.size()) - 1)];
 }
 
+CCPoint Utils::getPlayerScreenPos(PlayLayer* playLayer, CCNode* player, bool isPreview) {
+    if (!player) return {0, 0};
+
+    CCPoint pos = !isPreview && playLayer
+        ? player->convertToWorldSpaceAR({0, 0})
+        : player->getPosition();
+
+    if (!isPreview && playLayer) {
+        CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
+        float cameraAngleDegrees = -playLayer->m_gameState.m_cameraAngle;
+        float cameraAngleRadians = CC_DEGREES_TO_RADIANS(cameraAngleDegrees);
+
+        float cosAngle = cosf(cameraAngleRadians);
+        float sinAngle = sinf(cameraAngleRadians);
+
+        float offsetX = pos.x - cameraCenter.x;
+        float offsetY = pos.y - cameraCenter.y;
+
+        float rotatedX = offsetX * cosAngle - offsetY * sinAngle;
+        float rotatedY = offsetX * sinAngle + offsetY * cosAngle;
+
+        pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
+    }
+
+    return pos;
+}
+
 void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration, float volume, bool loop) {
     playSound(anim, sound, speed, fade, fade, duration, volume, loop);
 }

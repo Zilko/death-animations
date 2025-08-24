@@ -105,29 +105,8 @@ private:
     float m_waitTime = 0.f;
 
     void addHeart(CCNodeRGBA* player, bool isSecondPlayer = false) {
-        CCPoint playerPos = !m_isPreview
-            ? player->convertToWorldSpaceAR({0, 0})
-            : player->getPosition();
-
-        if (!m_isPreview) {
-            CCPoint cameraCenter = m_playLayer->m_cameraObb2->m_center;
-            float cameraAngleDegrees = -m_playLayer->m_gameState.m_cameraAngle;
-            float cameraAngleRadians = CC_DEGREES_TO_RADIANS(cameraAngleDegrees);
-
-            float cosAngle = cosf(cameraAngleRadians);
-            float sinAngle = sinf(cameraAngleRadians);
-
-            float offsetX = playerPos.x - cameraCenter.x;
-            float offsetY = playerPos.y - cameraCenter.y;
-
-            float rotatedX = offsetX * cosAngle - offsetY * sinAngle;
-            float rotatedY = offsetX * sinAngle + offsetY * cosAngle;
-
-            playerPos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
-        }
-
         UndertaleHeart* heart = UndertaleHeart::create(m_speed, m_isPreview ? 1.f : m_playLayer->m_gameState.m_cameraZoom, isSecondPlayer);
-        heart->setPosition(playerPos);
+        heart->setPosition(Utils::getPlayerScreenPos(m_playLayer, player, m_isPreview));
 
         addChild(heart);
     }

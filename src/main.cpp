@@ -6,7 +6,6 @@
 #include "UI/AnimationsLayer.hpp"
 
 #include "Animations/BaseAnimation.hpp"
-#include "Animations/Celeste.hpp"
 
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>

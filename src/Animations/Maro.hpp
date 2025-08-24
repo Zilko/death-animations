@@ -4,7 +4,7 @@ class Maro : public BaseAnimation {
 
 private:
 
-    const std::string m_shader = R"(
+    inline static const std::string m_shader = R"(
         #ifdef GL_ES
         precision mediump float;
         #endif
@@ -26,7 +26,7 @@ private:
         }
     )";
 
-    const std::string m_shaderNES = R"(
+    inline static const std::string m_shaderNES = R"(
         #ifdef GL_ES
         precision mediump float;
         #endif

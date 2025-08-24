@@ -141,7 +141,7 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
 };
 
 static const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
-    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true } } },
+    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true }, { "shockwave", true } } },
     { Anim::CBFDetected, { { "use-level-name", true } } },
     { Anim::Maro, { { "second-player", true } } },
     { Anim::Undertale, { { "second-player", true } } },
@@ -149,7 +149,7 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Pop, { { "second-player", true } } }
 };
 
-static const std::array<DeathAnimation, 17> animations = {
+static const std::array<DeathAnimation, 15> animations = {
     DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f},
@@ -163,8 +163,8 @@ static const std::array<DeathAnimation, 17> animations = {
     DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true },
     DeathAnimation{ .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f },
     DeathAnimation{ .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
-    DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
+    // DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
+    // DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
     DeathAnimation{ .id = Anim::Pop, .thumbnail = "none-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true }
 };
@@ -187,9 +187,10 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "colors", .name = "Colors", .description = "The colors of the impostor and victim in the animation.", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
     } },
     { Anim::Celeste, {
-        { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4" } },
+        { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player as well.", .type = SettingType::Toggle },
         { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the Celeste respawn animation.", .type = SettingType::Toggle },
-        { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player as well.", .type = SettingType::Toggle }
+        { .id = "shockwave", .name = "Shockwave", .description = "Play the shockwave effect.", .type = SettingType::Toggle },
+        { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4" } }
     } },
     { Anim::Jumpscare, {
         { .id = "static", .name = "Static", .description = "Stop the image from zooming in.", .type = SettingType::Toggle },

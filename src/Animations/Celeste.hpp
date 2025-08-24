@@ -22,7 +22,7 @@ class CelesteExplosion : public CCNode {
    
 private:
 
-    const std::string m_shader = R"(
+    inline static const std::string m_shader = R"(
         #ifdef GL_ES
         precision mediump float;
         #endif
@@ -575,20 +575,32 @@ class Celeste : public BaseAnimation {
   
 private:
 
-    const std::string m_shader = R"(
+    inline static const std::string m_shader = R"(
         #ifdef GL_ES
         precision mediump float;
         #endif
 
         varying vec2 v_texCoord;
         uniform sampler2D u_texture;
-        uniform float u_time;
 
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec2 u_origin;
+        
         void main() {
-            vec4 c = texture2D(u_texture, v_texCoord);
-            c.r = 1.0;
-            gl_FragColor = c;
+            vec4 baseColor = texture2D(u_texture, v_texCoord);
+            float t = clamp(u_time / 1.0, 0.0, 1.0);
+            vec2 aspect = vec2(u_resolution.x / u_resolution.y, 1.0);
+            float d = distance((v_texCoord - u_origin) * aspect, vec2(0.0));
+            float radius = u_time * 3.5;
+            float thickness = u_time < 0.3 ? 0.17 : 0.04;
+            float edge = smoothstep(radius - thickness, radius, d) - smoothstep(radius, radius + thickness, d);
+            vec2 dir = normalize(v_texCoord - u_origin);
+            vec2 distortedCoord = v_texCoord + dir * edge * 0.02;
+
+            gl_FragColor = mix(baseColor, texture2D(u_texture, distortedCoord), edge);
         }
+
     )";
 
     CCGLProgram* m_program = nullptr;
@@ -612,6 +624,8 @@ private:
     };
 
     float m_time = 0.f;
+
+    bool m_shockwaveStarted = false;
     
     int m_transition = 0;
 
@@ -634,11 +648,26 @@ private:
         (void)Utils::takeScreenshot(m_renderTexture);
 
         if (m_frameSprite) m_frameSprite->setVisible(true);
+
+        if (!m_shockwaveStarted) return;
     
         m_time += dt;
 
         m_program->use();
         m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time / m_speed);
+    }
+
+    void startShockwave(float) {
+        m_program->use();
+
+        CCPoint pos = Utils::getPlayerScreenPos(m_playLayer, m_explosion1, m_isPreview);
+
+        glUniform2f(glGetUniformLocation(m_program->getProgram(), "u_resolution"), m_size.width, m_size.height);
+        glUniform2f(glGetUniformLocation(m_program->getProgram(), "u_origin"), pos.x / m_size.width, pos.y / m_size.height);
+
+        m_frameSprite->setShaderProgram(m_program);
+
+        m_shockwaveStarted = true;
     }
     
 public:
@@ -651,7 +680,7 @@ public:
         if (!m_isPreview)
             Utils::setHighestZ(this);
 
-        // if (Utils::getSettingBool(Anim::Celeste, "shockwave")) {
+        if (Utils::getSettingBool(Anim::Celeste, "shockwave")) {
             m_program = Utils::createShader(m_shader, false);
 
             m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
@@ -663,13 +692,14 @@ public:
             m_frameSprite->setFlipY(true);
             m_frameSprite->setPosition(m_size / 2.f);
             m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
-            m_frameSprite->setShaderProgram(m_program);
 
             addChild(m_frameSprite);
 
+            scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f);
+
             float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
             schedule(schedule_selector(Celeste::update), 1.f / fps, kCCRepeatForever, 1.f / fps);
-        // }
+        }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
