@@ -102,7 +102,7 @@ private:
     }
     
     void updateBall(float dt) {
-        m_time += dt;
+        m_time += dt * m_speed;
         float t = std::min(m_time / 0.34f, 1.0f);
         float easedTime = 1.0f - cosf(t * M_PI_2);
         m_program->use();
@@ -538,7 +538,7 @@ public:
             setZOrder(10);
         
         if (m_extras.transition != 0) {
-            CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, m_speed, { .transition = m_extras.transition, .reverse = true}});
+            CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, 1.f, { .transition = m_extras.transition, .reverse = true}});
             transition->start();
         }
         
@@ -630,7 +630,7 @@ private:
     int m_transition = 0;
 
     void transitionOut(float) {
-        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, m_speed, { .transition = m_transition }})->start();
+        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, 1.f, { .transition = m_transition }})->start();
     }
     
     void playDeathSound(float) {
@@ -651,10 +651,10 @@ private:
 
         if (!m_shockwaveStarted) return;
     
-        m_time += dt;
+        m_time += dt * m_speed;
 
         m_program->use();
-        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time / m_speed);
+        m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time);
     }
 
     void startShockwave(float) {
@@ -695,7 +695,7 @@ public:
 
             addChild(m_frameSprite);
 
-            scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f);
+            scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
 
             float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
             schedule(schedule_selector(Celeste::update), 1.f / fps, kCCRepeatForever, 1.f / fps);

@@ -17,6 +17,8 @@ private:
     BaseAnimation* m_animation = nullptr;
     
     ccColor3B m_mainColor;
+
+    DeathAnimation m_animationStruct;
     
     float m_time = 0.f;
     float m_speed = 1.f;

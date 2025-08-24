@@ -2,6 +2,7 @@
 
 #include "Other/Utils.hpp"
 #include "Other/SoundManager.hpp"
+#include "Other/SelectedAnimation.hpp"
 
 #include "UI/AnimationsLayer.hpp"
 
@@ -86,10 +87,16 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         Anim anim = Utils::getSelectedAnimationEnum();
 
+        if (anim == Anim::Random)
+            anim = static_cast<Anim>(animations[Utils::getRandomInt(2, static_cast<int>(animations.size()) - 1)].id);
+
         if (shouldReturn(anim) || p1 == m_anticheatSpike || f->m_animation)
             return PlayLayer::destroyPlayer(p0, p1);
 
         const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
+
+        SelectedAnimation::set(animation);
+
         bool og = m_gameState.m_unkBool26;
         DashRingObject* dashOrb1 = m_player1->m_isDashing ? m_player1->m_dashRing : nullptr;
         DashRingObject* dashOrb2 = m_player2->m_isDashing && m_gameState.m_isDualMode ? m_player2->m_dashRing : nullptr;
@@ -110,9 +117,6 @@ class $modify(ProPlayLayer, PlayLayer) {
         }
 
         m_gameState.m_unkBool26 = og;
-        
-        while (anim == Anim::Random)
-            anim = static_cast<Anim>(Utils::getRandomInt(1, animations.size()));
 
         float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
@@ -148,7 +152,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (
             f->m_animation
             && !f->m_forceRestart
-            && Utils::getSettingBool(Utils::getSelectedAnimation().id, "prevent-early-restart")
+            && Utils::getSettingBool(SelectedAnimation::get().id, "prevent-early-restart")
         ) {
             return;
         }
@@ -228,12 +232,12 @@ class $modify(CCCircleWave) {
 class $modify(GJBaseGameLayer) {
 
     void update(float dt) { // disabled by defolt
-        if (!Utils::getSelectedAnimation().isFreezeGameLayer)
+        if (!SelectedAnimation::get().isFreezeGameLayer)
             GJBaseGameLayer::update(dt * 0.025f);
     }
 
     void shakeCamera(float duration, float strength, float interval) {
-        if (!Utils::getSelectedAnimation().isNoDeathEffect && !Utils::getSelectedAnimation().isNoShakeEffect)
+        if (!SelectedAnimation::get().isNoDeathEffect && !SelectedAnimation::get().isNoShakeEffect)
             GJBaseGameLayer::shakeCamera(duration, strength, interval);
     }
 
@@ -248,7 +252,7 @@ class $modify(PlayerObject) {
         if (this != m_gameLayer->m_player1 && this != m_gameLayer->m_player2)
             return PlayerObject::playDeathEffect();
             
-        if (!Utils::getSelectedAnimation().isNoDeathEffect)
+        if (!SelectedAnimation::get().isNoDeathEffect)
             return PlayerObject::playDeathEffect();
             
         stopActionByTag(11);

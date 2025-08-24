@@ -151,12 +151,19 @@ bool AnimationsLayer::setup() {
     m_scrollbar = Scrollbar::create(listView->m_tableView);
     m_scrollbar->setPosition(m_list->getPosition() + ccp(m_list->getContentSize().width + 6, 0));
     m_scrollbar->setAnchorPoint({0, 0});
-    m_mainLayer->addChild(m_scrollbar);
+    m_mainLayer->addChild(m_scrollbar, 5);
     
     int selected = Mod::get()->getSavedValue<int>("selected-animation");
     
-    if (m_animationCells.contains(selected))
-        selectAnimation(m_animationCells.at(selected));
+    if (m_animationCells.contains(selected)) {
+        AnimationCell* cell = m_animationCells.at(selected);
+        selectAnimation(cell);
+
+        float y = cell->getParent()->getParent()->getPositionY();
+
+        if (y < m_contentLayer->getContentHeight() - 180)
+            m_contentLayer->setPositionY(-y);
+    }
 
     schedule(schedule_selector(AnimationsLayer::updateTableView), 0, kCCRepeatForever, 1.f / 240.f);
     

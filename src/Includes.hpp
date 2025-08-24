@@ -103,6 +103,7 @@ struct DeathAnimation {
     bool isNoShakeEffect = false;
     bool isFreezeGameLayer = false;
     bool isSlowDown = false;
+    bool isStopMusic = false;
 };
 
 struct AnimationSetting {
@@ -152,17 +153,17 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
 static const std::array<DeathAnimation, 15> animations = {
     DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
-    DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f},
-    DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f },
-    DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f },
+    DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .isStopMusic = true },
+    DeathAnimation{ .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f, .isStopMusic = true  },
+    DeathAnimation{ .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f, .isStopMusic = true },
     DeathAnimation{ .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "to-be-continued-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::ToBeContinued, .thumbnail = "to-be-continued-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true, .isStopMusic = true },
     DeathAnimation{ .id = Anim::Wii, .thumbnail = "none-thumbnail.png", .name = "Wii", .duration = 621.f },
-    DeathAnimation{ .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true },
-    DeathAnimation{ .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .isNoDeathSound = true, .isNoShakeEffect = true, .isSlowDown = true },
-    DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true },
+    DeathAnimation{ .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true, .isStopMusic = true },
+    DeathAnimation{ .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .isNoDeathSound = true, .isNoShakeEffect = true, .isSlowDown = true, .isStopMusic = true },
+    DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true, .isStopMusic = true },
     DeathAnimation{ .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f },
-    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true, .isStopMusic = true },
     // DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
     // DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },

@@ -7,8 +7,12 @@ PreviewLayer::~PreviewLayer() {
     if (m_circleWave)
         m_circleWave->release();
 
-    FMODAudioEngine::get()->stopAllEffects();
     SoundManager::stop();
+
+    FMODAudioEngine::get()->stopAllEffects();
+
+    if (m_animationStruct.isStopMusic)
+        FMODAudioEngine::get()->resumeAllMusic();
 }
 
 PreviewLayer* PreviewLayer::create() {
@@ -35,6 +39,11 @@ void PreviewLayer::spawnPlayer(float) {
         m_animation->end();
         m_animation = nullptr;
     }
+
+    FMODAudioEngine::get()->stopAllEffects();
+
+    if (m_animationStruct.isStopMusic)
+        FMODAudioEngine::get()->resumeAllMusic();
     
     unschedule(schedule_selector(PreviewLayer::playerDied));
     scheduleOnce(schedule_selector(PreviewLayer::playerDied), m_time);
@@ -58,32 +67,34 @@ void PreviewLayer::spawnPlayer(float) {
     m_mainLayer->addChild(m_circleWave);
 }
 
-void PreviewLayer::playerDied(float) {
-    playDeathEffect();
-    
+void PreviewLayer::playerDied(float) {    
     Anim anim = Utils::getSelectedAnimationEnum();
-        
-    const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
-        
-    while (anim == Anim::Random || anim == Anim::None)
-        anim = static_cast<Anim>(Utils::getRandomInt(1, animations.size()));
     
-    m_speed = Utils::getSpeedValue(Utils::getSettingFloat(animation.id, "speed"));
-    m_duration = Utils::getSelectedAnimation(anim).duration / m_speed + 0.05f;
+    if (anim == Anim::Random)
+        anim = static_cast<Anim>(animations[Utils::getRandomInt(2, static_cast<int>(animations.size()) - 1)].id);
+
+    m_animationStruct = Utils::getSelectedAnimation(anim);
+    m_speed = Utils::getSpeedValue(Utils::getSettingFloat(m_animationStruct.id, "speed"));
     m_animation = Utils::createAnimation(anim, {m_mainLayer, nullptr, this, m_speed});
+    m_duration = m_animationStruct.duration / m_speed + 0.05f;
       
     if (!m_animation) return;
+
+    if (m_animationStruct.isStopMusic)
+        FMODAudioEngine::get()->pauseAllMusic(true);
     
     m_animation->start();
     m_animation->setZOrder(10);
+    
+    playDeathEffect();
     
     scheduleOnce(schedule_selector(PreviewLayer::spawnPlayer), m_duration);
 }
 
 void PreviewLayer::playDeathEffect() {
-    if (Utils::getSelectedAnimation().isNoDeathEffect) return;
+    if (m_animationStruct.isNoDeathEffect) return;
     
-    if (!Utils::getSelectedAnimation().isNoDeathSound)
+    if (!m_animationStruct.isNoDeathSound)
         FMODAudioEngine::get()->playEffect("explode_11.ogg", 1.f, 0.f, 0.5f);
     
     CCParticleSystemQuad* particles = CCParticleSystemQuad::create("explodeEffect.plist", false);
