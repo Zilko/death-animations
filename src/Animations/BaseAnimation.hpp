@@ -33,24 +33,23 @@ protected:
     
     float m_speed = 1.f;
     
-    BaseAnimation(const AnimationParams& params) {
-        m_extras = params.extras;
-        m_parentNode = params.parentNode;
-        m_playLayer = params.playLayer;
-        m_delegate = params.delegate;
-        m_speed = params.speed;
-        m_isPreview = m_delegate != nullptr;
-        m_size = CCDirector::get()->getWinSize();
-    }
-
-    virtual void setAnimationID() {
-        setID("death-animation"_spr);
-    }
+    BaseAnimation(const AnimationParams& params)
+        : m_extras(params.extras),
+          m_parentNode(params.parentNode),
+          m_playLayer(params.playLayer),
+          m_delegate(params.delegate),
+          m_speed(params.speed),
+          m_isPreview(params.delegate != nullptr),
+          m_size(CCDirector::get()->getWinSize()) {}
 
     void enableTouch() {
         setTouchEnabled(true);
         registerWithTouchDispatcher();
         setTouchMode(kCCTouchesOneByOne);
+    }
+
+    virtual void setAnimationID() {
+        setID("death-animation"_spr);
     }
 
 public:
@@ -67,5 +66,9 @@ public:
     virtual void end() {
         removeFromParentAndCleanup(true);
     }
+
+    virtual void onPause() {}
+
+    virtual void onResume() {}
   
 };

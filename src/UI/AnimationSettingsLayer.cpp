@@ -6,7 +6,8 @@
 #include "PercentSetting.hpp"
 #include "SelectSetting.hpp"
 #include "AmongUsSetting.hpp"
-#include "JumpscareSetting.hpp"
+#include "FolderSetting.hpp"
+#include "ScaleSetting.hpp"
 
 AnimationSettingsLayer::AnimationSettingsLayer(const DeathAnimation& animation) {
     m_animation = animation;
@@ -140,7 +141,8 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::Percent: settingNode = PercentSetting::create(this, setting, m_animation, y); break;
             case SettingType::Select: settingNode = SelectSetting::create(this, setting, m_animation, y); break;
             case SettingType::AmongUsColor: settingNode = AmongUsSetting::create(this, setting, m_animation, y); break;
-            case SettingType::JumpscareFolder: settingNode = JumpscareSetting::create(this, setting, m_animation, y); break;
+            case SettingType::Folder: settingNode = FolderSetting::create(this, setting, m_animation, y); break;
+            case SettingType::Scale: settingNode = ScaleSetting::create(this, setting, m_animation, y); break;
         }
 
         if (settingNode)

@@ -196,12 +196,24 @@ class $modify(ProPlayLayer, PlayLayer) {
 
     void pauseGame(bool p0) {
         PlayLayer::pauseGame(p0);
+
         SoundManager::pause(true);
+
+        auto f = m_fields.self();
+
+        if (f->m_animation)
+            f->m_animation->onPause();
     }
 
     void resume() {
         PlayLayer::resume();
+
         SoundManager::pause(false);
+
+        auto f = m_fields.self();
+
+        if (f->m_animation)
+            f->m_animation->onResume();
     }
     
 };

@@ -1,6 +1,6 @@
 #include "BaseSetting.hpp"
 
-class JumpscareSetting : public BaseSetting {
+class FolderSetting : public BaseSetting {
 
 private:
 
@@ -8,6 +8,6 @@ private:
 
     void init(float) override;
 
-    SETTING_CTOR_CREATE(JumpscareSetting, BaseSetting)
+    SETTING_CTOR_CREATE(FolderSetting, BaseSetting)
 
 };

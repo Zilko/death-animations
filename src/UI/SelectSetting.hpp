@@ -10,7 +10,7 @@ protected:
 
     virtual void onSelectorArrow(CCObject*);
 
-    void init(float) override;
+    virtual void init(float) override;
 
 private:
 

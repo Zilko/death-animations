@@ -42,7 +42,8 @@ enum SettingType {
     Percent,
     AmongUsColor,
     Select,
-    JumpscareFolder
+    Folder,
+    Scale
 };
 
 enum Anim {
@@ -102,6 +103,7 @@ struct AnimationSetting {
     SettingType type;
     
     std::vector<std::string> elements;
+    std::filesystem::path folder;
 };
 
 static const std::unordered_map<std::string, float> globalFloatDefaults = {
@@ -127,6 +129,9 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
     } },
     { Anim::Jumpscare, {
         { "probability", 10.f }
+    } },
+    { Anim::SpeechBubble, {
+        { "scale-y", 1.f }
     } }
 };
 
@@ -189,8 +194,8 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "disable-flashing", .name = "Disable Flashing", .description = "Stop the image from flashing repeatedly.", .type = SettingType::Toggle },
         { .id = "ignore-volume", .name = "Ignore Volume", .description = "Ignore the game's SFX volume.", .type = SettingType::Toggle },
         { .id = "fill-screen", .name = "Fill Screen", .description = "Make the image fill the screen (may crop the image).", .type = SettingType::Toggle },
-        { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the jumpscare images; one will be chosen at random.", .type = SettingType::JumpscareFolder },
-        { .id = "sounds-folder", .name = "Sounds Folder", .description = "Folder containing the jumpscare sounds; one will be chosen at random.", .type = SettingType::JumpscareFolder },
+        { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the jumpscare images; one will be chosen at random.", .type = SettingType::Folder, .folder = Mod::get()->getSaveDir() / "jumpscare-images" },
+        { .id = "sounds-folder", .name = "Sounds Folder", .description = "Folder containing the jumpscare sounds; one will be chosen at random.", .type = SettingType::Folder, .folder = Mod::get()->getSaveDir() / "jumpscare-sounds" }
     } },
     { Anim::Maro, {
         { .id = "use-nes-colors", .name = "Use NES Colors", .description = "", .type = SettingType::Toggle },
@@ -210,5 +215,13 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
     } },
     { Anim::Pop, {
         { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
+    } },
+    { Anim::SpeechBubble, {
+        { .id = "scale-y", .name = "Scale Y", .description = "", .type = SettingType::Scale },
+        { .id = "flip-x", .name = "Flip X", .description = "", .type = SettingType::Toggle },
+        { .id = "flip-y", .name = "Flip Y", .description = "", .type = SettingType::Toggle },
+        { .id = "hide-arrows", .name = "Hide Arrows", .description = "", .type = SettingType::Toggle },
+        { .id = "hide-ui", .name = "Hide UI", .description = "", .type = SettingType::Toggle },
+        { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the images you have saved.", .type = SettingType::Folder, .folder = Mod::get()->getSaveDir() / "screenshots" }
     } }
 };

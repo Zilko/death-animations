@@ -31,24 +31,24 @@ void SpeedSetting::onSlider(CCObject* obj) {
 void SpeedSetting::init(float y) {
     BaseSetting::init(y);
     
-    Slider* slider = Slider::create(this, menu_selector(SpeedSetting::onSlider));
-   	slider->setPosition({87, 10});
-   	slider->setAnchorPoint({ 0.f, 0.f });
-   	slider->setScale(0.37f);
-   	slider->setValue(1.f);
+    m_slider = Slider::create(this, menu_selector(SpeedSetting::onSlider));
+   	m_slider->setPosition({87, 10});
+   	m_slider->setAnchorPoint({ 0.f, 0.f });
+   	m_slider->setScale(0.37f);
+   	m_slider->setValue(1.f);
    	
-    addChild(slider);
+    addChild(m_slider);
     
     m_speedLabel = CCLabelBMFont::create("1.2x", "bigFont.fnt");
     m_speedLabel->setOpacity(190);
     m_speedLabel->setScale(0.25f);
     m_speedLabel->setAnchorPoint({0, 0.5f});
     m_speedLabel->setPosition({134, 10});
-    
+
     addChild(m_speedLabel);
     
-    slider->setValue(Utils::getSettingFloat(m_animation.id, m_setting.id));
-    onSlider(slider->getThumb());
+    m_slider->setValue(Utils::getSettingFloat(m_animation.id, m_setting.id));
+    onSlider(m_slider->getThumb());
     
     setInfoButtonPos(m_speedLabel);
 }

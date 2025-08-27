@@ -1,14 +1,20 @@
+#pragma once
+
 #include "BaseSetting.hpp"
 
 class SpeedSetting : public BaseSetting {
 
-private:
+protected:
 
     CCLabelBMFont* m_speedLabel = nullptr;
 
-    void onSlider(CCObject*);
+    Slider* m_slider = nullptr;
 
-    void init(float) override;
+    virtual void onSlider(CCObject*);
+
+    virtual void init(float) override;
+
+private:
 
     SETTING_CTOR_CREATE(SpeedSetting, BaseSetting)
 
