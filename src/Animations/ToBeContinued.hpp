@@ -25,10 +25,10 @@ private:
             gl_FragColor = vec4(finalColor, texColor.a);
         }
     )";
+        
+    ANIMATION_CTOR_CREATE(ToBeContinued)
     
 public:
-    
-    DEFINE_CREATE(ToBeContinued)
 
     void start() override {
         BaseAnimation::start();

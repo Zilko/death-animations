@@ -197,9 +197,9 @@ private:
         }
     }
     
+    ANIMATION_CTOR_CREATE(Bsod)
+    
 public:
-
-    DEFINE_CREATE(Bsod)
     
     void start() override {
         BaseAnimation::start();

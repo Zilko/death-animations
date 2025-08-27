@@ -36,18 +36,6 @@ static const std::string vertexShader = R"(
     if (animation == Anim::ANIMATION) \
         return ANIMATION::create(params);
 
-
-#define DEFINE_CREATE(CLASS)                                                 \
-    CLASS(const AnimationParams& params) \
-        : BaseAnimation(params) {}  \
-                                                                    \
-    static CLASS* create(const AnimationParams& params) { \
-        CLASS* ret = new CLASS(params); \
-        ret->init();                                                              \
-        ret->autorelease();                                                       \
-        return ret;                                                               \
-    }
-
 enum SettingType {
     Toggle,
     Speed,
@@ -74,7 +62,8 @@ enum Anim {
     Minecraft = 14,
     Terraria = 15,
     CBFDetected = 16,
-    Pop = 17
+    Pop = 17,
+    SpeechBubble = 18
 };
 
 struct ExtraParams {
@@ -147,10 +136,11 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Maro, { { "second-player", true } } },
     { Anim::Undertale, { { "second-player", true } } },
     { Anim::Ghost, { { "second-player", true } } },
-    { Anim::Pop, { { "second-player", true } } }
+    { Anim::Pop, { { "second-player", true } } },
+    { Anim::SpeechBubble, { { "stop-auto-restart", true } } }
 };
 
-static const std::array<DeathAnimation, 15> animations = {
+static const std::array<DeathAnimation, 18> animations = {
     DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .isStopMusic = true },
@@ -164,10 +154,11 @@ static const std::array<DeathAnimation, 15> animations = {
     DeathAnimation{ .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true, .isStopMusic = true },
     DeathAnimation{ .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f },
     DeathAnimation{ .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true, .isStopMusic = true },
-    // DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
-    // DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
+    DeathAnimation{ .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
+    DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
-    DeathAnimation{ .id = Anim::Pop, .thumbnail = "none-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true }
+    DeathAnimation{ .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true }
 };
 
 static const std::array<AnimationSetting, 9> defaultSettings = {

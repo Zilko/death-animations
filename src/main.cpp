@@ -50,6 +50,23 @@ $on_mod(Loaded) {
                 std::filesystem::copy_options::overwrite_existing
             );
     }
+
+    if (!Mod::get()->setSavedValue("created-speech-bubble-folder", true)) {
+        std::filesystem::path folder = Mod::get()->getSaveDir() / "speech-bubbles";
+        
+        if (!utils::file::createDirectoryAll(folder).isErr())
+            for (int i = 1; i < 3; i++) {
+                std::string name = fmt::format("speech-bubble-{}.png", i);
+                std::error_code ec;
+                
+                std::filesystem::copy_file(
+                    Mod::get()->getResourcesDir() / name,
+                    folder / name,
+                    std::filesystem::copy_options::overwrite_existing,
+                    ec
+                );
+            }
+    }
                 
 }
 

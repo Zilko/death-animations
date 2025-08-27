@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
 class CBFDetected : public BaseAnimation {
-
-public:
     
-    DEFINE_CREATE(CBFDetected)
+    ANIMATION_CTOR_CREATE(CBFDetected)
+    
+public:
 
     void start() override {
         BaseAnimation::start();

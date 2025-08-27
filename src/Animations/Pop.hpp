@@ -93,7 +93,7 @@ private:
 
         Utils::playSound(Anim::Pop, "dart.mp3", m_speed * 1.5, 1.5f);
 
-        m_sprite = Utils::renderPlayer(player, true);
+        m_sprite = Utils::renderPlayerSprite(player, true);
         m_sprite->setID("pop-sprite"_spr);
         m_sprite->setPosition(player->getPosition());
         m_sprite->setRotation(player->getRotation());
@@ -138,10 +138,10 @@ private:
 
         player->setOpacity(0);
     }
-
-public:
     
-    DEFINE_CREATE(Pop)
+    ANIMATION_CTOR_CREATE(Pop)
+    
+public:
 
     void start() override {
         BaseAnimation::start();

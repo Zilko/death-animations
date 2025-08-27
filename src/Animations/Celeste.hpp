@@ -81,7 +81,7 @@ private:
 
         m_program = Utils::createShader(m_shader, true);
 
-        m_playerSprite = Utils::renderPlayer(player, false);
+        m_playerSprite = Utils::renderPlayerSprite(player, false);
         m_playerSprite->setShaderProgram(m_program);
         
         setShaderState("u_white", 0);
@@ -415,9 +415,9 @@ private:
         setID("celeste-transition"_spr);
     }
 
-public:
+    ANIMATION_CTOR_CREATE(CelesteTransition)
 
-    DEFINE_CREATE(CelesteTransition)
+public:
     
     void start() override {
         BaseAnimation::start();
@@ -527,9 +527,9 @@ private:
         setID("celeste-revive"_spr);
     }
 
-public:
+    ANIMATION_CTOR_CREATE(CelesteRevive);
 
-    DEFINE_CREATE(CelesteRevive);
+public:
 
     void start() override {
         BaseAnimation::start();
@@ -669,10 +669,10 @@ private:
 
         m_shockwaveStarted = true;
     }
+        
+    ANIMATION_CTOR_CREATE(Celeste)
     
 public:
-    
-    DEFINE_CREATE(Celeste)
 
     void start() override {
         BaseAnimation::start();

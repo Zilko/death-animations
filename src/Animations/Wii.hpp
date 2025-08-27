@@ -2,9 +2,9 @@
 
 class Wii : public BaseAnimation {
 
+    ANIMATION_CTOR_CREATE(Wii)
+    
 public:
-
-    DEFINE_CREATE(Wii)
 
     void start() override {
         BaseAnimation::start();

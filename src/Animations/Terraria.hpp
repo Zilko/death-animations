@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
 class Terraria : public BaseAnimation {
-
-public:
     
-    DEFINE_CREATE(Terraria)
+    ANIMATION_CTOR_CREATE(Terraria)
+    
+public:
 
     void start() override {
         BaseAnimation::start();

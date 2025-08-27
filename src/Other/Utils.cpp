@@ -16,6 +16,7 @@
 #include "../Animations/Terraria.hpp"
 #include "../Animations/CBFDetected.hpp"
 #include "../Animations/Pop.hpp"
+#include "../Animations/SpeechBubble.hpp"
 
 #include <random>
 #include <Geode/cocos/support/data_support/uthash.h>
@@ -29,47 +30,11 @@ int Utils::getRandomInt(int min, int max) {
 }
 
 std::filesystem::path Utils::getRandomFile(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
-    std::vector<std::filesystem::path> files;
-    std::error_code ec;
-
-    for (const auto& entry : std::filesystem::directory_iterator(folder, ec)) {
-        if (ec) return std::filesystem::path{};
-
-        if (std::filesystem::is_regular_file(entry.status(ec)) && !ec)
-            if (validExtensions.contains(entry.path().extension().string()))
-                files.push_back(entry.path());
-    }
+    const std::vector<std::filesystem::path>& files = getAllFilesFromFolder(folder, validExtensions);
 
     if (files.empty()) return std::filesystem::path{};
 
     return files[getRandomInt(0, static_cast<int>(files.size()) - 1)];
-}
-
-CCPoint Utils::getPlayerScreenPos(PlayLayer* playLayer, CCNode* player, bool isPreview) {
-    if (!player) return {0, 0};
-
-    CCPoint pos = !isPreview && playLayer
-        ? player->convertToWorldSpaceAR({0, 0})
-        : player->getPosition();
-
-    if (!isPreview && playLayer) {
-        CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
-        float cameraAngleDegrees = -playLayer->m_gameState.m_cameraAngle;
-        float cameraAngleRadians = CC_DEGREES_TO_RADIANS(cameraAngleDegrees);
-
-        float cosAngle = cosf(cameraAngleRadians);
-        float sinAngle = sinf(cameraAngleRadians);
-
-        float offsetX = pos.x - cameraCenter.x;
-        float offsetY = pos.y - cameraCenter.y;
-
-        float rotatedX = offsetX * cosAngle - offsetY * sinAngle;
-        float rotatedY = offsetX * sinAngle + offsetY * cosAngle;
-
-        pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
-    }
-
-    return pos;
 }
 
 void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade, int duration, float volume, bool loop) {
@@ -87,7 +52,7 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade
     if (duration < 1000) duration = 1000;
             
     FMODAudioEngine::get()->playEffectAdvanced(
-        (Mod::get()->getResourcesDir() / sound).string().c_str(),
+        utils::string::pathToString(Mod::get()->getResourcesDir() / sound).c_str(),
         1.f, 1.f, volume, speed, 1.f, 1.f, 0, duration, fadeIn, fadeOut, loop, 0, false, false, 0, 0, 0, 0
     );
 }
@@ -98,7 +63,7 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, float vo
 
 void Utils::playSound(Anim anim, float speed, float volume, const std::filesystem::path& sound) {
     if (Utils::getSettingBool(anim, "play-sound-effects"))
-        FMODAudioEngine::get()->playEffect(sound.string().c_str(), speed, 1.f, volume);
+        FMODAudioEngine::get()->playEffect(utils::string::pathToString(sound).c_str(), speed, 1.f, volume);
 }
 
 void Utils::playSoundManual(Anim anim, const std::string& sound, float speed, float volume) {
@@ -113,31 +78,12 @@ void Utils::playSoundManual(Anim anim, float speed, float volume, const std::fil
     FMOD::Sound* souwnd;
     FMOD::Channel* channel;
     
-    system->createSound(sound.string().c_str(), FMOD_DEFAULT, nullptr, &souwnd);
+    system->createSound(utils::string::pathToString(sound).c_str(), FMOD_DEFAULT, nullptr, &souwnd);
     system->playSound(souwnd, nullptr, false, &channel);
     channel->setVolume(volume);
     channel->setPitch(speed);
     
     SoundManager::add(channel, souwnd);
-}
-
-BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
-    ANIMATION_CHECK(YouDied)
-    ANIMATION_CHECK(Bsod)
-    ANIMATION_CHECK(AmongUs)
-    ANIMATION_CHECK(Celeste)
-    ANIMATION_CHECK(ToBeContinued)
-    ANIMATION_CHECK(Wii)
-    ANIMATION_CHECK(Wasted)
-    ANIMATION_CHECK(Jumpscare)
-    ANIMATION_CHECK(Maro)
-    ANIMATION_CHECK(Ghost)
-    ANIMATION_CHECK(Undertale)
-    ANIMATION_CHECK(Minecraft)
-    ANIMATION_CHECK(Terraria)
-    ANIMATION_CHECK(CBFDetected)
-    ANIMATION_CHECK(Pop)
-    return nullptr;
 }
 
 Anim Utils::getSelectedAnimationEnum() {
@@ -258,6 +204,68 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     sprite->setScale(sprite->getScale() * mult);
 }
 
+CCPoint Utils::getPlayerScreenPos(PlayLayer* playLayer, CCNode* player, bool isPreview) {
+    if (!player) return {0, 0};
+
+    CCPoint pos = !isPreview && playLayer
+        ? player->convertToWorldSpaceAR({0, 0})
+        : player->getPosition();
+
+    if (!isPreview && playLayer) {
+        CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
+        float cameraAngleDegrees = -playLayer->m_gameState.m_cameraAngle;
+        float cameraAngleRadians = CC_DEGREES_TO_RADIANS(cameraAngleDegrees);
+
+        float cosAngle = cosf(cameraAngleRadians);
+        float sinAngle = sinf(cameraAngleRadians);
+
+        float offsetX = pos.x - cameraCenter.x;
+        float offsetY = pos.y - cameraCenter.y;
+
+        float rotatedX = offsetX * cosAngle - offsetY * sinAngle;
+        float rotatedY = offsetX * sinAngle + offsetY * cosAngle;
+
+        pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
+    }
+
+    return pos;
+}
+
+std::vector<std::filesystem::path> Utils::getAllFilesFromFolder(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
+    std::vector<std::filesystem::path> files;
+    std::error_code ec;
+
+    for (const auto& file : std::filesystem::directory_iterator(folder, ec)) {
+        if (ec) return std::vector<std::filesystem::path>{};
+
+        if (std::filesystem::is_regular_file(file.status(ec)) && !ec)
+            if (validExtensions.contains(utils::string::pathToString(file.path().extension())))
+                files.push_back(file.path());
+    }
+
+    return files;
+}
+
+BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
+    ANIMATION_CHECK(YouDied)
+    ANIMATION_CHECK(Bsod)
+    ANIMATION_CHECK(AmongUs)
+    ANIMATION_CHECK(Celeste)
+    ANIMATION_CHECK(ToBeContinued)
+    ANIMATION_CHECK(Wii)
+    ANIMATION_CHECK(Wasted)
+    ANIMATION_CHECK(Jumpscare)
+    ANIMATION_CHECK(Maro)
+    ANIMATION_CHECK(Ghost)
+    ANIMATION_CHECK(Undertale)
+    ANIMATION_CHECK(Minecraft)
+    ANIMATION_CHECK(Terraria)
+    ANIMATION_CHECK(CBFDetected)
+    ANIMATION_CHECK(Pop)
+    ANIMATION_CHECK(SpeechBubble)
+    return nullptr;
+}
+
 CCGLProgram* Utils::createShader(const std::string& shader, bool autorelease) {
     CCGLProgram* ret = new CCGLProgram();
     ret->initWithVertexShaderByteArray(vertexShader.c_str(), shader.c_str());
@@ -305,7 +313,14 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
     return renderTexture->getSprite()->getTexture();
 }
 
-CCSprite* Utils::renderPlayer(CCNodeRGBA* player, bool rotation0) {
+CCSprite* Utils::renderPlayerSprite(CCNodeRGBA* player, bool rotation0) {
+    CCSprite* spr = CCSprite::createWithTexture(renderPlayerTexture(player, rotation0)->getSprite()->getTexture());
+    spr->setFlipY(true);
+
+    return spr;
+}
+
+CCRenderTexture* Utils::renderPlayerTexture(CCNodeRGBA* player, bool rotation0) {
     CCRenderTexture* texture = CCRenderTexture::create(100, 100);
 
     CCPoint ogPosition = player->getPosition();
@@ -330,9 +345,5 @@ CCSprite* Utils::renderPlayer(CCNodeRGBA* player, bool rotation0) {
     
     texture->end();
 
-
-    CCSprite* spr = CCSprite::createWithTexture(texture->getSprite()->getTexture());
-    spr->setFlipY(true);
-
-    return spr;
+    return texture;
 }

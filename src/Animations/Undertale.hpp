@@ -242,9 +242,9 @@ private:
         m_gameOver->runAction(CCFadeTo::create(1.2f / m_speed, 0));
     }   
 
+    ANIMATION_CTOR_CREATE(Undertale)
+
 public:
-    
-    DEFINE_CREATE(Undertale)
 
     void start() override {
         BaseAnimation::start();

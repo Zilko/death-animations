@@ -168,7 +168,7 @@ private:
         }
             
 
-        CCSprite* spr = Utils::renderPlayer(player, true);
+        CCSprite* spr = Utils::renderPlayerSprite(player, true);
         spr->setID("player-pixel-sprite"_spr);
         spr->setPosition(position);
         spr->setScale(scale);
@@ -188,10 +188,10 @@ private:
         player->setOpacity(0);
         Utils::setHighestZ(spr);
     }
-
-public:
     
-    DEFINE_CREATE(Maro)
+    ANIMATION_CTOR_CREATE(Maro)
+    
+public:
 
     void start() override {
         BaseAnimation::start();

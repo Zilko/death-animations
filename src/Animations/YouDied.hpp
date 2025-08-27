@@ -37,9 +37,9 @@ private:
         m_title->runAction(CCFadeTo::create(0.35f / m_speed, 0));
     }
     
-public:
+    ANIMATION_CTOR_CREATE(YouDied)
 
-    DEFINE_CREATE(YouDied)
+public:
     
     void start() override {
         BaseAnimation::start();

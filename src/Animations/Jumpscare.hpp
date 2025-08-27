@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
 class Jumpscare : public BaseAnimation {
-
-public:
     
-    DEFINE_CREATE(Jumpscare)
+    ANIMATION_CTOR_CREATE(Jumpscare)
+    
+public:
 
     void start() override {
         BaseAnimation::start();
@@ -27,7 +27,7 @@ public:
         
         addChild(layer);
         
-        CCSprite* spr = CCSprite::create(image.string().c_str());
+        CCSprite* spr = CCSprite::create(utils::string::pathToString(image).c_str());
 
         if (!spr) return layer->setVisible(false);
 

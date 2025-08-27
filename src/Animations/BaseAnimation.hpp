@@ -2,6 +2,19 @@
 
 #include "../Includes.hpp"
 
+#define ANIMATION_CTOR_CREATE(CLASS) \
+    private: \
+        CLASS(const AnimationParams& params) \
+            : BaseAnimation(params) {} \
+    public:\
+        static CLASS* create(const AnimationParams& params) { \
+            CLASS* ret = new CLASS(params); \
+            ret->init(); \
+            ret->autorelease(); \
+            return ret; \
+        } \
+    private:
+
 class BaseAnimation : public CCLayer {
 
 protected:
@@ -34,23 +47,25 @@ protected:
         setID("death-animation"_spr);
     }
 
-public:
-
-    virtual void start() {
-        setContentSize(m_size);
-        setAnchorPoint({0, 0});
+    void enableTouch() {
         setTouchEnabled(true);
         registerWithTouchDispatcher();
         setTouchMode(kCCTouchesOneByOne);
+    }
+
+public:
+
+    virtual void start() {
         setAnimationID();
+        setContentSize(m_size);
+        setAnchorPoint({0, 0});
         
-        m_parentNode->addChild(this);
+        if (m_parentNode)
+            m_parentNode->addChild(this);
     }
 
     virtual void end() {
         removeFromParentAndCleanup(true);
     }
-    
-    virtual bool ccTouchBegan(CCTouch*, CCEvent*) override { return false; }
   
 };

@@ -184,9 +184,9 @@ private:
         m_wastedSprite->runAction(CCFadeTo::create(2.5f / m_speed, 0));
     }
 
+    ANIMATION_CTOR_CREATE(Wasted)
+    
 public:
-
-    DEFINE_CREATE(Wasted)
 
     void start() override {
         BaseAnimation::start();

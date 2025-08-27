@@ -55,12 +55,11 @@ private:
 
         m_program = Utils::createShader(m_shader, true);
 
-        CCSprite* spr = Utils::renderPlayer(player, true);
+        CCSprite* spr = Utils::renderPlayerSprite(player, true);
         spr->setShaderProgram(m_program);
+        spr->runAction(CCMoveBy::create(2.3f / m_speed, {0, 500}));
 
         addChild(spr);
-
-        spr->runAction(CCMoveBy::create(2.3f / m_speed, {0, 500}));
 
         scheduleOnce(schedule_selector(GhostNode::setHighestZ), 0.05f);
         schedule(schedule_selector(GhostNode::update));
@@ -108,10 +107,10 @@ private:
         player->getParent()->addChild(ghost);
         player->setOpacity(0);
     }
-
-public:
     
-    DEFINE_CREATE(Ghost)
+    ANIMATION_CTOR_CREATE(Ghost)
+    
+public:
 
     void start() override {
         BaseAnimation::start();

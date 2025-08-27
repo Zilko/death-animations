@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
 class Minecraft : public BaseAnimation {
-
-public:
     
-    DEFINE_CREATE(Minecraft)
+    ANIMATION_CTOR_CREATE(Minecraft)
+    
+public:
 
     void start() override {
         BaseAnimation::start();
