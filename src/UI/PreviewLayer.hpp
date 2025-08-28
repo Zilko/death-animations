@@ -2,7 +2,7 @@
 
 #include "../Animations/BaseAnimation.hpp"
 
-class PreviewLayer : public geode::Popup<>, public PreviewEvents {
+class PreviewLayer : public geode::Popup<>, public PreviewDelegate {
   
 private:
 
@@ -41,5 +41,6 @@ public:
     
     CCNodeRGBA* getPlayer() override;
     CCNode* getBackButton() override;
+    void setBackgroundOpacity(int) override;
 
 };

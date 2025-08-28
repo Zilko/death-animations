@@ -23,7 +23,7 @@ protected:
 
     PlayLayer* m_playLayer = nullptr;
     
-    PreviewEvents* m_delegate = nullptr;
+    PreviewDelegate* m_delegate = nullptr;
     
     ExtraParams m_extras;
     

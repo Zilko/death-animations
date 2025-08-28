@@ -645,7 +645,7 @@ private:
     void update(float dt) override {
         if (m_frameSprite) m_frameSprite->setVisible(false);
         
-        (void)Utils::takeScreenshot(m_renderTexture);
+        Utils::takeScreenshot(m_renderTexture);
 
         if (m_frameSprite) m_frameSprite->setVisible(true);
 

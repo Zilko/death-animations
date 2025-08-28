@@ -49,7 +49,7 @@ private:
         : m_speed(speed) {}
 
     void init(CCNodeRGBA* player) {
-        (void)CCNode::init();
+        CCNode::init();
 
         setID("player-ghost"_spr);
 

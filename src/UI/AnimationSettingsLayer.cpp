@@ -8,6 +8,7 @@
 #include "AmongUsSetting.hpp"
 #include "FolderSetting.hpp"
 #include "ScaleSetting.hpp"
+#include "TextSetting.hpp"
 
 AnimationSettingsLayer::AnimationSettingsLayer(const DeathAnimation& animation) {
     m_animation = animation;
@@ -143,6 +144,7 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::AmongUsColor: settingNode = AmongUsSetting::create(this, setting, m_animation, y); break;
             case SettingType::Folder: settingNode = FolderSetting::create(this, setting, m_animation, y); break;
             case SettingType::Scale: settingNode = ScaleSetting::create(this, setting, m_animation, y); break;
+            case SettingType::Text: settingNode = TextSetting::create(this, setting, m_animation, y); break;
         }
 
         if (settingNode)

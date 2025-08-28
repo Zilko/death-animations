@@ -35,6 +35,7 @@ void BaseSetting::init(float y) {
     
     m_infoBtn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(BaseSetting::onInfo));
     m_infoBtn->setPositionY(10);
+    m_infoBtn->setVisible(!m_setting.description.empty());
     
     m_menu->addChild(m_infoBtn);
 }

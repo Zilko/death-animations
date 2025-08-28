@@ -17,6 +17,7 @@
 #include "../Animations/CBFDetected.hpp"
 #include "../Animations/Pop.hpp"
 #include "../Animations/SpeechBubble.hpp"
+#include "../Animations/What.hpp"
 
 #include <random>
 #include <Geode/cocos/support/data_support/uthash.h>
@@ -106,6 +107,22 @@ float Utils::getSpeedValue(float value) {
     return 3.9f * std::clamp(value, 0.f, 1.f) + 0.1f;
 }
 
+std::string Utils::getSettingString(int id, const std::string& setting) {
+    std::string animation = std::to_string(id);
+    matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
+    
+    std::string defaultValue;
+    
+    if (specificStringDefaults.contains(id))
+        if (specificStringDefaults.at(id).contains(setting))
+            defaultValue = specificStringDefaults.at(id).at(setting);
+    
+    if (object.contains(animation))
+        return object[animation][setting].asString().unwrapOr(defaultValue);
+        
+    return defaultValue;
+}
+
 float Utils::getSettingFloat(int id, const std::string& setting) {
     std::string animation = std::to_string(id);
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
@@ -138,18 +155,12 @@ bool Utils::getSettingBool(int id, const std::string& setting) {
     return defaultValue;
 }
 
-void Utils::saveSetting(int id, const std::string& setting, float value) {
-    std::string animation = std::to_string(id);
-    matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
-    matjson::Value newObject = object[animation];
-    
-    newObject[setting] = value;
-    object[animation] = newObject;
-    
-    Mod::get()->setSavedValue("settings", object);
+void Utils::saveSetting(int id, const std::string& setting, const std::string& value) {
+    saveSetting<std::string>(id, setting, value);
 }
 
-void Utils::saveSetting(int id, const std::string& setting, bool value) {
+template <typename T>
+void Utils::saveSetting(int id, const std::string& setting, const T& value) {
     std::string animation = std::to_string(id);
     matjson::Value object = Mod::get()->getSavedValue<matjson::Value>("settings");
     matjson::Value newObject = object[animation];
@@ -263,6 +274,7 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(CBFDetected)
     ANIMATION_CHECK(Pop)
     ANIMATION_CHECK(SpeechBubble)
+    ANIMATION_CHECK(What)
     return nullptr;
 }
 

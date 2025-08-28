@@ -59,6 +59,10 @@
       "segoe-light": {
           "path": "resources/fonts/segoe-light.ttf",
           "size": 100
+      },
+	  "times-rouman": {
+          "path": "resources/fonts/times-rouman.ttf",
+          "size": 100
       }
     }
 	}

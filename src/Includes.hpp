@@ -2,15 +2,7 @@
 
 using namespace geode::prelude;
 
-class PreviewEvents {
-  
-public:
-
-    virtual CCNodeRGBA* getPlayer() { return nullptr; }
-
-    virtual CCNode* getBackButton() { return nullptr; }
-    
-};
+#include "UI/PreviewDelegate.hpp"
 
 static const std::string vertexShader = R"(
     attribute vec4 a_position;
@@ -43,7 +35,8 @@ enum SettingType {
     AmongUsColor,
     Select,
     Folder,
-    Scale
+    Scale,
+    Text
 };
 
 enum Anim {
@@ -64,7 +57,8 @@ enum Anim {
     Terraria = 15,
     CBFDetected = 16,
     Pop = 17,
-    SpeechBubble = 18
+    SpeechBubble = 18,
+    What = 19
 };
 
 struct ExtraParams {
@@ -78,7 +72,7 @@ struct ExtraParams {
 struct AnimationParams {
     CCNode* parentNode = nullptr;
     PlayLayer* playLayer = nullptr;
-    PreviewEvents* delegate = nullptr;
+    PreviewDelegate* delegate = nullptr;
     float speed = 1.f;
     ExtraParams extras = {};
 };
@@ -115,6 +109,13 @@ static const std::unordered_set<std::string> gloalBoolDefaults = {
     "play-sound-effects"
 };
 
+static const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
+    { Anim::What, {
+        { "top-text", "WHAT" },
+        { "bottom-text", "WHAT" }
+    } }
+};
+
 static const std::unordered_map<int, std::unordered_map<std::string, float>> specificFloatDefaults {
     { Anim::AmongUs, {
         { "r1", 243.f },
@@ -142,10 +143,11 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Undertale, { { "second-player", true } } },
     { Anim::Ghost, { { "second-player", true } } },
     { Anim::Pop, { { "second-player", true } } },
-    { Anim::SpeechBubble, { { "stop-auto-restart", true } } }
+    { Anim::SpeechBubble, { { "stop-auto-restart", true } } },
+    { Anim::ToBeContinued, { { "yellow-shader", true } } }
 };
 
-static const std::array<DeathAnimation, 18> animations = {
+static const std::array<DeathAnimation, 19> animations = {
     DeathAnimation{ .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     DeathAnimation{ .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     DeathAnimation{ .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .isStopMusic = true },
@@ -163,7 +165,8 @@ static const std::array<DeathAnimation, 18> animations = {
     DeathAnimation{ .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
     DeathAnimation{ .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true }
+    DeathAnimation{ .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::What, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 5.f, .isNoDeathEffect = true }
 };
 
 static const std::array<AnimationSetting, 9> defaultSettings = {
@@ -216,6 +219,9 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
     { Anim::Pop, {
         { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
     } },
+    { Anim::ToBeContinued, {
+        { .id = "yellow-shader", .name = "Yellow Shader", .description = "", .type = SettingType::Toggle }
+    } },
     { Anim::SpeechBubble, {
         { .id = "scale-y", .name = "Scale Y", .description = "", .type = SettingType::Scale },
         { .id = "flip-x", .name = "Flip X", .description = "", .type = SettingType::Toggle },
@@ -223,5 +229,9 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "hide-arrows", .name = "Hide Arrows", .description = "", .type = SettingType::Toggle },
         { .id = "hide-ui", .name = "Hide UI", .description = "", .type = SettingType::Toggle },
         { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the images you have saved.", .type = SettingType::Folder, .folder = Mod::get()->getSaveDir() / "screenshots" }
-    } }
+    } },
+    { Anim::What, {
+        { .id = "top-text", .name = "Top Text", .description = "", .type = SettingType::Text },
+        { .id = "bottom-text", .name = "Bottom Text", .description = "", .type = SettingType::Text }
+    } },
 };

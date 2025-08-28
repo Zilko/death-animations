@@ -192,3 +192,7 @@ CCNodeRGBA* PreviewLayer::getPlayer() {
 CCNode* PreviewLayer::getBackButton() {
     return m_backButton;
 }
+
+void PreviewLayer::setBackgroundOpacity(int opacity) {
+    setOpacity(opacity);
+}

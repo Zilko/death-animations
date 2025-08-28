@@ -14,7 +14,7 @@ private:
         : m_speed(speed), m_scale(scale), m_isSecondPlayer(isSecondPlayer) {}
 
     bool init() override {
-        (void)CCNode::init();
+        CCNode::init();
 
         m_color = !m_isSecondPlayer ? ccc3(255, 0, 0) : ccc3(0, 0, 255);
 
@@ -82,7 +82,7 @@ public:
     static UndertaleHeart* create(float speed, float scale, bool isSecondPlayer) {
         UndertaleHeart* ret = new UndertaleHeart(speed, scale, isSecondPlayer);
 
-        (void)ret->init();
+        ret->init();
         ret->autorelease();
         
         return ret;

@@ -110,7 +110,7 @@ private:
         if (m_wastedContainer) m_wastedContainer->setVisible(false);
         if (m_isPreview) m_delegate->getBackButton()->setVisible(false);
         
-        (void)Utils::takeScreenshot(m_renderTexture);
+        Utils::takeScreenshot(m_renderTexture);
 
         if (m_frameSprite) m_frameSprite->setVisible(true);
         if (m_wastedContainer) m_wastedContainer->setVisible(true);
@@ -190,6 +190,9 @@ public:
 
     void start() override {
         BaseAnimation::start();
+
+        if (m_isPreview)
+            m_delegate->setBackgroundOpacity(55);
 
         Utils::playSound(Anim::Wasted, "wasted.wav", m_speed, 1.f);
 
@@ -331,6 +334,9 @@ public:
     }
 
     void end() override {
+        if (m_isPreview)
+            m_delegate->setBackgroundOpacity(200);
+
         if (m_explosionSprite)
             m_explosionSprite->removeFromParentAndCleanup(true);
 

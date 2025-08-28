@@ -39,7 +39,8 @@ public:
         freezeSprite->setAnchorPoint({0, 0});
         freezeSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         
-        freezeSprite->setShaderProgram(Utils::createShader(m_shader, true));
+        if (Utils::getSettingBool(Anim::ToBeContinued, "yellow-shader"))
+            freezeSprite->setShaderProgram(Utils::createShader(m_shader, true));
         
         addChild(freezeSprite);
         

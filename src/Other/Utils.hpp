@@ -22,12 +22,15 @@ public:
     static const DeathAnimation& getSelectedAnimation(Anim anim);
 
     static float getSpeedValue(float);
+    static std::string getSettingString(int, const std::string&);
     static float getSettingFloat(int, const std::string&);
     static bool getSettingBool(int, const std::string&);
     
-    static void saveSetting(int, const std::string&, float);
-    static void saveSetting(int, const std::string&, bool);
+    static void saveSetting(int, const std::string&, const std::string&);
     static void setDefaults(int);
+
+    template <typename T>
+    static void saveSetting(int, const std::string&, const T&);
 
     static void setHookEnabled(const std::string&, bool);
     static void setHighestZ(CCNode*);
