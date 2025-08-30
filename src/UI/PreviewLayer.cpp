@@ -181,7 +181,7 @@ bool PreviewLayer::setup() {
         
     schedule(schedule_selector(PreviewLayer::updateCircle), 0, kCCRepeatForever, 0);
     scheduleOnce(schedule_selector(PreviewLayer::spawnPlayer), 0.2f);
-    
+
     return true;
 }
 

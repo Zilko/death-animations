@@ -18,6 +18,7 @@
 #include "../Animations/Pop.hpp"
 #include "../Animations/SpeechBubble.hpp"
 #include "../Animations/What.hpp"
+#include "../Animations/Congregation.hpp"
 
 #include <random>
 #include <Geode/cocos/support/data_support/uthash.h>
@@ -191,11 +192,7 @@ void Utils::setHookEnabled(const std::string& name, bool enabled) {
 void Utils::setHighestZ(CCNode* node) {
     if (!node->getParent()) return;
 
-    int highest = 0;
-
-    for (CCNode* brother : CCArrayExt<CCNode*>(node->getParent()->getChildren()))
-        if (brother->getZOrder() > highest && brother != node)
-            highest = brother->getZOrder();
+    int highest = static_cast<CCScene*>(node->getParent())->getHighestChildZ();
 
     if (highest < std::numeric_limits<int>::max())
         highest++;
@@ -275,6 +272,7 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(Pop)
     ANIMATION_CHECK(SpeechBubble)
     ANIMATION_CHECK(What)
+    ANIMATION_CHECK(Congregation)
     return nullptr;
 }
 

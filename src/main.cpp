@@ -19,6 +19,50 @@
 #include <Geode/modify/ExplodeItemNode.hpp>
 #include <Geode/modify/CCFadeOut.hpp>
 #include <Geode/modify/CCAnimation.hpp>
+#include <Geode/modify/EditorUI.hpp>
+#include <Geode/modify/ChannelControl.hpp>
+
+class $modify(FMOD::ChannelControl) {
+
+    FMOD_RESULT stop() {
+        if (!PlayLayer::get())
+            return FMOD::ChannelControl::stop();
+     return (FMOD_RESULT)0;
+    }
+
+    FMOD_RESULT setPaused(bool paused) {
+        if (PlayLayer::get()) paused = false;
+            return FMOD::ChannelControl::setPaused(paused);
+    }
+
+};
+
+std::vector<std::string> split(const std::string &s, char delim, bool keep_empty = true) {
+    std::vector<std::string> out;
+    size_t start = 0;
+    while (true) {
+        size_t pos = s.find(delim, start);
+        if (pos == std::string::npos) {
+            std::string token = s.substr(start);
+            if (keep_empty || !token.empty()) out.push_back(std::move(token));
+            break;
+        }
+        std::string token = s.substr(start, pos - start);
+        if (keep_empty || !token.empty()) out.push_back(std::move(token));
+        start = pos + 1;
+    }
+    return out;
+}
+
+class $modify(EditorUI) {
+
+    void selectObject(GameObject* o, bool p1) {
+        EditorUI::selectObject(o, p1);
+
+        
+    }
+
+};
 
 $on_mod(Loaded) {
 
