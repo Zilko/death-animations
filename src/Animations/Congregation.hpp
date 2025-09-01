@@ -13,19 +13,22 @@ class Congregation : public BaseAnimation {
 private:
 
     const std::array<xdObject, 2> m_objects = {
-        xdObject{ 67, CCPoint{100, 100}, std::vector<int>{ 2 }, 0, 0 },
-        xdObject{ 73, CCPoint{120, 100}, std::vector<int>{ 1 }, 0, 0 }
+        xdObject{ 67, CCPoint{277.82343, 379.19995}, std::vector<int>{ 2 }, 0, 0 },
+        xdObject{ 73, CCPoint{257.82343, 379.19995}, std::vector<int>{ 1 }, 0, 0 }
     };    
 
-    PlayerObject* m_player = nullptr;
+    CCLayerColor* m_overlay = nullptr;
     
     CCNode* m_objectLayer = nullptr;
+
+    PlayerObject* m_player = nullptr;
     
     CCPoint m_playerStartPos;
     CCPoint m_firstCameraPos;
     CCPoint m_cameraStartPos;
     CCPoint m_layerStartPos;
     CCPoint m_cameraPos;
+    CCPoint m_startCameraOffset;
 
     std::unordered_map<int, std::vector<GameObject*>> m_groupObjects;
     std::unordered_map<int, std::vector<GameObject*>> m_baseColorObjects;
@@ -34,6 +37,9 @@ private:
     float m_time = 0.f;
     float m_ogMusicVolume = 1.f;
     float m_ogSFXVolume = 1.f;
+    float m_fallHeight = 0.f;
+
+    bool m_isSecondStep = false;
 
     ~Congregation() {
         setVolume(m_ogMusicVolume, m_ogSFXVolume);
@@ -49,37 +55,56 @@ private:
     void update(float dt) {
         m_time += dt;
 
+        if (m_time > 0.9f && !m_isSecondStep) {
+            if (m_time > 2.f)
+                secondStep();
+
+            return;
+        }
+
         m_player->updateInternalActions(dt);
         m_player->update(dt * 60.f);
 
         m_player->m_totalTime = m_time;
 
-        if (m_player->getPosition().y < -2000) {
-
-            m_playerStartPos.y = 105.f;
-            // m_player->setPosition({m_player->getPosition().x, -2000});
-            // m_player->hitGround(nullptr, false);
+        if (m_isSecondStep && m_player->getPositionY() < m_fallHeight) {
+            m_player->setPositionY(m_fallHeight);
+            m_player->hitGround(nullptr, false);
         }
 
         m_player->updateRotation(dt * 60.f);
 
-        cocos2d::CCPoint targetPos =
-            (-m_playLayer->m_objectLayer->getPosition()
-            + m_size / 2.f
-            + m_player->getPosition()
-            - m_playerStartPos)
-            / m_objectLayer->getScale();
+        cocos2d::CCPoint targetPos;
+
+        if (m_isSecondStep)
+            targetPos = -m_player->getPosition() + ccp(211, 105);
+        else
+            targetPos = 
+                (-m_playLayer->m_objectLayer->getPosition() + (m_startCameraOffset - m_playLayer->m_gameState.m_cameraOffset)
+                + m_size / 2.f
+                + m_player->getPosition()
+                - m_playerStartPos)
+                / m_objectLayer->getScale();
 
         if (m_cameraPos == ccp(0, 0))
             m_cameraPos = targetPos;
 
         m_cameraPos = ccpLerp(m_cameraPos, targetPos, 1.f - expf(-7.f * dt));
 
-        m_objectLayer->setContentSize(m_cameraPos);
+        m_isSecondStep ? m_objectLayer->setPosition(m_cameraPos) : m_objectLayer->setContentSize(m_cameraPos);
 
-        m_playLayer->m_objectLayer->getParent()->setPosition(
-            m_cameraStartPos - (m_cameraPos - m_layerStartPos)
-        );
+        if (m_isSecondStep) return;
+        
+        m_objectLayer->setRotation(m_playLayer->m_gameState.m_cameraAngle);
+
+        float yPos = (m_cameraStartPos - (m_cameraPos - m_layerStartPos)).y;
+
+        if (yPos >= 0)
+            m_playLayer->m_objectLayer->getParent()->setPositionY(yPos);
+        else
+            m_playLayer->m_gameState.m_cameraOffset.y = (m_cameraPos - m_layerStartPos).y;
+
+        m_playLayer->m_gameState.m_cameraOffset.x = (m_cameraPos - m_layerStartPos).x;
 
         float progress = std::min(m_time / 0.5f, 1.f);
 
@@ -89,12 +114,61 @@ private:
         );
     }
 
+    void secondStep() {
+        m_isSecondStep = true;
+        m_cameraPos = -ccp(50, 2000) + ccp(211, 0);
+
+        m_player->setPosition({50, 2000});
+        m_player->setScale(1.f);
+
+        m_player->m_yVelocity = -15;
+        m_player->m_fallSpeed = 0;
+        m_player->m_platformerXVelocity = 0;
+        m_player->m_gravity = 0.958199f;
+        m_player->m_gravityMod = 1;
+        m_player->m_stateFlipGravity = -607;
+        m_player->m_isUpsideDown = false;
+        m_player->m_rotationSpeed = 415.38f;
+        m_player->m_rotateSpeed = 1;
+        m_player->m_isRotating = true;
+
+        m_objectLayer->setScale(1.f);
+        m_objectLayer->setRotation(0.f);
+        m_objectLayer->setAnchorPoint({0, 0});
+
+        m_overlay->stopAllActions();
+        m_overlay->runAction(CCFadeTo::create(0.97f, 0));
+
+        addChild(CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height), 0);
+
+        scheduleOnce(schedule_selector(Congregation::thirdStep), 1.5f);
+    }
+
+    void thirdStep(float) {
+        FMODAudioEngine* fmod = FMODAudioEngine::get();
+
+        fmod->m_backgroundMusicChannel->setPaused(true);
+        fmod->m_globalChannel->stop();
+
+        setVolume(m_ogMusicVolume, m_ogSFXVolume);
+
+        Utils::playSound(Anim::Congregation, "congregation.mp3", m_speed, 1.f);
+
+        scheduleOnce(schedule_selector(Congregation::fourthStep), 0.15f);
+    }
+
+    void fourthStep(float) {
+        m_fallHeight = m_player->getPositionY();
+    }
+
     ANIMATION_CTOR_CREATE(Congregation)
     
 public:
 
     void start() override {
         BaseAnimation::start();
+
+        Utils::setHighestZ(this);
 
         PlayerObject* player = m_playLayer->m_player1;
         FMODAudioEngine* fmod = FMODAudioEngine::get();
@@ -113,6 +187,7 @@ public:
         m_playerStartPos = player->getPosition();
         m_cameraStartPos = m_playLayer->m_objectLayer->getParent()->getPosition();
         m_layerStartPos = m_objectLayer->getContentSize();
+        m_startCameraOffset = m_playLayer->m_gameState.m_cameraOffset;
 
         addChild(m_objectLayer, 1);
 
@@ -150,29 +225,31 @@ public:
         m_player->m_gravityMod = player->m_gravityMod;
         m_player->m_stateFlipGravity = player->m_stateFlipGravity;
         m_player->m_isUpsideDown = player->m_isUpsideDown;
+        m_player->m_rotationSpeed = player->m_rotationSpeed;
+        m_player->m_rotateSpeed = player->m_rotateSpeed;
+        m_player->m_isRotating = player->m_isRotating;
         
         m_player->update(0.f);
 
         m_objectLayer->addChild(m_player);
 
-        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
-        layer->runAction(CCSequence::create(
-            CCDelayTime::create(0.f),
-            CCFadeTo::create(0.5f, 255),
+        m_overlay = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
+        m_overlay->runAction(CCSequence::create(
+            CCDelayTime::create(0.2f),
+            CCFadeTo::create(0.55f, 255),
             nullptr
         ));
 
-        addChild(layer, 3);
+        addChild(m_overlay, 3);
 
         schedule(schedule_selector(Congregation::update));
 
         for (const xdObject& prop : m_objects) {
-            break;
             GameObject* object = GameObject::createWithKey(prop.id);
 
             object->setPosition(prop.pos);
 
-            addChild(object);
+            m_objectLayer->addChild(object);
 
             for (int group : prop.groups)
                 if (m_groupObjects.contains(group))
@@ -202,6 +279,7 @@ public:
 
     void end() override {
         m_playLayer->m_objectLayer->getParent()->setPosition(m_cameraStartPos);
+        m_playLayer->m_gameState.m_cameraOffset = m_startCameraOffset;
 
         BaseAnimation::end();
     }

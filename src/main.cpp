@@ -63,7 +63,6 @@ $on_mod(Loaded) {
     Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
     Utils::setHookEnabled("GJBaseGameLayer::update", false);
-    Utils::setHookEnabled("ExplodeItemNode::update", false);
     Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
     Utils::setHookEnabled("FMOD::ChannelControl::setPaused", false);
 
@@ -210,7 +209,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         m_fields->m_forceRestart = true;
         delayedResetLevel();
     }
-
+    
     void resetLevel() {
         auto f = m_fields.self();
 
@@ -307,7 +306,7 @@ class $modify(CCCircleWave) {
 };
 
 class $modify(GJBaseGameLayer) {
-
+    
     void update(float dt) { // disabled by defolt
         if (!Vars::selectedAnimation.isFreezeGameLayer)
             GJBaseGameLayer::update(dt * 0.025f);
