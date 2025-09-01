@@ -15,186 +15,156 @@ private:
     const std::array<xdObject, 2> m_objects = {
         xdObject{ 67, CCPoint{100, 100}, std::vector<int>{ 2 }, 0, 0 },
         xdObject{ 73, CCPoint{120, 100}, std::vector<int>{ 1 }, 0, 0 }
-    };
+    };    
+
+    PlayerObject* m_player = nullptr;
+    
+    CCNode* m_objectLayer = nullptr;
+    
+    CCPoint m_playerStartPos;
+    CCPoint m_firstCameraPos;
+    CCPoint m_cameraStartPos;
+    CCPoint m_layerStartPos;
+    CCPoint m_cameraPos;
 
     std::unordered_map<int, std::vector<GameObject*>> m_groupObjects;
     std::unordered_map<int, std::vector<GameObject*>> m_baseColorObjects;
     std::unordered_map<int, std::vector<GameObject*>> m_detailColorObjects;
 
-    ANIMATION_CTOR_CREATE(Congregation)
+    float m_time = 0.f;
+    float m_ogMusicVolume = 1.f;
+    float m_ogSFXVolume = 1.f;
 
-    PlayerObject* player = nullptr;
-    float time = 0.f;
-    cocos2d::CCPoint _cameraPos;
-bool _cameraPosInitialized = false;
-float _cameraSmooth = 7.0f;     
+    ~Congregation() {
+        setVolume(m_ogMusicVolume, m_ogSFXVolume);
+    }
+
+    void setVolume(float music, float sfx) {
+        FMODAudioEngine* fmod = FMODAudioEngine::get();
+
+        fmod->m_backgroundMusicChannel->setVolume(music);
+        fmod->m_globalChannel->setVolume(sfx);
+    }
 
     void update(float dt) {
-        time += dt;
+        m_time += dt;
 
-        player->updateInternalActions(dt);
-        player->update(dt * 60.f);
+        m_player->updateInternalActions(dt);
+        m_player->update(dt * 60.f);
 
-        player->m_totalTime = time;
+        m_player->m_totalTime = m_time;
 
-        // player->m_waveTrail->m_pulseSize = 1.4f;
+        if (m_player->getPosition().y < -2000) {
 
-        // float height = 0.f;
-
-        // if (player->m_vehicleSize != 1.f)
-        //     height = (1.f - player->m_vehicleSize) * player->m_unkAngle1 * 0.5;
-
-        // height = (CCDirector::get()->getScreenBottom() + 90.f + player->m_unkAngle1 * 0.5) - height;
-
-        if (player->getPosition().y < -2000) {
-
-            startPip.y = 105.f;
-            // player->setPosition({player->getPosition().x, -2000});
-            // player->hitGround(nullptr, false);
+            m_playerStartPos.y = 105.f;
+            // m_player->setPosition({m_player->getPosition().x, -2000});
+            // m_player->hitGround(nullptr, false);
         }
 
-        player->updateRotation(dt * 60.f);
+        m_player->updateRotation(dt * 60.f);
 
-        // if (getPosition().x >= CCDirector::get()->getWinSize().width + 100.f)
-        //     m_fields->m_shouldKill ? meetGrimReaper() : reset(videoOptionsOpen);
+        cocos2d::CCPoint targetPos =
+            (-m_playLayer->m_objectLayer->getPosition()
+            + m_size / 2.f
+            + m_player->getPosition()
+            - m_playerStartPos)
+            / m_objectLayer->getScale();
 
-        // m_waveTrail->updateStroke(dt);
+        if (m_cameraPos == ccp(0, 0))
+            m_cameraPos = targetPos;
 
-        // layerun->setContentSize((-m_playLayer->m_player1->getParent()->getPosition() + m_size / 2.f + player->getPosition() - startPip) * (1.f / layerun->getScale()));
-        cocos2d::CCPoint target =
-        (-m_playLayer->m_player1->getParent()->getPosition()
-         + m_size / 2.f
-         + player->getPosition()
-         - startPip)
-        * (1.f / layerun->getScale());
+        m_cameraPos = ccpLerp(m_cameraPos, targetPos, 1.f - expf(-7.f * dt));
 
-    // init first frame so camera doesn't jump
-    if (!_cameraPosInitialized) {
-        _cameraPos = target;
-        _cameraPosInitialized = true;
+        m_objectLayer->setContentSize(m_cameraPos);
+
+        m_playLayer->m_objectLayer->getParent()->setPosition(
+            m_cameraStartPos - (m_cameraPos - m_layerStartPos)
+        );
+
+        float progress = std::min(m_time / 0.5f, 1.f);
+
+        setVolume(
+            m_ogMusicVolume - progress * m_ogMusicVolume,
+            m_ogSFXVolume - progress * m_ogSFXVolume
+        );
     }
 
-    // exponential smoothing: alpha = 1 - e^{-k * dt}
-    float k = _cameraSmooth;                    // tuning parameter
-    float alpha = 1.0f - expf(-k * dt);         // need <math.h> included
-    _cameraPos = ccpLerp(_cameraPos, target, alpha);
-
-    // apply smoothed value (keeps your original call)
-    layerun->setContentSize(_cameraPos);
-    log::debug("{}", startPip);
-    }
-
-    CCPoint startPip;
-    CCNode* layerun = nullptr;
+    ANIMATION_CTOR_CREATE(Congregation)
     
 public:
 
     void start() override {
         BaseAnimation::start();
 
-        addChild(CCLayerColor::create({ 0, 0, 0, 255 }, m_size.width, m_size.height));
+        PlayerObject* player = m_playLayer->m_player1;
+        FMODAudioEngine* fmod = FMODAudioEngine::get();
+
+        player->setOpacity(0);
+        fmod->m_backgroundMusicChannel->getVolume(&m_ogMusicVolume);
+        fmod->m_globalChannel->getVolume(&m_ogSFXVolume);
+
+        m_objectLayer = CCNode::create();
+        m_objectLayer->setAnchorPoint({1, 1});
+        m_objectLayer->setPosition(m_size / 2.f);
+        m_objectLayer->setScale(m_playLayer->m_objectLayer->getScale());
+        m_objectLayer->setRotation(m_playLayer->m_gameState.m_cameraAngle);
+        m_objectLayer->setContentSize((-m_playLayer->m_objectLayer->getPosition() + m_size / 2.f) / m_objectLayer->getScale());
+        
+        m_playerStartPos = player->getPosition();
+        m_cameraStartPos = m_playLayer->m_objectLayer->getParent()->getPosition();
+        m_layerStartPos = m_objectLayer->getContentSize();
+
+        addChild(m_objectLayer, 1);
 
         GameManager* gm = GameManager::get();
-    
-        // auto m_mainColor = gm->colorForIdx(gm->getPlayerColor());
-        // CCPoint playerPos = Utils::getPlayerScreenPos(m_playLayer, m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1, m_isPreview);
-        CCPoint playerPos = m_playLayer->m_player1->getPosition();
-        startPip = playerPos;
 
-        layerun = CCNode::create();
-
-        layerun->setPosition(m_size / 2.f);
-        layerun->setScale(m_playLayer->m_player1->getParent()->getScale());
-        layerun->setContentSize((-m_playLayer->m_player1->getParent()->getPosition() + m_size / 2.f) * (1.f / layerun->getScale()));
-        layerun->setRotation(m_playLayer->m_gameState.m_cameraAngle);
-        layerun->setAnchorPoint({1, 1});
-
-        player = PlayerObject::create(gm->getPlayerFrame(), 1, nullptr, this, false);
-        // player->addAllParticles();
-
-        // player->m_regularTrail->stopStroke();
-
-        if (player->m_fadeOutStreak) {
-            player->m_fadeOutStreak = false;
-            player->fadeOutStreak2(player->m_playEffects ? 0.2f : 0.6f);
-        }
-
-        if (player->m_hasGroundParticles) {
-            player->m_playerGroundParticles->stopSystem();
-            player->m_hasGroundParticles = false;
-        }
-
-
-        player->resetAllParticles();
-        player->toggleFlyMode(false, false);
-        player->toggleBirdMode(false, false);
-        player->toggleRollMode(false, false);
-        player->toggleDartMode(false, false);
-        player->toggleRobotMode(false, false);
-        player->toggleSpiderMode(false, false);
-        player->toggleSwingMode(false, false);
-
-        // SimplePlayer* m_player = SimplePlayer::create(gm->getPlayerFrame());
-        // m_player->m_hasGlowOutline = gm->getPlayerGlow();
-        player->setPosition(playerPos);
-        player->setRotation(m_playLayer->m_player1->getRotation());
-        // m_player->setColors(m_mainColor, gm->colorForIdx(gm->getPlayerColor2()));
-        
-        // if (m_player->m_hasGlowOutline)
-        //     m_player->enableCustomGlowColor(gm->colorForIdx(gm->getPlayerGlowColor()));
-        // else
-        //     m_player->disableCustomGlowColor();
-            
-        // m_player->updateColors();
+        m_player = PlayerObject::create(gm->getPlayerFrame(), 1, nullptr, this, false);
+        m_player->addAllParticles();
+        m_player->resetAllParticles();
+        m_player->setPosition(player->getPosition());
+        m_player->setRotation(player->getRotation());
+        m_player->updateTimeMod(0.3f, false);
+        m_player->setScale(player->getScale());
 
         cocos2d::ccColor3B color1 = gm->colorForIdx(gm->getPlayerColor());
         cocos2d::ccColor3B color2 = gm->colorForIdx(gm->getPlayerColor2());
         
-        player->setColor(color1);
-        player->setSecondColor(color2);
-        player->m_hasGlow = gm->getPlayerGlow();
+        m_player->setColor(color1);
+        m_player->setSecondColor(color2);
+        m_player->m_hasGlow = gm->getPlayerGlow();
 
         if (gm->getPlayerGlow())
-            player->enableCustomGlowColor(gm->colorForIdx(gm->getPlayerGlowColor()));
+            m_player->enableCustomGlowColor(gm->colorForIdx(gm->getPlayerGlowColor()));
         else
-            player->disableCustomGlowColor();
+            m_player->disableCustomGlowColor();
 
-        player->updateGlowColor();
-        player->updatePlayerGlow();
+        m_player->updateGlowColor();
+        m_player->updatePlayerGlow();
 
-        layerun->addChild(player);
+        m_player->m_fadeOutStreak = false;
+        m_player->m_hasGroundParticles = false;
+        m_player->m_yVelocity = player->m_yVelocity;
+        m_player->m_fallSpeed = player->m_fallSpeed;
+        m_player->m_platformerXVelocity = player->m_platformerXVelocity;
+        m_player->m_gravity = player->m_gravity;
+        m_player->m_gravityMod = player->m_gravityMod;
+        m_player->m_stateFlipGravity = player->m_stateFlipGravity;
+        m_player->m_isUpsideDown = player->m_isUpsideDown;
+        
+        m_player->update(0.f);
 
-        addChild(layerun, 1);
+        m_objectLayer->addChild(m_player);
 
-        player->updateTimeMod(0.3f, false);
-        player->m_yVelocity = m_playLayer->m_player1->m_yVelocity;
-        player->m_fallSpeed = m_playLayer->m_player1->m_fallSpeed;
-        player->m_platformerXVelocity = m_playLayer->m_player1->m_platformerXVelocity;
-        player->m_gravity = m_playLayer->m_player1->m_gravity;
-        player->m_gravityMod = m_playLayer->m_player1->m_gravityMod;
-        player->m_stateFlipGravity = m_playLayer->m_player1->m_stateFlipGravity;
-        player->m_isUpsideDown = m_playLayer->m_player1->m_isUpsideDown;
+        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
+        layer->runAction(CCSequence::create(
+            CCDelayTime::create(0.f),
+            CCFadeTo::create(0.5f, 255),
+            nullptr
+        ));
 
-        if (!m_isPreview) {
-            player->setRotation(m_playLayer->m_player1->getRotation());
-            player->setScale(m_playLayer->m_player1->getScale());
-        }
-
-        player->update(0.f);
+        addChild(layer, 3);
 
         schedule(schedule_selector(Congregation::update));
-
-        // m_player->runAction(CCEaseIn::create(CCRotateBy::create(5.f, 360 * 5), 1.2f));
-        // m_player->runAction(CCEaseSineInOut::create(CCScaleTo::create(1.1f, 1.f)));
-        // m_player->runAction(CCEaseSineInOut::create(CCMoveTo::create(1.1f, {211, -6})));
-        // m_player->runAction(CCEaseSineInOut::create(CCMoveBy::create(0.7f, {-1, -10})));
-
-        auto layer = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
-        layer->runAction(
-            CCFadeTo::create(0.5f, 255)
-        );
-
-        // addChild(layer, 10);
 
         for (const xdObject& prop : m_objects) {
             break;
@@ -228,6 +198,11 @@ public:
         if (m_groupObjects.contains(2))
             for (GameObject* object : m_groupObjects.at(2))
                 object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f, {0, 60})));
-        
+    }
+
+    void end() override {
+        m_playLayer->m_objectLayer->getParent()->setPosition(m_cameraStartPos);
+
+        BaseAnimation::end();
     }
 };

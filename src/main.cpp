@@ -2,7 +2,6 @@
 
 #include "Other/Utils.hpp"
 #include "Other/SoundManager.hpp"
-#include "Other/SelectedAnimation.hpp"
 
 #include "UI/AnimationsLayer.hpp"
 
@@ -22,18 +21,11 @@
 #include <Geode/modify/EditorUI.hpp>
 #include <Geode/modify/ChannelControl.hpp>
 
-class $modify(FMOD::ChannelControl) {
+class Vars {
 
-    FMOD_RESULT stop() {
-        if (!PlayLayer::get())
-            return FMOD::ChannelControl::stop();
-     return (FMOD_RESULT)0;
-    }
+public:
 
-    FMOD_RESULT setPaused(bool paused) {
-        if (PlayLayer::get()) paused = false;
-            return FMOD::ChannelControl::setPaused(paused);
-    }
+    inline static DeathAnimation selectedAnimation = {};
 
 };
 
@@ -72,6 +64,8 @@ $on_mod(Loaded) {
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
     Utils::setHookEnabled("GJBaseGameLayer::update", false);
     Utils::setHookEnabled("ExplodeItemNode::update", false);
+    Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
+    Utils::setHookEnabled("FMOD::ChannelControl::setPaused", false);
 
     if (!Mod::get()->hasSavedValue("selected-animation"))
         Mod::get()->setSavedValue("selected-animation", 1);
@@ -156,7 +150,7 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
 
-        SelectedAnimation::set(animation);
+        Vars::selectedAnimation = animation;
 
         bool og = m_gameState.m_unkBool26;
         DashRingObject* dashOrb1 = m_player1->m_isDashing ? m_player1->m_dashRing : nullptr;
@@ -170,11 +164,21 @@ class $modify(ProPlayLayer, PlayLayer) {
             Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);
         }
 
+        if (animation.isNoStopMusic) {
+            Utils::setHookEnabled("FMOD::ChannelControl::stop", true);
+            Utils::setHookEnabled("FMOD::ChannelControl::setPaused", true);
+        }
+
         PlayLayer::destroyPlayer(p0, p1);
 
         if (animation.isSlowDown) {
             Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
             Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+        }
+        
+        if (animation.isNoStopMusic) {
+            Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
+            Utils::setHookEnabled("FMOD::ChannelControl::setPaused", false);
         }
 
         m_gameState.m_unkBool26 = og;
@@ -206,26 +210,26 @@ class $modify(ProPlayLayer, PlayLayer) {
         m_fields->m_forceRestart = true;
         delayedResetLevel();
     }
-    
+
     void resetLevel() {
         auto f = m_fields.self();
 
         if (
             f->m_animation
             && !f->m_forceRestart
-            && Utils::getSettingBool(SelectedAnimation::get().id, "prevent-early-restart")
+            && Utils::getSettingBool(Vars::selectedAnimation.id, "prevent-early-restart")
         ) {
             return;
         }
 
         f->m_forceRestart = false;
 
-        PlayLayer::resetLevel();
-        
         if (f->m_animation) {
             f->m_animation->end();
             f->m_animation = nullptr;
         }
+
+        PlayLayer::resetLevel();
     }
 
     void dialogClosed(DialogLayer* wa) {
@@ -305,12 +309,12 @@ class $modify(CCCircleWave) {
 class $modify(GJBaseGameLayer) {
 
     void update(float dt) { // disabled by defolt
-        if (!SelectedAnimation::get().isFreezeGameLayer)
+        if (!Vars::selectedAnimation.isFreezeGameLayer)
             GJBaseGameLayer::update(dt * 0.025f);
     }
 
     void shakeCamera(float duration, float strength, float interval) {
-        if (!SelectedAnimation::get().isNoDeathEffect && !SelectedAnimation::get().isNoShakeEffect)
+        if (!Vars::selectedAnimation.isNoDeathEffect && !Vars::selectedAnimation.isNoShakeEffect)
             GJBaseGameLayer::shakeCamera(duration, strength, interval);
     }
 
@@ -325,10 +329,24 @@ class $modify(PlayerObject) {
         if (this != m_gameLayer->m_player1 && this != m_gameLayer->m_player2)
             return PlayerObject::playDeathEffect();
             
-        if (!SelectedAnimation::get().isNoDeathEffect)
+        if (!Vars::selectedAnimation.isNoDeathEffect)
             return PlayerObject::playDeathEffect();
             
         stopActionByTag(11);
     }
     
+};
+
+class $modify(FMOD::ChannelControl) {
+
+    FMOD_RESULT stop() { // disabled by defolt
+        return (FMOD_RESULT)0;
+    }
+
+    FMOD_RESULT setPaused(bool paused) { // disabled by defolt
+        paused = false;
+
+        return FMOD::ChannelControl::setPaused(paused);
+    }
+
 };

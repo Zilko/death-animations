@@ -89,6 +89,7 @@ struct DeathAnimation {
     bool isFreezeGameLayer = false;
     bool isSlowDown = false;
     bool isStopMusic = false;
+    bool isNoStopMusic = false;
 };
 
 struct AnimationSetting {
@@ -168,7 +169,7 @@ static const std::array<DeathAnimation, 20> animations = {
     DeathAnimation{ .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::What, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 15.f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::Congregation, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 15.f, .isNoDeathEffect = true }
+    DeathAnimation{ .id = Anim::Congregation, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 15.f, .isNoDeathEffect = true, .isNoStopMusic = true }
 };
 
 static const std::array<AnimationSetting, 9> defaultSettings = {
