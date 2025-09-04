@@ -38,6 +38,7 @@ public:
     static void fixScaleTextureSizexd(CCNode*);
     static CCPoint getPlayerScreenPos(PlayLayer*, CCNode*, bool);
     static std::vector<std::filesystem::path> getAllFilesFromFolder(const std::filesystem::path&, const std::unordered_set<std::string>);
+    static ccColor3B applyHSV(const ccColor3B&, const NoobHSV&);
 
     static BaseAnimation* createAnimation(Anim, const AnimationParams&);
     static CCGLProgram* createShader(const std::string&, bool);

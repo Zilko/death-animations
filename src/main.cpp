@@ -48,9 +48,56 @@ std::vector<std::string> split(const std::string &s, char delim, bool keep_empty
 
 class $modify(EditorUI) {
 
+    void selectObjects(CCArray* a, bool b) {
+        EditorUI::selectObjects(a, b);
+
+        for (GameObject* o : CCArrayExt<GameObject*>(a)) {
+            std::unordered_map<int, std::string> p;
+
+auto v = split(o->getSaveString(nullptr), ',');
+for (size_t i = 0; i + 1 < v.size(); i += 2) {
+        int pa = numFromString<int>(v[i]).unwrapOr(0);
+        if (pa != 0)
+        p[pa] = v[i + 1];
+}
+
+std::string vecPlap;
+
+auto it = p.find(57);
+if (it != p.end()) {
+    auto parts = split(it->second, '.');
+    for (const auto& k : parts) {
+        vecPlap += k + ", ";
+    }
+    if (!vecPlap.empty()) {
+        vecPlap.pop_back();
+        vecPlap.pop_back();
+    }
+}
+
+auto safeAt = [&](int key, std::string ddef) -> std::string {
+    auto it = p.find(key);
+    return (it != p.end()) ? it->second : ddef;
+};
+
+;
+
+std::vector plappy = split(safeAt(43, "0a1a1a0a0"), 'a');
+std::vector plappy2 = split(safeAt(44, "0a1a1a0a0"), 'a');
+
+log::debug("xdObjectPLAP22{},PLAP22{},{}PLAP23,PLAP22{}PLAP23,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}PLAP23,",
+           safeAt(1, "0"), safeAt(2, "0"), safeAt(3, "0"), vecPlap, safeAt(21, "0"), safeAt(22, "0"), safeAt(128, "1.f"), safeAt(6, "0"), safeAt(24, "0"), safeAt(25, "0"), safeAt(4, "0"), safeAt(5, "0"),
+            plappy[0], plappy[3], plappy[4], plappy[1], plappy[2],
+            plappy2[0], plappy2[3], plappy2[4], plappy2[1], plappy2[2]
+        );
+        }
+    }
+
     void selectObject(GameObject* o, bool p1) {
         EditorUI::selectObject(o, p1);
-
+log::debug("{}", o->getSaveString(nullptr));
+        
+        // xdObject{ 67, CCPoint{277.82343, 379.19995}, std::vector<int>{ 2 }, 0, 0, 1.f, 0.f },
         
     }
 

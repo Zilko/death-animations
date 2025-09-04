@@ -62,6 +62,12 @@ enum Anim {
     Congregation = 20
 };
 
+struct NoobHSV {
+    float hue = 0.f;
+    float saturation = 1.f;
+    float brightness = 1.f;
+};
+
 struct ExtraParams {
     int transition = 0;
     bool reverse = false;

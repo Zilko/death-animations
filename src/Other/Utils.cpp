@@ -254,6 +254,54 @@ std::vector<std::filesystem::path> Utils::getAllFilesFromFolder(const std::files
     return files;
 }
 
+ccColor3B Utils::applyHSV(const ccColor3B& color, const NoobHSV& hsv) {
+    float r = color.r / 255.f;
+    float g = color.g / 255.f;
+    float b = color.b / 255.f;
+
+    float maxc = std::max(r, std::max(g, b));
+    float minc = std::min(r, std::min(g, b));
+    float v = maxc;
+
+    float s = (maxc == 0.f) ? 0.f : (maxc - minc) / maxc;
+    float h = 0.f;
+
+    if (maxc != minc) {
+        if (r == maxc)       h = (g - b) / (maxc - minc);
+        else if (g == maxc)  h = 2 + (b - r) / (maxc - minc);
+        else                 h = 4 + (r - g) / (maxc - minc);
+        h *= 60.f;
+        if (h < 0) h += 360.f;
+    }
+
+    h += hsv.hue;
+    if (h < 0) h += 360.f;
+    if (h >= 360.f) h -= 360.f;
+
+    int i = (int)(h / 60.f) % 6;
+    float f = (h / 60.f) - i;
+    float p = v * (1 - s);
+    float q = v * (1 - f * s);
+    float t = v * (1 - (1 - f) * s);
+
+    switch (i) {
+        case 0: r = v; g = t; b = p; break;
+        case 1: r = q; g = v; b = p; break;
+        case 2: r = p; g = v; b = t; break;
+        case 3: r = p; g = q; b = v; break;
+        case 4: r = t; g = p; b = v; break;
+        case 5: r = v; g = p; b = q; break;
+    }
+
+    ccColor3B ret = ccc3(std::clamp(r, 0.f, 1.f) * 255, std::clamp(g, 0.f, 1.f) * 255, std::clamp(b, 0.f, 1.f) * 255);
+
+    ret.r = static_cast<int>(std::min(static_cast<int>(ret.r) * hsv.brightness, 255.f));
+    ret.g = static_cast<int>(std::min(static_cast<int>(ret.g) * hsv.brightness, 255.f));
+    ret.b = static_cast<int>(std::min(static_cast<int>(ret.b) * hsv.brightness, 255.f));
+
+    return ret;
+}
+
 BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
     ANIMATION_CHECK(YouDied)
     ANIMATION_CHECK(Bsod)
