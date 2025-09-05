@@ -302,6 +302,32 @@ ccColor3B Utils::applyHSV(const ccColor3B& color, const NoobHSV& hsv) {
     return ret;
 }
 
+std::vector<std::string> Utils::split(const std::string& str, char c, size_t size) {
+    size_t tokens = size ? size : (std::count(str.begin(), str.end(), c) + 1);
+
+    std::vector<std::string> ret;
+
+    if (tokens)
+        ret.reserve(tokens);
+
+    size_t start = 0;
+
+    while (true) {
+        size_t pos = str.find(c, start);
+
+        if (pos == std::string::npos) {
+            ret.emplace_back(str.data() + start, str.size() - start);
+            break;
+        }
+
+        ret.emplace_back(str.data() + start, pos - start);
+
+        start = pos + 1;
+    }
+
+    return ret;
+}
+
 BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
     ANIMATION_CHECK(YouDied)
     ANIMATION_CHECK(Bsod)

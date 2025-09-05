@@ -121,12 +121,16 @@ private:
             folder / fmt::format("{}_{}.png", m_isPreview ? "speech_bubble" : m_playLayer->m_level->m_levelName, std::to_string(timestamp))
         );
 
+        #if defined(GEODE_IS_ANDROID) || defined(GEODE_IS_WINDOWS)
+
         CCImage* image = renderTexture->newCCImage();
         image->saveToFile(
             filepath.c_str(),
             false
         );
         image->release();
+
+        #endif
 
         m_layer = FLAlertLayer::create(
             this,
