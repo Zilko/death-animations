@@ -7,8 +7,6 @@ class Jumpscare : public BaseAnimation {
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         std::filesystem::path sound = Utils::getRandomFile(Mod::get()->getSaveDir() / "jumpscare-sounds", { ".mp3", ".ogg", ".wav" });
         std::filesystem::path image = Utils::getRandomFile(Mod::get()->getSaveDir() / "jumpscare-images", { ".png", ".jpg" });
 

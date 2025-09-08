@@ -34,6 +34,7 @@ $on_mod(Loaded) {
     Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
     Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
+    Utils::setHookEnabled("ExplodeItemNode::update", false);
     Utils::setHookEnabled("GJBaseGameLayer::update", false);
     Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
     Utils::setHookEnabled("FMOD::ChannelControl::setPaused", false);
@@ -123,9 +124,16 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         Vars::selectedAnimation = animation;
 
+        float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
+        
+        f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed});      
+
+        if (!f->m_animation)
+            return PlayLayer::destroyPlayer(p0, p1);
+
+        f->m_animation->startEarly();
+
         bool og = m_gameState.m_unkBool26;
-        DashRingObject* dashOrb1 = m_player1->m_isDashing ? m_player1->m_dashRing : nullptr;
-        DashRingObject* dashOrb2 = m_player2->m_isDashing && m_gameState.m_isDualMode ? m_player2->m_dashRing : nullptr;
 
         if (animation.isNoDeathEffect || animation.isNoDeathSound)
             m_gameState.m_unkBool26 = true;
@@ -153,12 +161,6 @@ class $modify(ProPlayLayer, PlayLayer) {
         }
 
         m_gameState.m_unkBool26 = og;
-
-        float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
-        
-        f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed, { .dashOrb1 = dashOrb1, .dashOrb2 = dashOrb2 }});      
-      
-        if (!f->m_animation) return;
         
         f->m_animation->start();
         

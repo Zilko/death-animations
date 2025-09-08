@@ -72,8 +72,6 @@ struct ExtraParams {
     int transition = 0;
     bool reverse = false;
     CCPoint position = {0, 0};
-    DashRingObject* dashOrb1 = nullptr;
-    DashRingObject* dashOrb2 = nullptr;
 };
 
 struct AnimationParams {
@@ -174,7 +172,7 @@ static const std::array<DeathAnimation, 20> animations = {
     DeathAnimation{ .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
     DeathAnimation{ .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true },
     DeathAnimation{ .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true },
-    DeathAnimation{ .id = Anim::What, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 15.f, .isNoDeathEffect = true },
+    DeathAnimation{ .id = Anim::What, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 15.f, .isNoDeathEffect = true },   
     DeathAnimation{ .id = Anim::Congregation, .thumbnail = "none-thumbnail.png", .name = "Congregation Jumpscare", .duration = 4.45f, .isNoDeathEffect = true, .isNoStopMusic = true }
 };
 

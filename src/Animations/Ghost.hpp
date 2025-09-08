@@ -113,8 +113,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         Utils::playSound(Anim::Ghost, "ghost.ogg", m_speed * 0.8f, 0.3f);
     
         if (m_isPreview)

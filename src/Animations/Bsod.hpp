@@ -202,8 +202,6 @@ private:
 public:
     
     void start() override {
-        BaseAnimation::start();
-        
         if (!m_isPreview)
             Utils::setHighestZ(this);
         

@@ -7,9 +7,6 @@ class Minecraft : public BaseAnimation {
 public:
 
     void start() override {
-        BaseAnimation::start();
-        
-        // CCSprite::create();
     }
 
     };

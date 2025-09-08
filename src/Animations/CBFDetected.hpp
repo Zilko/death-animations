@@ -7,8 +7,6 @@ class CBFDetected : public BaseAnimation {
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         setPositionY((m_size.height - m_size.width / 1.777777f) / 5.f);
 
         CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 144}, m_size.width, 60);

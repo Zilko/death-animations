@@ -52,16 +52,24 @@ protected:
         setID("death-animation"_spr);
     }
 
-public:
+    virtual bool init() override {
+        CCLayer::init();
 
-    virtual void start() {
         setAnimationID();
         setContentSize(m_size);
         setAnchorPoint({0, 0});
         
         if (m_parentNode)
             m_parentNode->addChild(this);
+
+        return true;
     }
+
+public:
+
+    virtual void startEarly() {}
+
+    virtual void start() {}
 
     virtual void end() {
         removeFromParentAndCleanup(true);

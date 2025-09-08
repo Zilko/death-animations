@@ -420,8 +420,6 @@ private:
 public:
     
     void start() override {
-        BaseAnimation::start();
-
         m_reverse = m_extras.reverse;
 
         if (m_isPreview)
@@ -532,8 +530,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-        
         if (m_isPreview)
             setZOrder(10);
         
@@ -674,9 +670,7 @@ private:
     
 public:
 
-    void start() override {
-        BaseAnimation::start();
-
+    void startEarly() override {
         if (!m_isPreview)
             Utils::setHighestZ(this);
 
@@ -704,9 +698,7 @@ public:
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
             m_transition = Utils::getRandomInt(2, 5);   
-        
-        Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
-        
+                
         scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.45f / m_speed);
 
         if (m_transition != 0)
@@ -722,9 +714,20 @@ public:
             
             return;
         }
+
+        DashRingObject* dashOrb1 = nullptr;
+        DashRingObject* dashOrb2 = nullptr;
+
+        if (!m_isPreview) {
+            if (m_playLayer->m_player1->m_isDashing)
+                dashOrb1 = m_playLayer->m_player1->m_dashRing;
+
+            if (m_playLayer->m_player2->m_isDashing && m_playLayer->m_gameState.m_isDualMode)
+                dashOrb2 = m_playLayer->m_player2->m_dashRing;
+        }
         
         PlayerObject* player = m_playLayer->m_player1;
-        ccColor3B color = m_extras.dashOrb1 ? (m_extras.dashOrb1->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
+        ccColor3B color = dashOrb1 ? (dashOrb1->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
 
         m_explosion1 = CelesteExplosion::create(
             player,
@@ -740,7 +743,7 @@ public:
         if (!Utils::getSettingBool(Anim::Celeste, "second-player") || !m_playLayer->m_gameState.m_isDualMode) return;
         
         player = m_playLayer->m_player2;
-        color = m_extras.dashOrb2 ? (m_extras.dashOrb2->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
+        color = dashOrb2 ? (dashOrb2->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
         
         m_explosion2 = CelesteExplosion::create(
             player,
@@ -751,6 +754,10 @@ public:
         m_explosion2->setPosition(player->getPosition());
         player->getParent()->addChild(m_explosion2);
         Utils::setHighestZ(m_explosion2);
+    }
+    
+    void start() {
+        Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
     }
     
     void end() override {

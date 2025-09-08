@@ -7,8 +7,6 @@ class What : public BaseAnimation {
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         Utils::setHighestZ(this);
 
         Utils::playSound(Anim::What, "what.mp3", m_speed, 1.f);

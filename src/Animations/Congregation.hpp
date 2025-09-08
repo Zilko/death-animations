@@ -564,9 +564,7 @@ private:
     
 public:
 
-    void start() override {
-        BaseAnimation::start();
-
+    void startEarly() override {
         Utils::setHighestZ(this);
 
         PlayerObject* player = m_playLayer->m_player1;

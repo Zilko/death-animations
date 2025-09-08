@@ -194,8 +194,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         m_isMarioSprite = Utils::getSettingBool(Anim::Maro, "use-maro-sprite");
 
         Utils::playSound(Anim::Maro, "maro-death.mp3", m_speed, 1.f);

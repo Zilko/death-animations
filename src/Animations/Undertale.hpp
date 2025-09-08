@@ -247,8 +247,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         scheduleOnce(schedule_selector(Undertale::playSound), 0.15f / m_speed);
         scheduleOnce(schedule_selector(Undertale::firstStep), 2.5f / m_speed);
 

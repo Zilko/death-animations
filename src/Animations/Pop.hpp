@@ -144,8 +144,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         if (m_isPreview)
             addPip(m_delegate->getPlayer());
         else {

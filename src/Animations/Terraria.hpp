@@ -7,8 +7,6 @@ class Terraria : public BaseAnimation {
 public:
 
     void start() override {
-        BaseAnimation::start();
-        
         // CCSprite::create();
     }
 

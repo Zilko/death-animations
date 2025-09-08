@@ -135,8 +135,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-        
         Utils::setHighestZ(this);
         
         Utils::playSound(Anim::AmongUs, "scary-among-us.ogg", m_speed, 0.5f);

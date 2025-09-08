@@ -165,8 +165,6 @@ public:
     }
 
     void start() override {
-        BaseAnimation::start();
-
         m_speechBubbles = Utils::getAllFilesFromFolder(Mod::get()->getSaveDir() / "speech-bubbles", { ".png", ".jpg" });
 
         if (m_speechBubbles.empty()) {

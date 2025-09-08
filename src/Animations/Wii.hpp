@@ -7,8 +7,6 @@ class Wii : public BaseAnimation {
 public:
 
     void start() override {
-        BaseAnimation::start();
-        
     }
     
     void end() override {

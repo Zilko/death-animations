@@ -189,8 +189,6 @@ private:
 public:
 
     void start() override {
-        BaseAnimation::start();
-
         if (m_isPreview)
             m_delegate->setBackgroundOpacity(55);
 
