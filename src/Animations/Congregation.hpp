@@ -326,6 +326,7 @@ private:
     CCNode* m_congregationContainer = nullptr;
 
     PlayerObject* m_player = nullptr;
+    PlayerObject* m_secondPlayer = nullptr;
 
     NoobGameObject* m_arbitraryObject = nullptr;
     
@@ -371,6 +372,15 @@ private:
             return;
         }
 
+        if (m_secondPlayer) {
+            m_secondPlayer->updateInternalActions(dt);
+            m_secondPlayer->update(dt * 60.f);
+
+            m_secondPlayer->m_totalTime = m_time;
+
+            m_secondPlayer->updateRotation(dt * 60.f);
+        }
+
         m_player->updateInternalActions(dt);
         m_player->update(dt * 60.f);
 
@@ -402,7 +412,8 @@ private:
 
         m_cameraPos = ccpLerp(m_cameraPos, targetPos, 1.f - expf(-6.84f * dt));
 
-        m_isSecondStep ? m_objectLayer->setPosition({targetPos.x, m_didJump ? m_lockedCameraYPos : m_cameraPos.y}) : m_objectLayer->setContentSize(m_cameraPos);
+        // m_isSecondStep ? m_objectLayer->setPosition({targetPos.x, m_didJump ? m_lockedCameraYPos : m_cameraPos.y}) : m_objectLayer->setContentSize(m_cameraPos);
+        m_isSecondStep ? m_objectLayer->setPosition({targetPos.x, m_didJump ? m_lockedCameraYPos : m_cameraPos.y}) : m_objectLayer->setContentSize({targetPos.x, m_cameraPos.y});
 
         if (m_isSecondStep) return;
         
@@ -415,7 +426,7 @@ private:
         else
             m_playLayer->m_gameState.m_cameraOffset.y = (m_cameraPos - m_layerStartPos).y;
 
-        m_playLayer->m_gameState.m_cameraOffset.x = (m_cameraPos - m_layerStartPos).x;
+        m_playLayer->m_gameState.m_cameraOffset.x = (ccp(targetPos.x, m_cameraPos.y) - m_layerStartPos).x;
 
         float progress = std::min(m_time / 0.5f, 1.f);
 
@@ -429,19 +440,14 @@ private:
         m_isSecondStep = true;
         m_cameraPos = -ccp(50, 2000) + ccp(211, 0);
 
-        m_player->setPosition({50, 2000});
-        m_player->setScale(1.f);
+        m_player->removeFromParentAndCleanup(true);
 
-        m_player->m_yVelocity = -15;
-        m_player->m_fallSpeed = 0;
-        m_player->m_platformerXVelocity = 0;
-        m_player->m_gravity = 0.958199f;
-        m_player->m_gravityMod = 1;
-        m_player->m_stateFlipGravity = -607;
-        m_player->m_isUpsideDown = false;
-        m_player->m_rotationSpeed = 415.38f;
-        m_player->m_rotateSpeed = 1;
-        m_player->m_isRotating = true;
+        m_player = m_secondPlayer;
+        m_secondPlayer = nullptr;
+
+        m_player->setPosition({50, 2000});
+
+        m_objectLayer->addChild(m_player, 10);
 
         m_objectLayer->setScale(1.f);
         m_objectLayer->setRotation(0.f);
@@ -560,6 +566,31 @@ private:
         }
     }
 
+    PlayerObject* createPlayer() {
+        GameManager* gm = GameManager::get();
+
+        PlayerObject* player = PlayerObject::create(gm->getPlayerFrame(), 1, nullptr, this, false);
+        player->addAllParticles();
+        player->resetAllParticles();
+        
+        cocos2d::ccColor3B color1 = gm->colorForIdx(gm->getPlayerColor());
+        cocos2d::ccColor3B color2 = gm->colorForIdx(gm->getPlayerColor2());
+        
+        player->setColor(color1);
+        player->setSecondColor(color2);
+        player->m_hasGlow = gm->getPlayerGlow();
+
+        if (gm->getPlayerGlow())
+            player->enableCustomGlowColor(gm->colorForIdx(gm->getPlayerGlowColor()));
+        else
+            player->disableCustomGlowColor();
+
+        player->updateGlowColor();
+        player->updatePlayerGlow();
+
+        return player;
+    }
+
     ANIMATION_CTOR_CREATE(Congregation)
     
 public:
@@ -588,47 +619,215 @@ public:
         m_layerStartPos = m_objectLayer->getContentSize();
         m_startCameraOffset = m_playLayer->m_gameState.m_cameraOffset;
 
-        GameManager* gm = GameManager::get();
+        m_player = createPlayer();
+        m_secondPlayer = createPlayer();
 
-        m_player = PlayerObject::create(gm->getPlayerFrame(), 1, nullptr, this, false);
-        m_player->addAllParticles();
-        m_player->resetAllParticles();
+        m_secondPlayer->m_playerSpeed = 0.3f;
+
+        m_secondPlayer->update(0.f);
+
         m_player->setPosition(player->getPosition());
         m_player->setRotation(player->getRotation());
-        m_player->updateTimeMod(0.3f, false);
         m_player->setScale(player->getScale());
 
-        cocos2d::ccColor3B color1 = gm->colorForIdx(gm->getPlayerColor());
-        cocos2d::ccColor3B color2 = gm->colorForIdx(gm->getPlayerColor2());
-        
-        m_player->setColor(color1);
-        m_player->setSecondColor(color2);
-        m_player->m_hasGlow = gm->getPlayerGlow();
-
-        if (gm->getPlayerGlow())
-            m_player->enableCustomGlowColor(gm->colorForIdx(gm->getPlayerGlowColor()));
-        else
-            m_player->disableCustomGlowColor();
-
-        m_player->updateGlowColor();
-        m_player->updatePlayerGlow();
-
-        m_player->m_fadeOutStreak = false;
-        m_player->m_hasGroundParticles = false;
-        m_player->m_yVelocity = player->m_yVelocity;
-        m_player->m_fallSpeed = player->m_fallSpeed;
-        m_player->m_platformerXVelocity = player->m_platformerXVelocity;
-        m_player->m_gravity = player->m_gravity;
-        m_player->m_gravityMod = player->m_gravityMod;
-        m_player->m_stateFlipGravity = player->m_stateFlipGravity;
-        m_player->m_isUpsideDown = player->m_isUpsideDown;
+        m_player->m_shipRotation = player->m_shipRotation;
+        m_player->m_lastPortalPos = player->m_lastPortalPos;
+        m_player->m_lastGroundedPos = player->m_lastGroundedPos;
+        m_player->m_position = player->m_position;
+        m_player->m_stateForceVector = player->m_stateForceVector;
+        m_player->m_wasTeleported = player->m_wasTeleported;
+        m_player->m_fixGravityBug = player->m_fixGravityBug;
+        m_player->m_reverseSync = player->m_reverseSync;
+        m_player->m_yVelocityBeforeSlope = player->m_yVelocityBeforeSlope;
+        m_player->m_slopeStartTime = player->m_slopeStartTime;
+        m_player->m_justPlacedStreak = player->m_justPlacedStreak;
+        m_player->m_lastCollisionBottom = player->m_lastCollisionBottom;
+        m_player->m_lastCollisionTop = player->m_lastCollisionTop;
+        m_player->m_lastCollisionLeft = player->m_lastCollisionLeft;
+        m_player->m_lastCollisionRight = player->m_lastCollisionRight;
+        m_player->m_unk50C = player->m_unk50C;
+        m_player->m_unk510 = player->m_unk510;
+        m_player->m_slopeAngle = player->m_slopeAngle;
+        m_player->m_slopeSlidingMaybeRotated = player->m_slopeSlidingMaybeRotated;
+        m_player->m_quickCheckpointMode = player->m_quickCheckpointMode;
+        m_player->m_maybeSavedPlayerFrame = player->m_maybeSavedPlayerFrame;
+        m_player->m_scaleXRelated2 = player->m_scaleXRelated2;
+        m_player->m_groundYVelocity = player->m_groundYVelocity;
+        m_player->m_yVelocityRelated = player->m_yVelocityRelated;
+        m_player->m_scaleXRelated3 = player->m_scaleXRelated3;
+        m_player->m_scaleXRelated4 = player->m_scaleXRelated4;
+        m_player->m_scaleXRelated5 = player->m_scaleXRelated5;
+        m_player->m_isCollidingWithSlope = player->m_isCollidingWithSlope;
+        m_player->m_isBallRotating = player->m_isBallRotating;
+        m_player->m_unk669 = player->m_unk669;
+        m_player->unk_584 = player->unk_584;
+        m_player->m_collidingWithSlopeId = player->m_collidingWithSlopeId;
+        m_player->m_slopeFlipGravityRelated = player->m_slopeFlipGravityRelated;
+        m_player->m_slopeAngleRadians = player->m_slopeAngleRadians;
         m_player->m_rotationSpeed = player->m_rotationSpeed;
         m_player->m_rotateSpeed = player->m_rotateSpeed;
         m_player->m_isRotating = player->m_isRotating;
-        
+        m_player->m_isBallRotating2 = player->m_isBallRotating2;
+        m_player->m_hasGlow = player->m_hasGlow;
+        m_player->m_isHidden = player->m_isHidden;
+        m_player->m_speedMultiplier = player->m_speedMultiplier;
+        m_player->m_yStart = player->m_yStart;
+        m_player->m_gravity = player->m_gravity;
+        m_player->m_trailingParticleLife = player->m_trailingParticleLife;
+        m_player->m_unk648 = player->m_unk648;
+        m_player->m_gameModeChangedTime = player->m_gameModeChangedTime;
+        m_player->m_padRingRelated = player->m_padRingRelated;
+        m_player->m_maybeReducedEffects = player->m_maybeReducedEffects;
+        m_player->m_maybeIsFalling = player->m_maybeIsFalling;
+        m_player->m_shouldTryPlacingCheckpoint = player->m_shouldTryPlacingCheckpoint;
+        m_player->m_playEffects = player->m_playEffects;
+        m_player->m_maybeCanRunIntoBlocks = player->m_maybeCanRunIntoBlocks;
+        m_player->m_hasGroundParticles = player->m_hasGroundParticles;
+        m_player->m_hasShipParticles = player->m_hasShipParticles;
+        m_player->m_checkpointTimeout = player->m_checkpointTimeout;
+        m_player->m_lastCheckpointTime = player->m_lastCheckpointTime;
+        m_player->m_lastJumpTime = player->m_lastJumpTime;
+        m_player->m_lastFlipTime = player->m_lastFlipTime;
+        m_player->m_lastSpiderFlipTime = player->m_lastSpiderFlipTime;
+        m_player->m_unkBool5 = player->m_unkBool5;
+        m_player->m_maybeIsVehicleGlowing = player->m_maybeIsVehicleGlowing;
+        m_player->m_practiceDeathEffect = player->m_practiceDeathEffect;
+        m_player->m_accelerationOrSpeed = player->m_accelerationOrSpeed;
+        m_player->m_snapDistance = player->m_snapDistance;
+        m_player->m_ringJumpRelated = player->m_ringJumpRelated;
+        m_player->m_onFlyCheckpointTries = player->m_onFlyCheckpointTries;
+        m_player->m_maybeSpriteRelated = player->m_maybeSpriteRelated;
+        m_player->m_useLandParticles0 = player->m_useLandParticles0;
+        m_player->m_landParticlesAngle = player->m_landParticlesAngle;
+        m_player->m_landParticleRelatedY = player->m_landParticleRelatedY;
+        m_player->m_playerStreak = player->m_playerStreak;
+        m_player->m_streakStrokeWidth = player->m_streakStrokeWidth;
+        m_player->m_disableStreakTint = player->m_disableStreakTint;
+        m_player->m_alwaysShowStreak = player->m_alwaysShowStreak;
+        m_player->m_slopeRotation = player->m_slopeRotation;
+        m_player->m_currentSlopeYVelocity = player->m_currentSlopeYVelocity;
+        m_player->m_unk3d0 = player->m_unk3d0;
+        m_player->m_blackOrbRelated = player->m_blackOrbRelated;
+        m_player->m_unk3e0 = player->m_unk3e0;
+        m_player->m_unk3e1 = player->m_unk3e1;
+        m_player->m_isAccelerating = player->m_isAccelerating;
+        m_player->m_collidedTopMinY = player->m_collidedTopMinY;
+        m_player->m_collidedBottomMaxY = player->m_collidedBottomMaxY;
+        m_player->m_collidedLeftMaxX = player->m_collidedLeftMaxX;
+        m_player->m_collidedRightMinX = player->m_collidedRightMinX;
+        m_player->m_fadeOutStreak = player->m_fadeOutStreak;
+        m_player->m_canPlaceCheckpoint = player->m_canPlaceCheckpoint;
+        m_player->m_maybeIsColliding = player->m_maybeIsColliding;
+        m_player->m_jumpBuffered = player->m_jumpBuffered;
+        m_player->m_stateRingJump = player->m_stateRingJump;
+        m_player->m_wasJumpBuffered = player->m_wasJumpBuffered;
+        m_player->m_wasRobotJump = player->m_wasRobotJump;
+        m_player->m_stateJumpBuffered = player->m_stateJumpBuffered;
+        m_player->m_stateRingJump2 = player->m_stateRingJump2;
+        m_player->m_touchedRing = player->m_touchedRing;
+        m_player->m_touchedCustomRing = player->m_touchedCustomRing;
+        m_player->m_touchedGravityPortal = player->m_touchedGravityPortal;
+        m_player->m_maybeTouchedBreakableBlock = player->m_maybeTouchedBreakableBlock;
+        m_player->m_touchedPad = player->m_touchedPad;
+        m_player->m_yVelocity = player->m_yVelocity;
+        m_player->m_fallSpeed = player->m_fallSpeed;
+        m_player->m_slopeVelocity = player->m_slopeVelocity;
+        m_player->m_maybeUpsideDownSlope = player->m_maybeUpsideDownSlope;
+        m_player->m_isUpsideDown = player->m_isUpsideDown;
+        m_player->m_isDead = player->m_isDead;
+        m_player->m_isGoingLeft = player->m_isGoingLeft;
+        m_player->m_isSideways = player->m_isSideways;
+        m_player->m_reverseRelated = player->m_reverseRelated;
+        m_player->m_maybeReverseSpeed = player->m_maybeReverseSpeed;
+        m_player->m_maybeReverseAcceleration = player->m_maybeReverseAcceleration;
+        m_player->m_xVelocityRelated2 = player->m_xVelocityRelated2;
+        m_player->m_unk9e8 = player->m_unk9e8;
+        m_player->m_groundObjectMaterial = player->m_groundObjectMaterial;
+        m_player->m_vehicleSize = player->m_vehicleSize;
+        m_player->m_playerSpeed = player->m_playerSpeed;
+        m_player->m_shipRotation = player->m_shipRotation;
+        m_player->m_lastPortalPos = player->m_lastPortalPos;
+        m_player->m_unkUnused3 = player->m_unkUnused3;
+        m_player->m_lastLandTime = player->m_lastLandTime;
+        m_player->m_platformerVelocityRelated = player->m_platformerVelocityRelated;
+        m_player->m_maybeIsBoosted = player->m_maybeIsBoosted;
+        m_player->m_scaleXRelatedTime = player->m_scaleXRelatedTime;
+        m_player->m_decreaseBoostSlide = player->m_decreaseBoostSlide;
+        m_player->m_unkA29 = player->m_unkA29;
+        m_player->m_isLocked = player->m_isLocked;
+        m_player->m_controlsDisabled = player->m_controlsDisabled;
+        m_player->m_lastGroundedPos = player->m_lastGroundedPos;
+        m_player->m_hasEverJumped = player->m_hasEverJumped;
+        m_player->m_hasEverHitRing = player->m_hasEverHitRing;
+        m_player->m_isSecondPlayer = player->m_isSecondPlayer;
+        m_player->m_unkA99 = player->m_unkA99;
+        m_player->m_totalTime = player->m_totalTime;
+        m_player->m_isBeingSpawnedByDualPortal = player->m_isBeingSpawnedByDualPortal;
+        m_player->m_unkAAC = player->m_unkAAC;
+        m_player->m_unkAngle1 = player->m_unkAngle1;
+        m_player->m_yVelocityRelated3 = player->m_yVelocityRelated3;
+        m_player->m_defaultMiniIcon = player->m_defaultMiniIcon;
+        m_player->m_followRelated = player->m_followRelated;
+        m_player->m_unk838 = player->m_unk838;
+        m_player->m_stateOnGround = player->m_stateOnGround;
+        m_player->m_stateUnk = player->m_stateUnk;
+        m_player->m_stateNoStickX = player->m_stateNoStickX;
+        m_player->m_stateNoStickY = player->m_stateNoStickY;
+        m_player->m_stateUnk2 = player->m_stateUnk2;
+        m_player->m_stateBoostX = player->m_stateBoostX;
+        m_player->m_stateBoostY = player->m_stateBoostY;
+        m_player->m_maybeStateForce2 = player->m_maybeStateForce2;
+        m_player->m_stateScale = player->m_stateScale;
+        m_player->m_platformerXVelocity = player->m_platformerXVelocity;
+        m_player->m_leftPressedFirst = player->m_leftPressedFirst;
+        m_player->m_scaleXRelated = player->m_scaleXRelated;
+        m_player->m_maybeHasStopped = player->m_maybeHasStopped;
+        m_player->m_xVelocityRelated = player->m_xVelocityRelated;
+        m_player->m_maybeGoingCorrectSlopeDirection = player->m_maybeGoingCorrectSlopeDirection;
+        m_player->m_isSliding = player->m_isSliding;
+        m_player->m_maybeSlopeForce = player->m_maybeSlopeForce;
+        m_player->m_isOnIce = player->m_isOnIce;
+        m_player->m_physDeltaRelated = player->m_physDeltaRelated;
+        m_player->m_maybeSlidingTime = player->m_maybeSlidingTime;
+        m_player->m_maybeSlidingStartTime = player->m_maybeSlidingStartTime;
+        m_player->m_changedDirectionsTime = player->m_changedDirectionsTime;
+        m_player->m_slopeEndTime = player->m_slopeEndTime;
+        m_player->m_isMoving = player->m_isMoving;
+        m_player->m_platformerMovingLeft = player->m_platformerMovingLeft;
+        m_player->m_platformerMovingRight = player->m_platformerMovingRight;
+        m_player->m_isSlidingRight = player->m_isSlidingRight;
+        m_player->m_maybeChangedDirectionAngle = player->m_maybeChangedDirectionAngle;
+        m_player->m_unkUnused2 = player->m_unkUnused2;
+        m_player->m_isPlatformer = player->m_isPlatformer;
+        m_player->m_stateNoAutoJump = player->m_stateNoAutoJump;
+        m_player->m_stateDartSlide = player->m_stateDartSlide;
+        m_player->m_stateHitHead = player->m_stateHitHead;
+        m_player->m_stateFlipGravity = player->m_stateFlipGravity;
+        m_player->m_gravityMod = player->m_gravityMod;
+        m_player->m_stateForce = player->m_stateForce;
+        m_player->m_stateForceVector = player->m_stateForceVector;
+        m_player->m_affectedByForces = player->m_affectedByForces;
+        m_player->m_somethingPlayerSpeedTime = player->m_somethingPlayerSpeedTime;
+        m_player->m_playerSpeedAC = player->m_playerSpeedAC;
+        m_player->m_fixRobotJump = player->m_fixRobotJump;
+        m_player->m_inputsLocked = player->m_inputsLocked;
+        m_player->m_gv0123 = player->m_gv0123;
+        m_player->m_iconRequestID = player->m_iconRequestID;
+        m_player->m_unkUnused = player->m_unkUnused;
+        m_player->m_isOutOfBounds = player->m_isOutOfBounds;
+        m_player->m_fallStartY = player->m_fallStartY;
+        m_player->m_disablePlayerSqueeze = player->m_disablePlayerSqueeze;
+        m_player->m_robotAnimation1Enabled = player->m_robotAnimation1Enabled;
+        m_player->m_robotAnimation2Enabled = player->m_robotAnimation2Enabled;
+        m_player->m_spiderAnimationEnabled = player->m_spiderAnimationEnabled;
+        m_player->m_ignoreDamage = player->m_ignoreDamage;
+        m_player->m_enable22Changes = player->m_enable22Changes;
+
+        m_player->releaseAllButtons();
         m_player->update(0.f);
 
         m_objectLayer->addChild(m_player, 10);
+        m_objectLayer->addChild(m_secondPlayer, 10);
 
         m_overlay = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
         m_overlay->runAction(CCSequence::create(
