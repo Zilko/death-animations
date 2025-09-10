@@ -41,6 +41,7 @@ void PreviewLayer::spawnPlayer(float) {
     }
 
     FMODAudioEngine::get()->stopAllEffects();
+    SoundManager::stop();
 
     if (m_animationStruct.isStopMusic)
         FMODAudioEngine::get()->resumeAllMusic();
@@ -83,6 +84,7 @@ void PreviewLayer::playerDied(float) {
     if (m_animationStruct.isStopMusic)
         FMODAudioEngine::get()->pauseAllMusic(true);
     
+    m_animation->startEarly();
     m_animation->start();
     m_animation->setZOrder(10);
     

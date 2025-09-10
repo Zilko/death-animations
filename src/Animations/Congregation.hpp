@@ -41,8 +41,12 @@ private:
     bool m_baseBlending;
     bool m_detailBlending;
 
+    int m_id;
+
     void init(int id) {
         CCNode::init();
+
+        m_id = id;
 
         setTag(id);
 
@@ -63,28 +67,30 @@ private:
             m_defaultZOrder = 3;
         }
 
+        if (id == 202) {
+            CCSprite* spr = CCSprite::createWithSpriteFrameName("boost_03_glow_001.png");
+            spr->setOpacity(130);
+
+            addChild(spr);
+
+            ParticleStruct papi;
+            GameToolbox::particleStringToStruct("15a-1a1.3a0.2a20a90a0a2a5a20a20a0a0a8a0a0a0a5a1a0a0a0a0a210a0a0a0a1a0a1a1a0a 0a0a0a150a0a0a0a1a0a0.27a0a0.27a0a0a0a0a0a0a0a0a2a0a0a0a0a0a0a0a0.25a0a 0a0a0a0a0a0a0a0a0a0", papi);
+            
+            CCParticleSystemQuad* p = GameToolbox::particleFromStruct(papi, nullptr, false);
+
+            addChild(p, -1);
+
+            p->resetSystem();
+
+            for (int i = 0; i < 6; i++)
+                p->update(0.15f);
+        }
+
         if (id == 1528)
             runAction(CCRepeatForever::create(CCRotateBy::create(2.65f, 360)));
 
         if (id == 1527)
             runAction(CCRepeatForever::create(CCRotateBy::create(2.65f, -360)));
-
-        if (id == 255) {
-            m_detailObject = GameObject::createWithKey(259);
-
-            Loader::get()->queueInMainThread([self = Ref(this)] {
-                self->getParent()->addChild(self->m_detailObject, self->getZOrder());
-
-                self->m_detailObject->setPosition(self->getPosition());
-                self->m_detailObject->setScale(self->getScale());
-                self->m_detailObject->setFlipX(self->m_baseObject->isFlipX());
-                self->m_detailObject->setFlipY(self->m_baseObject->isFlipY());
-
-                self->setZOrder(self->getZOrder() * 10);
-            });
-
-            schedule(schedule_selector(NoobGameObject::updateDetailObjectPosition));
-        }
 
         if (id == 220) {
             CCSprite* spr = CCSprite::createWithSpriteFrameName("colorSquare_01_small_color_001.png");
@@ -242,6 +248,35 @@ public:
         }
     }
 
+    void postInit() {
+        if (m_id == 255) {
+            m_detailObject = GameObject::createWithKey(259);
+
+            getParent()->addChild(m_detailObject, getZOrder());
+
+            m_detailObject->setPosition(getPosition());
+            m_detailObject->setScale(getScale());
+            m_detailObject->setFlipX(m_baseObject->isFlipX());
+            m_detailObject->setFlipY(m_baseObject->isFlipY());
+
+            setZOrder(getZOrder() * 10);
+
+            schedule(schedule_selector(NoobGameObject::updateDetailObjectPosition));
+        }
+
+        if (m_id == 494 || m_id == 495) {
+            runAction(CCRepeatForever::create(
+                CCSequence::create(
+                    CCScaleTo::create(0.03f, getScale() * 1.2f),
+                    CCScaleTo::create(0.15f, getScale() * 1.05f),
+                    CCScaleTo::create(0.05f, getScale() * 1.2f),
+                    CCScaleTo::create(0.15f, getScale() * 1.05f),
+                    nullptr
+                )
+            ));
+        }
+    }
+
 };
 
 class FadeTo : public CCActionInterval {
@@ -324,6 +359,10 @@ private:
     
     CCNode* m_objectLayer = nullptr;
     CCNode* m_congregationContainer = nullptr;
+    CCNode* m_playerContainer = nullptr;
+    CCNode* m_playerContainer2 = nullptr;
+
+    CCParticleSystemQuad* m_speedParticles = nullptr;
 
     PlayerObject* m_player = nullptr;
     PlayerObject* m_secondPlayer = nullptr;
@@ -336,6 +375,8 @@ private:
     CCPoint m_layerStartPos;
     CCPoint m_cameraPos;
     CCPoint m_startCameraOffset;
+    CCPoint m_jumpPosition;
+;
 
     std::unordered_map<int, std::vector<NoobGameObject*>> m_groupObjects;
     std::unordered_map<int, std::vector<NoobGameObject*>> m_baseColorObjects;
@@ -353,6 +394,8 @@ private:
 
     ~Congregation() {
         setVolume(m_ogMusicVolume, m_ogSFXVolume);
+
+        SoundManager::stop();
     }
 
     void setVolume(float music, float sfx) {
@@ -379,6 +422,9 @@ private:
             m_secondPlayer->m_totalTime = m_time;
 
             m_secondPlayer->updateRotation(dt * 60.f);
+
+            m_secondPlayer->m_playerGroundParticles->setPosition({100, 100});
+            m_secondPlayer->m_playerGroundParticles->setVisible(true);
         }
 
         m_player->updateInternalActions(dt);
@@ -395,11 +441,11 @@ private:
 
         m_player->updateRotation(dt * 60.f);
 
-        cocos2d::CCPoint targetPos;
+        CCPoint targetPos;
 
         if (m_isSecondStep)
             targetPos = -m_player->getPosition() + ccp(211, 105);
-        else
+        else if (!m_isPreview)
             targetPos = 
                 (-m_playLayer->m_objectLayer->getPosition() + (m_startCameraOffset - m_playLayer->m_gameState.m_cameraOffset)
                 + m_size / 2.f
@@ -412,10 +458,25 @@ private:
 
         m_cameraPos = ccpLerp(m_cameraPos, targetPos, 1.f - expf(-6.84f * dt));
 
-        // m_isSecondStep ? m_objectLayer->setPosition({targetPos.x, m_didJump ? m_lockedCameraYPos : m_cameraPos.y}) : m_objectLayer->setContentSize(m_cameraPos);
         m_isSecondStep ? m_objectLayer->setPosition({targetPos.x, m_didJump ? m_lockedCameraYPos : m_cameraPos.y}) : m_objectLayer->setContentSize({targetPos.x, m_cameraPos.y});
 
-        if (m_isSecondStep) return;
+        if (!m_isSecondStep) {
+            float progress = std::min(m_time / 0.5f, 1.f);
+
+            setVolume(
+                m_ogMusicVolume - progress * m_ogMusicVolume,
+                m_ogSFXVolume - progress * m_ogSFXVolume
+            );
+        }
+
+        if (m_isSecondStep && m_player->m_playerGroundParticles->isVisible()) {
+            CCPoint playerPos = m_didJump ? m_jumpPosition : m_player->getPosition();
+
+            m_playerContainer->setPosition(-m_player->m_playerGroundParticles->getPosition() + playerPos - ccp(10, 13));
+            m_playerContainer2->setPosition(m_playerContainer->getPosition() - getPosition());
+        }
+
+        if (m_isSecondStep || m_isPreview) return;
         
         m_objectLayer->setRotation(m_playLayer->m_gameState.m_cameraAngle);
 
@@ -427,13 +488,6 @@ private:
             m_playLayer->m_gameState.m_cameraOffset.y = (m_cameraPos - m_layerStartPos).y;
 
         m_playLayer->m_gameState.m_cameraOffset.x = (ccp(targetPos.x, m_cameraPos.y) - m_layerStartPos).x;
-
-        float progress = std::min(m_time / 0.5f, 1.f);
-
-        setVolume(
-            m_ogMusicVolume - progress * m_ogMusicVolume,
-            m_ogSFXVolume - progress * m_ogSFXVolume
-        );
     }
 
     void secondStep() {
@@ -446,8 +500,7 @@ private:
         m_secondPlayer = nullptr;
 
         m_player->setPosition({50, 2000});
-
-        m_objectLayer->addChild(m_player, 10);
+        m_player->setVisible(true);
 
         m_objectLayer->setScale(1.f);
         m_objectLayer->setRotation(0.f);
@@ -492,12 +545,7 @@ private:
     void thirdStep(float) {
         FMODAudioEngine* fmod = FMODAudioEngine::get();
 
-        fmod->m_backgroundMusicChannel->setPaused(true);
-        fmod->m_globalChannel->stop();
-
-        setVolume(m_ogMusicVolume, m_ogSFXVolume);
-
-        Utils::playSound(Anim::Congregation, "congregation.mp3", m_speed, 1.f);
+        Utils::playSoundManual(Anim::Congregation, "congregation.mp3", m_speed, 1.f);
 
         for (NoobGameObject* object : m_groupObjects.at(35))
             object->runAction(CCMoveBy::create(100.f, {-18000, 0}));
@@ -511,6 +559,12 @@ private:
     void fourthStep(float) {
         m_player->m_playerSpeed = 1.1f;
 
+        CCParticleSystemQuad* particle = CCParticleSystemQuad::create("speedEffect_fast.plist",false);
+        particle->setPosition({m_size.width + 10, m_size.height / 2.f});
+        particle->resetSystem();
+
+        addChild(particle, 100);
+
         scheduleOnce(schedule_selector(Congregation::dontJump), 0.45f);
         scheduleOnce(schedule_selector(Congregation::fifthStep), 0.45f);
     }
@@ -520,6 +574,7 @@ private:
         m_player->releaseButton(PlayerButton::Jump);
 
         m_didJump = true;
+        m_jumpPosition = m_player->getPosition();
         m_lockedCameraYPos = m_cameraPos.y;
     }
 
@@ -570,11 +625,9 @@ private:
         GameManager* gm = GameManager::get();
 
         PlayerObject* player = PlayerObject::create(gm->getPlayerFrame(), 1, nullptr, this, false);
-        player->addAllParticles();
-        player->resetAllParticles();
         
-        cocos2d::ccColor3B color1 = gm->colorForIdx(gm->getPlayerColor());
-        cocos2d::ccColor3B color2 = gm->colorForIdx(gm->getPlayerColor2());
+        ccColor3B color1 = gm->colorForIdx(gm->getPlayerColor());
+        ccColor3B color2 = gm->colorForIdx(gm->getPlayerColor2());
         
         player->setColor(color1);
         player->setSecondColor(color2);
@@ -591,40 +644,21 @@ private:
         return player;
     }
 
-    ANIMATION_CTOR_CREATE(Congregation)
-    
-public:
-
-    void startEarly() override {
-        Utils::setHighestZ(this);
-
+    void setup() {
         PlayerObject* player = m_playLayer->m_player1;
-        FMODAudioEngine* fmod = FMODAudioEngine::get();
 
         player->setOpacity(0);
-        fmod->m_backgroundMusicChannel->getVolume(&m_ogMusicVolume);
-        fmod->m_globalChannel->getVolume(&m_ogSFXVolume);
 
-        m_objectLayer = CCNode::create();
         m_objectLayer->setAnchorPoint({1, 1});
         m_objectLayer->setPosition(m_size / 2.f);
         m_objectLayer->setScale(m_playLayer->m_objectLayer->getScale());
         m_objectLayer->setRotation(m_playLayer->m_gameState.m_cameraAngle);
         m_objectLayer->setContentSize((-m_playLayer->m_objectLayer->getPosition() + m_size / 2.f) / m_objectLayer->getScale());
-        
-        addChild(m_objectLayer, 1);
 
         m_playerStartPos = player->getPosition();
         m_cameraStartPos = m_playLayer->m_objectLayer->getParent()->getPosition();
-        m_layerStartPos = m_objectLayer->getContentSize();
         m_startCameraOffset = m_playLayer->m_gameState.m_cameraOffset;
-
-        m_player = createPlayer();
-        m_secondPlayer = createPlayer();
-
-        m_secondPlayer->m_playerSpeed = 0.3f;
-
-        m_secondPlayer->update(0.f);
+        m_layerStartPos = m_objectLayer->getContentSize();
 
         m_player->setPosition(player->getPosition());
         m_player->setRotation(player->getRotation());
@@ -638,8 +672,6 @@ public:
         m_player->m_wasTeleported = player->m_wasTeleported;
         m_player->m_fixGravityBug = player->m_fixGravityBug;
         m_player->m_reverseSync = player->m_reverseSync;
-        m_player->m_yVelocityBeforeSlope = player->m_yVelocityBeforeSlope;
-        m_player->m_slopeStartTime = player->m_slopeStartTime;
         m_player->m_justPlacedStreak = player->m_justPlacedStreak;
         m_player->m_lastCollisionBottom = player->m_lastCollisionBottom;
         m_player->m_lastCollisionTop = player->m_lastCollisionTop;
@@ -647,8 +679,6 @@ public:
         m_player->m_lastCollisionRight = player->m_lastCollisionRight;
         m_player->m_unk50C = player->m_unk50C;
         m_player->m_unk510 = player->m_unk510;
-        m_player->m_slopeAngle = player->m_slopeAngle;
-        m_player->m_slopeSlidingMaybeRotated = player->m_slopeSlidingMaybeRotated;
         m_player->m_quickCheckpointMode = player->m_quickCheckpointMode;
         m_player->m_maybeSavedPlayerFrame = player->m_maybeSavedPlayerFrame;
         m_player->m_scaleXRelated2 = player->m_scaleXRelated2;
@@ -657,13 +687,9 @@ public:
         m_player->m_scaleXRelated3 = player->m_scaleXRelated3;
         m_player->m_scaleXRelated4 = player->m_scaleXRelated4;
         m_player->m_scaleXRelated5 = player->m_scaleXRelated5;
-        m_player->m_isCollidingWithSlope = player->m_isCollidingWithSlope;
         m_player->m_isBallRotating = player->m_isBallRotating;
         m_player->m_unk669 = player->m_unk669;
         m_player->unk_584 = player->unk_584;
-        m_player->m_collidingWithSlopeId = player->m_collidingWithSlopeId;
-        m_player->m_slopeFlipGravityRelated = player->m_slopeFlipGravityRelated;
-        m_player->m_slopeAngleRadians = player->m_slopeAngleRadians;
         m_player->m_rotationSpeed = player->m_rotationSpeed;
         m_player->m_rotateSpeed = player->m_rotateSpeed;
         m_player->m_isRotating = player->m_isRotating;
@@ -704,8 +730,6 @@ public:
         m_player->m_streakStrokeWidth = player->m_streakStrokeWidth;
         m_player->m_disableStreakTint = player->m_disableStreakTint;
         m_player->m_alwaysShowStreak = player->m_alwaysShowStreak;
-        m_player->m_slopeRotation = player->m_slopeRotation;
-        m_player->m_currentSlopeYVelocity = player->m_currentSlopeYVelocity;
         m_player->m_unk3d0 = player->m_unk3d0;
         m_player->m_blackOrbRelated = player->m_blackOrbRelated;
         m_player->m_unk3e0 = player->m_unk3e0;
@@ -731,8 +755,6 @@ public:
         m_player->m_touchedPad = player->m_touchedPad;
         m_player->m_yVelocity = player->m_yVelocity;
         m_player->m_fallSpeed = player->m_fallSpeed;
-        m_player->m_slopeVelocity = player->m_slopeVelocity;
-        m_player->m_maybeUpsideDownSlope = player->m_maybeUpsideDownSlope;
         m_player->m_isUpsideDown = player->m_isUpsideDown;
         m_player->m_isDead = player->m_isDead;
         m_player->m_isGoingLeft = player->m_isGoingLeft;
@@ -783,15 +805,12 @@ public:
         m_player->m_scaleXRelated = player->m_scaleXRelated;
         m_player->m_maybeHasStopped = player->m_maybeHasStopped;
         m_player->m_xVelocityRelated = player->m_xVelocityRelated;
-        m_player->m_maybeGoingCorrectSlopeDirection = player->m_maybeGoingCorrectSlopeDirection;
         m_player->m_isSliding = player->m_isSliding;
-        m_player->m_maybeSlopeForce = player->m_maybeSlopeForce;
         m_player->m_isOnIce = player->m_isOnIce;
         m_player->m_physDeltaRelated = player->m_physDeltaRelated;
         m_player->m_maybeSlidingTime = player->m_maybeSlidingTime;
         m_player->m_maybeSlidingStartTime = player->m_maybeSlidingStartTime;
         m_player->m_changedDirectionsTime = player->m_changedDirectionsTime;
-        m_player->m_slopeEndTime = player->m_slopeEndTime;
         m_player->m_isMoving = player->m_isMoving;
         m_player->m_platformerMovingLeft = player->m_platformerMovingLeft;
         m_player->m_platformerMovingRight = player->m_platformerMovingRight;
@@ -822,32 +841,18 @@ public:
         m_player->m_spiderAnimationEnabled = player->m_spiderAnimationEnabled;
         m_player->m_ignoreDamage = player->m_ignoreDamage;
         m_player->m_enable22Changes = player->m_enable22Changes;
+    }
 
-        m_player->releaseAllButtons();
-        m_player->update(0.f);
+    void setupPreview() {
+        m_player->setPosition(m_delegate->getPlayer()->getPosition());
+        m_delegate->getPlayer()->setOpacity(0);
+    }
 
-        m_objectLayer->addChild(m_player, 10);
-        m_objectLayer->addChild(m_secondPlayer, 10);
-
-        m_overlay = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
-        m_overlay->runAction(CCSequence::create(
-            CCDelayTime::create(0.2f),
-            CCFadeTo::create(0.55f, 255),
-            nullptr
-        ));
-
-        addChild(m_overlay, 3);
-
-        schedule(schedule_selector(Congregation::update));
-
-        m_congregationContainer = CCNode::create();
-        m_congregationContainer->setPosition({181, 545.5f});
-        m_congregationContainer->setVisible(false);
-
-        m_objectLayer->addChild(m_congregationContainer);
-
+    void setupCongregation() {
         for (const ObjectProperties& prop : m_objects) {
             NoobGameObject* object = NoobGameObject::create(prop.p1);
+
+            m_congregationContainer->addChild(object);
 
             object->setPosition(ccp(prop.p2, prop.p3));
             object->setScale(prop.p7);
@@ -858,6 +863,7 @@ public:
             );
             object->setFlipX(prop.p11);
             object->setFlipY(prop.p12);
+            object->postInit();
 
             object->m_baseHSV = {
                 prop.p13,
@@ -872,8 +878,6 @@ public:
             };
 
             object->updateColor();
-
-            m_congregationContainer->addChild(object);
 
             std::string groups = prop.p4;
 
@@ -969,9 +973,79 @@ public:
         }
     }
 
+    ANIMATION_CTOR_CREATE(Congregation)
+    
+public:
+
+    void startEarly() override {
+        Utils::setHighestZ(this);
+
+        FMODAudioEngine* fmod = FMODAudioEngine::get();
+
+        fmod->m_backgroundMusicChannel->getVolume(&m_ogMusicVolume);
+        fmod->m_globalChannel->getVolume(&m_ogSFXVolume);
+
+        m_objectLayer = CCNode::create();
+
+        addChild(m_objectLayer, 1);
+
+        m_player = createPlayer();
+        m_secondPlayer = createPlayer();
+
+        m_secondPlayer->m_playerSpeed = 0.3f;
+        m_secondPlayer->update(0.f);
+        m_secondPlayer->setVisible(false);
+
+        m_isPreview ? setupPreview() : setup();
+        
+        m_player->releaseAllButtons();
+        m_player->update(0.f);
+
+        m_overlay = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
+        m_overlay->runAction(CCSequence::create(
+            CCDelayTime::create(0.2f),
+            CCFadeTo::create(0.55f, 255),
+            nullptr
+        ));
+
+        addChild(m_overlay, 3);
+
+        schedule(schedule_selector(Congregation::update));
+
+        m_congregationContainer = CCNode::create();
+        m_congregationContainer->setPosition({181, 545.5f});
+        m_congregationContainer->setVisible(false);
+
+        m_objectLayer->addChild(m_congregationContainer);
+
+        setupCongregation();
+
+        m_playerContainer = CCNode::create();
+        m_playerContainer2 = CCNode::create();
+        
+        m_objectLayer->addChild(m_playerContainer);
+        m_playerContainer->addChild(m_playerContainer2);
+
+        Utils::setHighestZ(m_playerContainer);
+
+        m_playerContainer2->addChild(m_player, 10);
+        m_playerContainer2->addChild(m_secondPlayer, 10);
+
+        m_player->resetAllParticles();
+
+        m_secondPlayer->m_parentLayer = static_cast<CCLayer*>(m_playerContainer);
+        m_secondPlayer->addAllParticles();
+        m_secondPlayer->m_parentLayer = nullptr;
+
+        Utils::setHighestZ(m_playerContainer2);
+    }
+
     void end() override {
-        m_playLayer->m_objectLayer->getParent()->setPosition(m_cameraStartPos);
-        m_playLayer->m_gameState.m_cameraOffset = m_startCameraOffset;
+        if (!m_isPreview) {
+            m_playLayer->m_objectLayer->getParent()->setPosition(m_cameraStartPos);
+            m_playLayer->m_gameState.m_cameraOffset = m_startCameraOffset;
+        } else
+            m_delegate->getPlayer()->setOpacity(255);
 
         BaseAnimation::end();
     }
