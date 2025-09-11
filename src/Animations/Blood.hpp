@@ -1,8 +1,8 @@
 #include "BaseAnimation.hpp"
 
-class Wii : public BaseAnimation {
+class Blood : public BaseAnimation {
 
-    ANIMATION_CTOR_CREATE(Wii)
+    ANIMATION_CTOR_CREATE(Blood)
     
 public:
 

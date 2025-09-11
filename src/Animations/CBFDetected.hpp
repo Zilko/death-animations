@@ -29,7 +29,8 @@ public:
         CCLabelBMFont* lbl = CCLabelBMFont::create(fmt::format("CBF Detected{}!", Utils::getSettingBool(Anim::CBFDetected, "include-loser") ? ", loser" : "").c_str(), "bigFont.fnt");
         lbl->setColor(Utils::getSettingBool(Anim::CBFDetected, "yellow-color") ? ccc3(250, 237, 114) : ccc3(255, 56, 35));
         lbl->setScale(0.6f);
-        lbl->setPosition({115, 41});
+        lbl->setPosition({5.5f, 41});
+        lbl->setAnchorPoint({0, 1});
 
         addChild(lbl);
 

@@ -62,6 +62,8 @@ private:
 
     CCSprite* m_animationSprite = nullptr;
     CCSprite* m_playerSprite = nullptr;
+
+    CCNodeRGBA* m_player = nullptr;
     
     CCGLProgram* m_program = nullptr;
     
@@ -71,24 +73,26 @@ private:
     float m_time = 0.f;
     bool m_isWhite = false;
     
-    CelesteExplosion(const ccColor3B& color, float speed) {
-        m_color = color;
-        m_speed = speed;
+    CelesteExplosion(CCNodeRGBA* player, const ccColor3B& color, float speed)
+        : m_player(player), m_color(color), m_speed(speed) {}
+
+    ~CelesteExplosion() {
+        m_player->setVisible(true);
     }
 
-    bool init(CCNodeRGBA* player, const CCPoint& velocity) {
+    bool init(const CCPoint& velocity) {
         setID("celeste-explosion"_spr);
 
         m_program = Utils::createShader(m_shader, true);
 
-        m_playerSprite = Utils::renderPlayerSprite(player, false);
+        m_playerSprite = Utils::renderPlayerSprite(m_player, false);
         m_playerSprite->setShaderProgram(m_program);
         
         setShaderState("u_white", 0);
         setShaderState("u_fullWhite", 0);
         glUniform1f(glGetUniformLocation(m_program->getProgram(), "u_time"), 0.f);
         
-        player->setVisible(false);
+        m_player->setVisible(false);
         
         addChild(m_playerSprite);
         
@@ -199,8 +203,8 @@ private:
 public:
     
     static CelesteExplosion* create(CCNodeRGBA* player, const CCPoint& velocity, const ccColor3B& color, float speed) {
-        CelesteExplosion* ret = new CelesteExplosion(color, speed);
-        ret->init(player, velocity);
+        CelesteExplosion* ret = new CelesteExplosion(player, color, speed);
+        ret->init(velocity);
         ret->autorelease();
         return ret;
     }
@@ -235,7 +239,7 @@ private:
     }
     
     void chapter2Transition() {
-        static const std::vector<std::vector<CCPoint>> circlePositions = {
+        std::vector<std::vector<CCPoint>> circlePositions = {
             { { 24.f, 303.f }, { 26.f, 128.f }, { 8.f, 102.f } },
             { { 27.f, 11.f }, { 51.f, 68.f }, { 54.f, 149.f }, { 48.f, 310.f } },
             { { 47.17f, 270.52f }, { 99.31f, 257.48f }, { 67.61f, 229.63f }, { 20.20f, 214.52f }, { 23.76f, 185.19f }, { 65.54f, 176.89f }, { 68.20f, 92.15f }, { 19.31f, 47.70f } },
@@ -256,17 +260,34 @@ private:
             { { 557.09f, 298.37f }, { 546.13f, 26.07f } },
             { { 540.80f, 218.67f } }
         };
-        
+
+        if (m_size.width > 569) {
+            int count = 0;
+
+            while (circlePositions.back().back().x < m_size.width + 50) {
+                std::vector<CCPoint> extraPositions;
+                
+                for (const CCPoint& position : circlePositions[count])
+                    extraPositions.push_back(position + ccp(565, 0));
+
+                circlePositions.push_back(extraPositions);
+
+                count++;
+
+                if (count >= 19) count = 0;
+            }
+        }
+
         for (int i = 0; i < circlePositions.size(); i++)
             for (const CCPoint& position : circlePositions[i]) {
                 CCSprite* spr = CCSprite::create("circle-celeste.png"_spr);
-                spr->setScale(m_reverse ? 3.f : 0.f);
+                spr->setScale(m_reverse ? 0.5f : 0.f);
                 spr->setPosition(position);
                  
                 addChild(spr);
                 spr->runAction(CCSequence::create(
-                    CCDelayTime::create(i / 60.f / m_speed),
-                    CCScaleTo::create(0.4f / m_speed, m_reverse ? 0.f : 3.f),
+                    CCDelayTime::create(i * (19.f / static_cast<int>(circlePositions.size()) / 60.f) / m_speed),
+                    CCScaleTo::create(0.2f / m_speed, m_reverse ? 0.f : 0.5f),
                     nullptr
                 ));
             }
@@ -441,10 +462,17 @@ class CelesteRevive : public BaseAnimation {
 
 private:
 
+    SoundUpdater* m_sound = nullptr;
+
     std::vector<CCSprite*> m_animationSprites;
     std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
     
     bool m_isWhite = false;
+
+    ~CelesteRevive() {
+        SoundManager::release(m_sound);
+        SoundManager::stop();
+    }
 
     void startAnimations(float) {
         for (CCSprite* sprite : m_animationSprites) {
@@ -486,14 +514,14 @@ private:
         m_animationSprites.push_back(sprite);
         m_players[sprite] = player;
         
-        player->setOpacity(0);
+        player->setVisible(false);
         player->getParent()->addChild(sprite);
     }
     
     void updatePositions(float) {
         for (CCSprite* sprite : m_animationSprites) {
             sprite->setPosition(m_players.at(sprite)->getPosition() + ccp(27, 4));
-            m_players.at(sprite)->setOpacity(0);
+            m_players.at(sprite)->setVisible(false);
         }
     }
     
@@ -507,7 +535,7 @@ private:
     void implosionEnded() {
         for (CCSprite* sprite : m_animationSprites) {
             sprite->removeFromParentAndCleanup(true);
-            m_players.at(sprite)->setOpacity(255);
+            m_players.at(sprite)->setVisible(true);
         }
         
         m_animationSprites.clear();
@@ -518,7 +546,8 @@ private:
     }
     
     void playSound(float) {
-        Utils::playSound(Anim::Celeste, "revive-celeste.wav", m_speed, 1.f);
+        m_sound = Utils::playSoundManual(Anim::Celeste, "revive-celeste.wav", m_speed, FMODAudioEngine::get()->m_sfxVolume);
+        SoundManager::retain(m_sound);
     }
 
     void setAnimationID() override {
@@ -532,6 +561,8 @@ public:
     void start() override {
         if (m_isPreview)
             setZOrder(10);
+        else
+            Utils::setHighestZ(this);
         
         if (m_extras.transition != 0) {
             CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, 1.f, { .transition = m_extras.transition, .reverse = true}});
@@ -609,8 +640,8 @@ private:
     CelesteExplosion* m_explosion2 = nullptr;
 
     const std::unordered_map<int, float> m_transitionDelays = {
-        { 2, 0.9f },
-        { 3, 0.65f },
+        { 2, 0.905f },
+        { 3, 0.93f },
         { 4, 0.7f },
         { 5, 0.9f },
         { 6, 0.9f },
@@ -626,7 +657,8 @@ private:
     int m_transition = 0;
 
     void transitionOut(float) {
-        CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, 1.f, { .transition = m_transition }})->start();
+        if (!Utils::getSettingBool(Anim::Celeste, "stop-auto-restart"))
+            CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, 1.f, { .transition = m_transition }})->start();
     }
     
     void playDeathSound(float) {
@@ -736,6 +768,7 @@ public:
             m_speed
         );
         m_explosion1->setPosition(player->getPosition());
+        
         player->getParent()->addChild(m_explosion1);
 
         Utils::setHighestZ(m_explosion1);
@@ -752,7 +785,9 @@ public:
             m_speed
         );
         m_explosion2->setPosition(player->getPosition());
+
         player->getParent()->addChild(m_explosion2);
+
         Utils::setHighestZ(m_explosion2);
     }
     
@@ -770,7 +805,7 @@ public:
             m_explosion2->removeFromParentAndCleanup(true);
             m_explosion2 = nullptr;
         }
-        
+
         BaseAnimation::end();
     }
 };

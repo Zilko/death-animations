@@ -41,7 +41,9 @@ void PreviewLayer::spawnPlayer(float) {
     }
 
     FMODAudioEngine::get()->stopAllEffects();
-    SoundManager::stop();
+
+    if (m_animationStruct.isStopSoundsOnEnd)
+        SoundManager::stop();
 
     if (m_animationStruct.isStopMusic)
         FMODAudioEngine::get()->resumeAllMusic();
@@ -120,8 +122,10 @@ void PreviewLayer::playDeathEffect() {
 }
 
 void PreviewLayer::keyDown(enumKeyCodes key) {
-    if (key == enumKeyCodes::KEY_R)
+    if (key == enumKeyCodes::KEY_R) {
         spawnPlayer(0.f);
+        unschedule(schedule_selector(PreviewLayer::spawnPlayer));
+    }
 
     geode::Popup<>::keyDown(key);
 }

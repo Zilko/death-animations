@@ -406,6 +406,8 @@ private:
     }
 
     void update(float dt) {
+        dt *= m_speed;
+        
         m_time += dt;
 
         if (m_time > 0.9f && !m_isSecondStep) {
@@ -508,7 +510,7 @@ private:
         m_objectLayer->setContentSize({0, 0});
 
         m_overlay->stopAllActions();
-        m_overlay->runAction(CCFadeTo::create(0.97f, 0));
+        m_overlay->runAction(CCFadeTo::create(0.97f / m_speed, 0));
 
         m_congregationContainer->setVisible(true);
 
@@ -517,29 +519,29 @@ private:
 
         addChild(CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height), 0);
 
-        scheduleOnce(schedule_selector(Congregation::secondPointFiveStep), 0.5f);
-        scheduleOnce(schedule_selector(Congregation::idkAnymore), 1.45f);
-        scheduleOnce(schedule_selector(Congregation::thirdStep), 1.5f);
+        scheduleOnce(schedule_selector(Congregation::secondPointFiveStep), 0.5f / m_speed);
+        scheduleOnce(schedule_selector(Congregation::idkAnymore), 1.45f / m_speed);
+        scheduleOnce(schedule_selector(Congregation::thirdStep), 1.5f / m_speed);
     }
 
     void idkAnymore(float) {
         for (NoobGameObject* object : m_groupObjects.at(83))
-            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f, {0, -60})));
+            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f / m_speed, {0, -60})));
 
-        scheduleOnce(schedule_selector(Congregation::xd), 0.5f);
+        scheduleOnce(schedule_selector(Congregation::xd), 0.5f / m_speed);
     }
 
     void xd(float) {
         for (NoobGameObject* object : m_groupObjects.at(84))
-            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f, {0, -60})));
+            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f / m_speed, {0, -60})));
 
         for (NoobGameObject* object : m_groupObjects.at(82))
-            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f, {0, 60})));
+            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f / m_speed, {0, 60})));
     }
 
     void secondPointFiveStep(float) {
         for (NoobGameObject* object : m_groupObjects.at(82))
-            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f, {0, -60})));
+            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f / m_speed, {0, -60})));
     }
 
     void thirdStep(float) {
@@ -548,12 +550,12 @@ private:
         Utils::playSoundManual(Anim::Congregation, "congregation.mp3", m_speed, 1.f);
 
         for (NoobGameObject* object : m_groupObjects.at(35))
-            object->runAction(CCMoveBy::create(100.f, {-18000, 0}));
+            object->runAction(CCMoveBy::create(100.f / m_speed, {-18000, 0}));
 
         for (NoobGameObject* object : m_groupObjects.at(80))
-            object->runAction(CCMoveBy::create(53.f, {530 * 3, 0}));
+            object->runAction(CCMoveBy::create(53.f / m_speed, {530 * 3, 0}));
 
-        scheduleOnce(schedule_selector(Congregation::fourthStep), 0.15f);
+        scheduleOnce(schedule_selector(Congregation::fourthStep), 0.15f / m_speed);
     }
 
     void fourthStep(float) {
@@ -565,8 +567,8 @@ private:
 
         addChild(particle, 100);
 
-        scheduleOnce(schedule_selector(Congregation::dontJump), 0.45f);
-        scheduleOnce(schedule_selector(Congregation::fifthStep), 0.45f);
+        scheduleOnce(schedule_selector(Congregation::dontJump), 0.45f / m_speed);
+        scheduleOnce(schedule_selector(Congregation::fifthStep), 0.45f / m_speed);
     }
 
     void dontJump(float) {
@@ -590,29 +592,29 @@ private:
         m_hueActionsForGroup.at(34).clear();
 
         for (NoobGameObject* object : m_baseColorObjects.at(4))
-            object->runAction(HueTo::create(1.f, 43, object->m_baseColorHSV.hue, object->m_baseColorHSV.hue));
+            object->runAction(HueTo::create(1.f / m_speed, 43, object->m_baseColorHSV.hue, object->m_baseColorHSV.hue));
 
         for (NoobGameObject* object : m_detailColorObjects.at(4))
-            object->runAction(HueTo::create(1.f, 43, object->m_detailColorHSV.hue, object->m_detailColorHSV.hue));
+            object->runAction(HueTo::create(1.f / m_speed, 43, object->m_detailColorHSV.hue, object->m_detailColorHSV.hue));
 
         for (NoobGameObject* object : m_baseColorObjects.at(6))
-            object->runAction(HueTo::create(1.f, 43, object->m_baseColorHSV.hue, object->m_baseColorHSV.hue));
+            object->runAction(HueTo::create(1.f / m_speed, 43, object->m_baseColorHSV.hue, object->m_baseColorHSV.hue));
 
         for (NoobGameObject* object : m_groupObjects.at(76))
-            object->runAction(FadeTo::create(1.f, 220, 255 / 2));
+            object->runAction(FadeTo::create(1.f / m_speed, 220, 255 / 2));
     
-        scheduleOnce(schedule_selector(Congregation::sixthStep), 1.f);
+        scheduleOnce(schedule_selector(Congregation::sixthStep), 1.f / m_speed);
     }
 
     void sixthStep(float) {
         for (NoobGameObject* object : m_groupObjects.at(34)) {
             CCRepeatForever* action = CCRepeatForever::create(
                 CCSequence::create(
-                    HueTo::create(0.15f, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
-                    HueTo::create(0.15f, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
-                    HueTo::create(0.15f, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
-                    HueTo::create(0.15f, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
-                    CCDelayTime::create(0.1f),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
+                    CCDelayTime::create(0.1f / m_speed),
                     nullptr
                 )
             );
@@ -955,10 +957,10 @@ private:
         for (NoobGameObject* object : m_groupObjects.at(34)) {
             CCRepeatForever* action = CCRepeatForever::create(
                 CCSequence::create(
-                    HueTo::create(0.15f, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
-                    HueTo::create(0.15f, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
-                    HueTo::create(0.15f, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
-                    HueTo::create(0.15f, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue + 30, object->m_baseHSV.hue - 30, object->m_baseHSV.hue),
+                    HueTo::create(0.15f / m_speed, object->m_baseHSV.hue - 30, object->m_baseHSV.hue + 30, object->m_baseHSV.hue),
                     CCDelayTime::create(0.1f),
                     nullptr
                 )
@@ -1003,8 +1005,8 @@ public:
 
         m_overlay = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
         m_overlay->runAction(CCSequence::create(
-            CCDelayTime::create(0.2f),
-            CCFadeTo::create(0.55f, 255),
+            CCDelayTime::create(0.2f / m_speed),
+            CCFadeTo::create(0.55f / m_speed, 255),
             nullptr
         ));
 
@@ -1046,6 +1048,8 @@ public:
             m_playLayer->m_gameState.m_cameraOffset = m_startCameraOffset;
         } else
             m_delegate->getPlayer()->setOpacity(255);
+
+        SoundManager::stop();
 
         BaseAnimation::end();
     }

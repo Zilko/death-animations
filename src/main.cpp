@@ -93,7 +93,14 @@ class $modify(ProPlayLayer, PlayLayer) {
     struct Fields {
         BaseAnimation* m_animation = nullptr;
 
+        bool m_isNewBest = false;
         bool m_forceRestart = false;
+        bool m_storedNewReward = false;
+        bool m_storedDemonKey = false;
+        bool m_storedNoTitle = false;
+
+        int m_storedOrbs = 0;
+        int m_storedDiamonds = 0;
     };
     
     static void onModify(auto& self) {
@@ -197,12 +204,45 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         f->m_forceRestart = false;
 
+        bool endedAnimation = f->m_animation != nullptr;
+
         if (f->m_animation) {
             f->m_animation->end();
             f->m_animation = nullptr;
         }
 
         PlayLayer::resetLevel();
+
+        if (endedAnimation && f->m_isNewBest && Vars::selectedAnimation.isDelayNewBest) {
+            Vars::selectedAnimation = {};
+            f->m_isNewBest = false;
+            
+            showNewBest(
+                f->m_storedNewReward,
+                f->m_storedOrbs,
+                f->m_storedDiamonds,
+                f->m_storedDemonKey,
+                false,
+                f->m_storedNoTitle
+            );
+        }
+    }
+
+    void showNewBest(bool newReward, int orbs, int diamonds, bool demonKey, bool noRetry, bool noTitle) {
+        auto f = m_fields.self();
+
+        if (f->m_animation && Vars::selectedAnimation.isDelayNewBest) {
+            f->m_storedNewReward = newReward;
+            f->m_storedOrbs = orbs;
+            f->m_storedDiamonds = diamonds;
+            f->m_storedDemonKey = demonKey;
+            f->m_storedNoTitle = noTitle;
+            f->m_isNewBest = true;
+            
+            return;
+        }
+            
+        PlayLayer::showNewBest(newReward, orbs, diamonds, demonKey, noRetry, noTitle);
     }
 
     void dialogClosed(DialogLayer* wa) {
@@ -306,6 +346,11 @@ class $modify(PlayerObject) {
             return PlayerObject::playDeathEffect();
             
         stopActionByTag(11);
+    }
+
+    void playSpawnEffect() {
+        if (!Vars::selectedAnimation.isNoSpawnEffect)
+            PlayerObject::playSpawnEffect();
     }
     
 };

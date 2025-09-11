@@ -28,13 +28,19 @@ private:
 
     std::vector<SoundUpdater*> m_sounds;
 
+    std::unordered_set<SoundUpdater*> m_retainedSounds;
+
     static SoundManager& get();
 
 public:
 
-    static void add(FMOD::Channel*, FMOD::Sound*);
+    static SoundUpdater* add(FMOD::Channel*, FMOD::Sound*);
 
     static void remove(SoundUpdater*);
+
+    static void retain(SoundUpdater*);
+
+    static void release(SoundUpdater*);
 
     static void pause(bool);
 

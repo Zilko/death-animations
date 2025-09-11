@@ -3,6 +3,8 @@
 #include "../Includes.hpp"
 #include "../Animations/BaseAnimation.hpp"
 
+class SoundUpdater;
+
 class Utils {
     
 public:
@@ -14,8 +16,8 @@ public:
     static void playSound(Anim, float, float, const std::filesystem::path&);
     static void playSound(Anim, const std::string&, float, int, int, int, float = 1.f, bool = false);
     static void playSound(Anim, const std::string&, float, int, int, float = 1.f, bool = false);
-    static void playSoundManual(Anim, const std::string&, float, float);
-    static void playSoundManual(Anim, float, float, const std::filesystem::path&);
+    static SoundUpdater* playSoundManual(Anim, const std::string&, float, float);
+    static SoundUpdater* playSoundManual(Anim, float, float, const std::filesystem::path&);
     
     static Anim getSelectedAnimationEnum();
     static const DeathAnimation& getSelectedAnimation();

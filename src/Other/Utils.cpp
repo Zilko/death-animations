@@ -6,7 +6,6 @@
 #include "../Animations/AmongUs.hpp"
 #include "../Animations/Celeste.hpp"
 #include "../Animations/ToBeContinued.hpp"
-#include "../Animations/Wii.hpp"
 #include "../Animations/Jumpscare.hpp"
 #include "../Animations/Wasted.hpp"
 #include "../Animations/Maro.hpp"
@@ -19,9 +18,14 @@
 #include "../Animations/SpeechBubble.hpp"
 #include "../Animations/What.hpp"
 #include "../Animations/Congregation.hpp"
+#include "../Animations/LevelComplete.hpp"
+#include "../Animations/PracticeComplete.hpp"
+#include "../Animations/NewBest.hpp"
+#include "../Animations/Blood.hpp"
+#include "../Animations/Poof.hpp"
+#include "../Animations/FadeOut.hpp"
 
 #include <random>
-#include <Geode/cocos/support/data_support/uthash.h>
 
 int Utils::getRandomInt(int min, int max) {
     static std::mt19937 gen(std::random_device{}());
@@ -68,13 +72,13 @@ void Utils::playSound(Anim anim, float speed, float volume, const std::filesyste
         FMODAudioEngine::get()->playEffect(utils::string::pathToString(sound).c_str(), speed, 1.f, volume);
 }
 
-void Utils::playSoundManual(Anim anim, const std::string& sound, float speed, float volume) {
-    playSoundManual(anim, speed, volume, Mod::get()->getResourcesDir() / sound);
+SoundUpdater* Utils::playSoundManual(Anim anim, const std::string& sound, float speed, float volume) {
+    return playSoundManual(anim, speed, volume, Mod::get()->getResourcesDir() / sound);
 }
 
-void Utils::playSoundManual(Anim anim, float speed, float volume, const std::filesystem::path& sound) {
+SoundUpdater* Utils::playSoundManual(Anim anim, float speed, float volume, const std::filesystem::path& sound) {
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
-        return;
+        return nullptr;
             
     FMOD::System* system = FMODAudioEngine::get()->m_system;
     FMOD::Sound* souwnd;
@@ -85,7 +89,7 @@ void Utils::playSoundManual(Anim anim, float speed, float volume, const std::fil
     channel->setVolume(volume);
     channel->setPitch(speed);
     
-    SoundManager::add(channel, souwnd);
+    return SoundManager::add(channel, souwnd);
 }
 
 Anim Utils::getSelectedAnimationEnum() {
@@ -105,7 +109,7 @@ const DeathAnimation& Utils::getSelectedAnimation(Anim anim) {
 }
 
 float Utils::getSpeedValue(float value) {
-    return 3.9f * std::clamp(value, 0.f, 1.f) + 0.1f;
+    return 4.9f * std::clamp(value, 0.f, 1.f) + 0.1f;
 }
 
 std::string Utils::getSettingString(int id, const std::string& setting) {
@@ -215,26 +219,21 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
 CCPoint Utils::getPlayerScreenPos(PlayLayer* playLayer, CCNode* player, bool isPreview) {
     if (!player) return {0, 0};
 
-    CCPoint pos = !isPreview && playLayer
-        ? player->convertToWorldSpaceAR({0, 0})
-        : player->getPosition();
+    if (isPreview)
+        return player->getPosition();
 
-    if (!isPreview && playLayer) {
-        CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
-        float cameraAngleDegrees = -playLayer->m_gameState.m_cameraAngle;
-        float cameraAngleRadians = CC_DEGREES_TO_RADIANS(cameraAngleDegrees);
+    CCPoint pos = player->convertToWorldSpaceAR({0, 0});
+    CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
 
-        float cosAngle = cosf(cameraAngleRadians);
-        float sinAngle = sinf(cameraAngleRadians);
+    float angle = CC_DEGREES_TO_RADIANS(-playLayer->m_gameState.m_cameraAngle);
+    float cos = cosf(angle);
+    float isn = sinf(angle);
+    float offsetX = pos.x - cameraCenter.x;
+    float offsetY = pos.y - cameraCenter.y;
+    float rotatedX = offsetX * cos - offsetY * isn;
+    float rotatedY = offsetX * isn + offsetY * cos;
 
-        float offsetX = pos.x - cameraCenter.x;
-        float offsetY = pos.y - cameraCenter.y;
-
-        float rotatedX = offsetX * cosAngle - offsetY * sinAngle;
-        float rotatedY = offsetX * sinAngle + offsetY * cosAngle;
-
-        pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
-    }
+    pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
 
     return pos;
 }
@@ -334,7 +333,6 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(AmongUs)
     ANIMATION_CHECK(Celeste)
     ANIMATION_CHECK(ToBeContinued)
-    ANIMATION_CHECK(Wii)
     ANIMATION_CHECK(Wasted)
     ANIMATION_CHECK(Jumpscare)
     ANIMATION_CHECK(Maro)
@@ -347,6 +345,12 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(SpeechBubble)
     ANIMATION_CHECK(What)
     ANIMATION_CHECK(Congregation)
+    ANIMATION_CHECK(LevelComplete)
+    ANIMATION_CHECK(PracticeComplete)
+    ANIMATION_CHECK(NewBest)
+    ANIMATION_CHECK(Blood)
+    ANIMATION_CHECK(Poof)
+    ANIMATION_CHECK(FadeOut)
     return nullptr;
 }
 
