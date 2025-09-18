@@ -47,7 +47,7 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade
     playSound(anim, sound, speed, fade, fade, duration, volume, loop);
 }
 
-void Utils::playSound(Anim anim, const std::string& sound, float speed, int fadeIn, int fadeOut, int duration, float volume, bool loop) {
+void Utils::playSound(Anim anim, const std::string& sound, float speed, int fadeIn, int fadeOut, int duration, float volume, bool loop, int start) {
     if (!Utils::getSettingBool(anim, "play-sound-effects"))
         return;
                 
@@ -59,7 +59,7 @@ void Utils::playSound(Anim anim, const std::string& sound, float speed, int fade
             
     FMODAudioEngine::get()->playEffectAdvanced(
         utils::string::pathToString(Mod::get()->getResourcesDir() / sound).c_str(),
-        1.f, 1.f, volume, speed, 1.f, 1.f, 0, duration, fadeIn, fadeOut, loop, 0, false, false, 0, 0, 0, 0
+        0.f, 0.f, volume, speed, false, false, start, duration, fadeIn, fadeOut, loop, 0, false, false, 0, 0, 0, 0
     );
 }
 
@@ -216,13 +216,13 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     sprite->setScale(sprite->getScale() * mult);
 }
 
-CCPoint Utils::getPlayerScreenPos(PlayLayer* playLayer, CCNode* player, bool isPreview) {
-    if (!player) return {0, 0};
+CCPoint Utils::getNodeScreenPos(PlayLayer* playLayer, CCNode* node, bool isPreview) {
+    if (!node) return {0, 0};
 
     if (isPreview)
-        return player->getPosition();
+        return node->getPosition();
 
-    CCPoint pos = player->convertToWorldSpaceAR({0, 0});
+    CCPoint pos = node->convertToWorldSpaceAR({0, 0});
     CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
 
     float angle = CC_DEGREES_TO_RADIANS(-playLayer->m_gameState.m_cameraAngle);

@@ -175,7 +175,7 @@ private:
     }
 
     void startFadeOut(float) {
-        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height);
+        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255});
         layer->setOpacity(0);
         layer->runAction(CCFadeIn::create(2.5f / m_speed));
      

@@ -106,7 +106,7 @@ private:
 
     void addHeart(CCNodeRGBA* player, bool isSecondPlayer = false) {
         UndertaleHeart* heart = UndertaleHeart::create(m_speed, m_isPreview ? 1.f : m_playLayer->m_gameState.m_cameraZoom, isSecondPlayer);
-        heart->setPosition(Utils::getPlayerScreenPos(m_playLayer, player, m_isPreview));
+        heart->setPosition(Utils::getNodeScreenPos(m_playLayer, player, m_isPreview));
 
         addChild(heart);
     }
@@ -252,7 +252,7 @@ public:
 
         Utils::setHighestZ(this);
 
-        addChild(CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height));
+        addChild(CCLayerColor::create({0, 0, 0, 255}));
 
         if (m_isPreview)
             addHeart(m_delegate->getPlayer());

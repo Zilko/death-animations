@@ -112,7 +112,7 @@ private:
             
             vec3 nes = vec3(0.0);
             float best = 10.0;
-            for(int i=0; i<64; i++) {
+            for(int i = 0; i < 64; i++) {
                 float d = distance(col, pal[i]);
                 if(d < best) {
                     best = d;
@@ -148,7 +148,7 @@ private:
             spr->getTexture()->setAliasTexParameters();
             spr->runAction(
                 CCSequence::create(
-                    CCDelayTime::create(0.35f),
+                    CCDelayTime::create(0.35f / m_speed),
                     CCJumpBy::create(2.f / m_speed, {0, -320}, 220, 1),
                     nullptr
                 )
@@ -175,7 +175,7 @@ private:
         spr->setShaderProgram(m_program);
         spr->runAction(
             CCSequence::create(
-                CCDelayTime::create(0.35f),
+                CCDelayTime::create(0.35f / m_speed),
                 CCJumpBy::create(2.f / m_speed, {0, -320}, 220, 1),
                 nullptr
             )

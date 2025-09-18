@@ -1,12 +1,14 @@
+#pragma once
+
 #include "BaseSetting.hpp"
 
 class ToggleSetting : public BaseSetting {
 
-private:
+protected:
 
     CCMenuItemToggler* m_toggle = nullptr;
 
-    void onToggle(CCObject*);
+    virtual void onToggle(CCObject*);
 
     void init(float) override;
 

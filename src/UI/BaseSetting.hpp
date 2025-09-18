@@ -8,11 +8,11 @@ class AnimationSettingsLayer;
     protected: \
         CLASS(AnimationSettingsLayer* parentLayer, const AnimationSetting& setting, DeathAnimation animation) \
             : PARENT(parentLayer, setting, animation) {} \
-    public:\
+    public: \
         static CLASS* create(AnimationSettingsLayer* parentLayer, const AnimationSetting& setting, DeathAnimation animation, float y) { \
             CLASS* ret = new CLASS(parentLayer, setting, animation); \
-            ret->init(y); \
             ret->autorelease(); \
+            ret->init(y); \
             return ret; \
         } \
     private:

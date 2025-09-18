@@ -113,7 +113,8 @@ class $modify(ProPlayLayer, PlayLayer) {
             || (m_isPracticeMode && !Utils::getSettingBool(anim, "play-in-practice"))
             || (m_isTestMode && !Utils::getSettingBool(anim, "play-in-testmode"))
             || getCurrentPercentInt() < Utils::getSettingFloat(anim, "only-after")
-            || (getCurrentPercentInt() <= m_level->m_normalPercent && Utils::getSettingBool(anim, "only-on-new-best"));
+            || (getCurrentPercentInt() <= m_level->m_normalPercent.value() && Utils::getSettingBool(anim, "only-on-new-best"))
+            || (getCurrentPercentInt() > m_level->m_normalPercent.value() && anim == Anim::NewBest);
     }
 
     void destroyPlayer(PlayerObject* p0, GameObject* p1) {
@@ -124,8 +125,10 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (anim == Anim::Random)
             anim = static_cast<Anim>(animations[Utils::getRandomInt(2, static_cast<int>(animations.size()) - 1)].id);
 
-        if (shouldReturn(anim) || p1 == m_anticheatSpike || f->m_animation)
+        if (shouldReturn(anim) || p1 == m_anticheatSpike || f->m_animation) {
+            Vars::selectedAnimation = {};
             return PlayLayer::destroyPlayer(p0, p1);
+        }
 
         const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
 
@@ -170,6 +173,9 @@ class $modify(ProPlayLayer, PlayLayer) {
         m_gameState.m_unkBool26 = og;
         
         f->m_animation->start();
+
+        if (!getActionByTag(16))
+            return;
         
         stopActionByTag(16);
         

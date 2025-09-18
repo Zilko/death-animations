@@ -14,7 +14,7 @@ public:
 
     static void playSound(Anim, const std::string&, float, float);
     static void playSound(Anim, float, float, const std::filesystem::path&);
-    static void playSound(Anim, const std::string&, float, int, int, int, float = 1.f, bool = false);
+    static void playSound(Anim, const std::string&, float, int, int, int, float = 1.f, bool = false, int = 0);
     static void playSound(Anim, const std::string&, float, int, int, float = 1.f, bool = false);
     static SoundUpdater* playSoundManual(Anim, const std::string&, float, float);
     static SoundUpdater* playSoundManual(Anim, float, float, const std::filesystem::path&);
@@ -28,17 +28,16 @@ public:
     static float getSettingFloat(int, const std::string&);
     static bool getSettingBool(int, const std::string&);
     
-    static void saveSetting(int, const std::string&, const std::string&);
-    static void setDefaults(int);
-
     template <typename T>
     static void saveSetting(int, const std::string&, const T&);
+    static void saveSetting(int, const std::string&, const std::string&);
+    static void setDefaults(int);
 
     static void setHookEnabled(const std::string&, bool);
     static void setHighestZ(CCNode*);
 
     static void fixScaleTextureSizexd(CCNode*);
-    static CCPoint getPlayerScreenPos(PlayLayer*, CCNode*, bool);
+    static CCPoint getNodeScreenPos(PlayLayer*, CCNode*, bool);
     static std::vector<std::filesystem::path> getAllFilesFromFolder(const std::filesystem::path&, const std::unordered_set<std::string>);
     static ccColor3B applyHSV(const ccColor3B&, const NoobHSV&);
     static std::vector<std::string> split(const std::string&, char, size_t = 0);

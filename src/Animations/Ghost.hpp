@@ -1,5 +1,8 @@
 #include "BaseAnimation.hpp"
 
+#include <opus.h>
+#include <opusfile.h>
+
 class GhostNode : public CCNode {
 
 private:
@@ -113,6 +116,10 @@ private:
 public:
 
     void start() override {
+        Utils::playSound(Anim::Ghost, "hippo.opus", m_speed * 0.8f, 0.3f);
+        log::debug("wa");
+return;
+
         Utils::playSound(Anim::Ghost, "ghost.ogg", m_speed * 0.8f, 0.3f);
     
         if (m_isPreview)

@@ -58,14 +58,18 @@ public:
 
         addChild(lbl);
 
+        Utils::fixScaleTextureSizexd(lbl);
+
         lbl = CCLabelBMFont::create(Utils::getSettingString(Anim::What, "bottom-text").c_str(), "times-rouman.fnt"_spr);
         lbl->setPosition({m_size.width / 2.f, 31});
         lbl->setScale(0.55f);
         
         addChild(lbl);
 
+        Utils::fixScaleTextureSizexd(lbl);
+
         CCRect innerRect = CCRectMake(leftBorderWidth, bottomBorderHeight, m_size.width - leftBorderWidth * 2, m_size.height - bottomBorderHeight - topBorderHeight);
-        CCPoint playerPos = Utils::getPlayerScreenPos(m_playLayer, m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1, m_isPreview);
+        CCPoint playerPos = Utils::getNodeScreenPos(m_playLayer, m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1, m_isPreview);
         CCPoint desiredPosition = ccp(innerRect.origin.x + innerRect.size.width / 2, innerRect.origin.y + innerRect.size.height / 2) - playerPos;
 
         spr->setScale(1.1f);

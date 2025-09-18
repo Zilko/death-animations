@@ -44,7 +44,7 @@ public:
     void start() override {
         Utils::playSound(Anim::YouDied, "you-died.mp3", m_speed, 3000, 5000);
         
-        m_bg = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
+        m_bg = CCLayerColor::create({0, 0, 0, 0});
         m_bg->setOpacity(0);
         
         m_banner = CCSprite::create("bg-you-died.png"_spr);

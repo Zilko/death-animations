@@ -4,7 +4,7 @@ using namespace geode::prelude;
 
 #include "UI/PreviewDelegate.hpp"
 
-static const std::string vertexShader = R"(
+inline const std::string vertexShader = R"(
     attribute vec4 a_position;
     attribute vec2 a_texCoord;
     attribute vec4 a_color;
@@ -29,6 +29,7 @@ static const std::string vertexShader = R"(
         return ANIMATION::create(params);
 
 enum SettingType {
+    Empty,
     Toggle,
     Speed,
     Percent,
@@ -36,7 +37,8 @@ enum SettingType {
     Select,
     Folder,
     Scale,
-    Text
+    Text,
+    PercentToggle
 };
 
 enum Anim {
@@ -64,7 +66,7 @@ enum Anim {
     NewBest = 23,
     Blood = 24,
     Poof = 25,
-    FadeOut = 25,
+    FadeOut = 26,
 };
 
 struct NoobHSV {
@@ -114,23 +116,23 @@ struct AnimationSetting {
     std::filesystem::path folder;
 };
 
-static const std::unordered_map<std::string, float> globalFloatDefaults = {
+inline const std::unordered_map<std::string, float> globalFloatDefaults = {
     { "speed", 0.183673f },
     { "probability", 100.f }
 };
 
-static const std::unordered_set<std::string> gloalBoolDefaults = {
+inline const std::unordered_set<std::string> gloalBoolDefaults = {
     "play-sound-effects"
 };
 
-static const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
+inline const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
     { Anim::What, {
         { "top-text", "WHAT" },
         { "bottom-text", "what" }
     } }
 };
 
-static const std::unordered_map<int, std::unordered_map<std::string, float>> specificFloatDefaults {
+inline const std::unordered_map<int, std::unordered_map<std::string, float>> specificFloatDefaults {
     { Anim::AmongUs, {
         { "r1", 243.f },
         { "g1", 65.f },
@@ -150,7 +152,7 @@ static const std::unordered_map<int, std::unordered_map<std::string, float>> spe
     } }
 };
 
-static const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
+inline const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
     { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true }, { "shockwave", true } } },
     { Anim::CBFDetected, { { "use-level-name", true } } },
     { Anim::Maro, { { "second-player", true } } },
@@ -161,7 +163,7 @@ static const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::ToBeContinued, { { "yellow-shader", true } } }
 };
 
-static const std::array<DeathAnimation, 25> animations = {{
+inline const std::array<DeathAnimation, 25> animations = {{
     { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .isStopMusic = true, .isDelayNewBest = true },
@@ -181,15 +183,15 @@ static const std::array<DeathAnimation, 25> animations = {{
     { .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true, .isDelayNewBest = true },
     { .id = Anim::What, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 4.5f, .isNoDeathEffect = true, .isDelayNewBest = true },   
     { .id = Anim::Congregation, .thumbnail = "none-thumbnail.png", .name = "Congregation Jumpscare", .duration = 4.45f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true, .isStopSoundsOnEnd = true },
-    { .id = Anim::LevelComplete, .thumbnail = "none-thumbnail.png", .name = "Level Complete", .duration = 10.f },
-    { .id = Anim::PracticeComplete, .thumbnail = "none-thumbnail.png", .name = "Practice Complete", .duration = 10.f },
-    { .id = Anim::NewBest, .thumbnail = "none-thumbnail.png", .name = "New Best", .duration = 10.f },
+    { .id = Anim::LevelComplete, .thumbnail = "none-thumbnail.png", .name = "Level Complete", .duration = 3.9f, .isNoDeathEffect = true, .isNoStopMusic = true },
+    { .id = Anim::PracticeComplete, .thumbnail = "none-thumbnail.png", .name = "Practice Complete", .duration = 2.3f, .isNoDeathEffect = true, .isNoStopMusic = true },
+    { .id = Anim::NewBest, .thumbnail = "none-thumbnail.png", .name = "New Best", .duration = 1.8f },
     { .id = Anim::Blood, .thumbnail = "none-thumbnail.png", .name = "Blood", .duration = 10.f },
-    { .id = Anim::Poof, .thumbnail = "none-thumbnail.png", .name = "Poof", .duration = 10.f },
+    { .id = Anim::Poof, .thumbnail = "none-thumbnail.png", .name = "Poof", .duration = 10.f, .isNoDeathEffect = true },
     { .id = Anim::FadeOut, .thumbnail = "none-thumbnail.png", .name = "Fade Out", .duration = 10.f },
 }};
 
-static const std::array<AnimationSetting, 9> defaultSettings = {{
+inline const std::array<AnimationSetting, 9> defaultSettings = {{
     { .id = "speed", .name = "Speed", .description = "The speed at which the animation plays.", .type = SettingType::Speed },
     { .id = "only-after", .name = "Only After", .description = "Play the animation only if you die after a certain percentage.", .type = SettingType::Percent },
     { .id = "probability", .name = "Probability", .description = "The probability that the animation will play.", .type = SettingType::Percent },
@@ -201,7 +203,7 @@ static const std::array<AnimationSetting, 9> defaultSettings = {{
     { .id = "only-on-new-best", .name = "Only on New Best", .description = "Play the animation only when achieving a new best.", .type = SettingType::Toggle }
 }};
 
-static const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
+inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
     { Anim::AmongUs, {
         { .id = "animation", .name = "Kill Animation", .description = "The Among Us kill animation that plays on death.", .type = SettingType::Select, .elements = { "Random", "Gun", "Knife", "Neck", "Alien" } },
         { .id = "colors", .name = "Colors", .description = "The colors of the impostor and victim in the animation.", .type = SettingType::AmongUsColor, .elements = { "Player Colors", "Custom" } }
@@ -254,4 +256,14 @@ static const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "top-text", .name = "Top Text", .description = "", .type = SettingType::Text },
         { .id = "bottom-text", .name = "Bottom Text", .description = "", .type = SettingType::Text }
     } },
+    { Anim::NewBest, {
+        { .id = "use-custom-percent", .name = "Use Custom Percent", .description = "", .type = SettingType::PercentToggle },
+        { .type = SettingType::Empty },
+    } },
+};
+
+inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSettings = {
+    { Anim::Congregation, { "stop-auto-restart", "play-sound-effects" } },
+    { Anim::NewBest, { "only-on-new-best", "speed", "play-sound-effects" } },
+    { Anim::PracticeComplete, { "play-sound-effects" } },
 };

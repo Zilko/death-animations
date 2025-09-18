@@ -16,21 +16,27 @@ void PercentSetting::textChanged(CCTextInputNode* node) {
 void PercentSetting::init(float y) {
     BaseSetting::init(y);
     
-    TextInput* input = TextInput::create(70, "%");
-   	input->setPosition({96, 10});
-   	input->setScale(0.525f);
-   	input->getInputNode()->setDelegate(this);
-   	input->getInputNode()->setAllowedChars("0123456789");
-   	input->setString(std::to_string(static_cast<int>(Utils::getSettingFloat(m_animation.id, m_setting.id))).c_str());
+    m_input = TextInput::create(70, "%");
+   	m_input->setPosition({96, 10});
+   	m_input->setScale(0.525f);
+   	m_input->getInputNode()->setDelegate(this);
+   	m_input->getInputNode()->setAllowedChars("0123456789");
+   	m_input->setString(std::to_string(static_cast<int>(Utils::getSettingFloat(m_animation.id, m_setting.id))).c_str());
     
-    addChild(input);
+    addChild(m_input);
     
-    CCLabelBMFont* lbl = CCLabelBMFont::create("%", "bigFont.fnt");
-    lbl->setOpacity(220);
-    lbl->setScale(0.325f);
-    lbl->setPosition({125, 10});
+    m_percentLabel = CCLabelBMFont::create("%", "bigFont.fnt");
+    m_percentLabel->setOpacity(220);
+    m_percentLabel->setScale(0.325f);
+    m_percentLabel->setPosition({125, 10});
     
-    addChild(lbl);
+    addChild(m_percentLabel);
     
-    setInfoButtonPos(lbl);
+    setInfoButtonPos(m_percentLabel);
+}
+
+void PercentSetting::setEnabled(bool enabled) {
+    m_input->setEnabled(enabled);
+    m_percentLabel->setOpacity(enabled ? 255 : 140);
+    m_nameLabel->setOpacity(enabled ? 255 : 140);
 }

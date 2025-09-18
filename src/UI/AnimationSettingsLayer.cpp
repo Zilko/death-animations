@@ -9,6 +9,7 @@
 #include "FolderSetting.hpp"
 #include "ScaleSetting.hpp"
 #include "TextSetting.hpp"
+#include "PercentToggleSetting.hpp"
 
 AnimationSettingsLayer::AnimationSettingsLayer(const DeathAnimation& animation) {
     m_animation = animation;
@@ -120,7 +121,9 @@ bool AnimationSettingsLayer::setup() {
             settings.push_back(setting);
     
     float separation = 25.f;
-    float y = static_cast<int>(settings.size()) * separation + 15;
+    float y = (static_cast<int>(settings.size())
+        - (blockedSettings.contains(m_animation.id) ? static_cast<int>(blockedSettings.at(m_animation.id).size()) : 0))
+        * separation + 15;
     
     scroll->m_contentLayer->setContentHeight(y);
     
@@ -136,6 +139,10 @@ bool AnimationSettingsLayer::setup() {
     for (const AnimationSetting& setting : settings) {
         BaseSetting* settingNode = nullptr;
 
+        if (blockedSettings.contains(m_animation.id))
+            if (blockedSettings.at(m_animation.id).contains(setting.id))
+                continue;
+
         switch (setting.type) {
             case SettingType::Toggle: settingNode = ToggleSetting::create(this, setting, m_animation, y); break;
             case SettingType::Speed: settingNode = SpeedSetting::create(this, setting, m_animation, y); break;
@@ -145,6 +152,8 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::Folder: settingNode = FolderSetting::create(this, setting, m_animation, y); break;
             case SettingType::Scale: settingNode = ScaleSetting::create(this, setting, m_animation, y); break;
             case SettingType::Text: settingNode = TextSetting::create(this, setting, m_animation, y); break;
+            case SettingType::PercentToggle: settingNode = PercentToggleSetting::create(this, setting, m_animation, y); break;
+            default: break;
         }
 
         if (settingNode)

@@ -80,7 +80,7 @@ private:
         }
 
         
-        CCLayerColor* m_bg = CCLayerColor::create({0, 120, 215, 255}, m_size.width, m_size.height);
+        CCLayerColor* m_bg = CCLayerColor::create({0, 120, 215, 255});
         
         addChild(m_bg);
         
@@ -89,12 +89,16 @@ private:
         face->setPosition({74, m_size.height - 82});
         
         addChild(face);
+
+        Utils::fixScaleTextureSizexd(face);
         
         CCSprite* text = CCSprite::create("text_bsod.png"_spr);
         text->setScale(0.59f);
         text->setPosition({204, m_size.height - 181});
         
         addChild(text);
+
+        Utils::fixScaleTextureSizexd(text);
         
         m_percentLabel = CCLabelBMFont::create("0% complete", "segoe-semilight.fnt"_spr);
         m_percentLabel->setScale(0.475f);
@@ -102,6 +106,8 @@ private:
         m_percentLabel->setPosition({62, m_size.height - 186.5f});
         
         addChild(m_percentLabel);
+
+        Utils::fixScaleTextureSizexd(m_percentLabel);
         
         CCLabelBMFont* lbl = CCLabelBMFont::create(m_stopCodes[Utils::getRandomInt(0, m_stopCodes.size() - 1)], "segoe-light.fnt"_spr);
         lbl->setOpacity(190);
@@ -110,6 +116,8 @@ private:
         lbl->setPosition({124, m_size.height - 239.2f});
         
         addChild(lbl);
+
+        Utils::fixScaleTextureSizexd(lbl);
         
         const std::vector<std::pair<CCSize, CCPoint>> covers = {
             {{100,  17}, {55, 124}},

@@ -1,7 +1,20 @@
 #include "BaseAnimation.hpp"
 
 class Jumpscare : public BaseAnimation {
+
+private:
+
+    CCLayerColor* m_backgroundLayer = nullptr;
+
+    CCSprite* m_jumpcare = nullptr;
     
+    void fadeOut(float) {
+        m_backgroundLayer->runAction(CCFadeOut::create(2.5f));
+
+        if (m_jumpcare)
+            m_jumpcare->runAction(CCFadeOut::create(2.5f));
+    }
+
     ANIMATION_CTOR_CREATE(Jumpscare)
     
 public:
@@ -21,30 +34,32 @@ public:
         else
             Utils::playSound(Anim::Jumpscare, m_speed, 1.f, sound);
 
-        CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height);
+        m_backgroundLayer = CCLayerColor::create({0, 0, 0, 255});
         
-        addChild(layer);
+        addChild(m_backgroundLayer);
         
-        CCSprite* spr = CCSprite::create(utils::string::pathToString(image).c_str());
+        m_jumpcare = CCSprite::create(utils::string::pathToString(image).c_str());
 
-        if (!spr) return layer->setVisible(false);
+        if (!m_jumpcare) return m_backgroundLayer->setVisible(false);
 
         float scale = Utils::getSettingBool(Anim::Jumpscare, "fill-screen")
-            ? std::max(m_size.width / spr->getContentWidth(), m_size.height / spr->getContentHeight())
-            : std::min(m_size.width / spr->getContentWidth(), m_size.height / spr->getContentHeight());
+            ? std::max(m_size.width / m_jumpcare->getContentWidth(), m_size.height / m_jumpcare->getContentHeight())
+            : std::min(m_size.width / m_jumpcare->getContentWidth(), m_size.height / m_jumpcare->getContentHeight());
         
-        spr->setScale(scale * 0.35f);
-        spr->setPosition(m_size / 2.f);
+        m_jumpcare->setScale(scale * 0.35f);
+        m_jumpcare->setPosition(m_size / 2.f);
 
         if (!Utils::getSettingBool(Anim::Jumpscare, "static"))
-            spr->runAction(CCBlink::create(0.5f / m_speed, 10));
+            m_jumpcare->runAction(CCBlink::create(0.5f / m_speed, 10));
         else
-            spr->setScale(scale);
+            m_jumpcare->setScale(scale);
 
         if (!Utils::getSettingBool(Anim::Jumpscare, "disable-flashing"))
-            spr->runAction(CCScaleTo::create(0.2f / m_speed, scale));
+            m_jumpcare->runAction(CCScaleTo::create(0.2f / m_speed, scale));
         
 
-        addChild(spr);
+        addChild(m_jumpcare);
+
+        scheduleOnce(schedule_selector(Jumpscare::fadeOut), 1.f);
     }
 };

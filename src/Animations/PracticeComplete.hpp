@@ -1,16 +1,20 @@
-#include "BaseAnimation.hpp"
+#include "LevelComplete.hpp"
 
-class PracticeComplete : public BaseAnimation {
+class PracticeComplete : public LevelComplete {
 
-    ANIMATION_CTOR_CREATE(PracticeComplete)
+private:
+
+    PracticeComplete(const AnimationParams& params)
+        : LevelComplete(params) {}
+
+    ANIMATION_CREATE(PracticeComplete)
     
 public:
 
     void start() override {
-    }
-    
-    void end() override {
-        BaseAnimation::end();
+        m_isPractice = true;
 
+        LevelComplete::start();
     }
+
 };

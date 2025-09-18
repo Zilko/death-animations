@@ -147,7 +147,7 @@ public:
         
         addChild(m_bg);
         
-        m_redLayer = CCLayerColor::create({255, 1, 0, 255}, m_size.width, m_size.height);
+        m_redLayer = CCLayerColor::create({255, 1, 0, 255});
         
         addChild(m_redLayer);
         

@@ -2,18 +2,23 @@
 
 #include "../Includes.hpp"
 
-#define ANIMATION_CTOR_CREATE(CLASS) \
-    private: \
+#define ANIMATION_CTOR(CLASS) \
+    protected: \
         CLASS(const AnimationParams& params) \
-            : BaseAnimation(params) {} \
-    public:\
+            : BaseAnimation(params) {}
+
+#define ANIMATION_CREATE(CLASS) \
+    public: \
         static CLASS* create(const AnimationParams& params) { \
             CLASS* ret = new CLASS(params); \
-            ret->init(); \
             ret->autorelease(); \
+            ret->init(); \
             return ret; \
-        } \
-    private:
+        }
+
+#define ANIMATION_CTOR_CREATE(CLASS) \
+    ANIMATION_CTOR(CLASS) \
+    ANIMATION_CREATE(CLASS)
 
 class BaseAnimation : public CCLayer {
 

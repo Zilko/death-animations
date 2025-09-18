@@ -424,7 +424,7 @@ private:
             spr->setPosition({m_size.width, m_size.height - spr->getContentHeight() * spr->getScale() * i});
             container->addChild(spr);
             
-            CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height);
+            CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 255});
             container->addChild(layer);
         }
         
@@ -688,7 +688,7 @@ private:
     void startShockwave(float) {
         m_program->use();
 
-        CCPoint pos = Utils::getPlayerScreenPos(m_playLayer, m_explosion1, m_isPreview);
+        CCPoint pos = Utils::getNodeScreenPos(m_playLayer, m_explosion1, m_isPreview);
 
         glUniform2f(glGetUniformLocation(m_program->getProgram(), "u_resolution"), m_size.width, m_size.height);
         glUniform2f(glGetUniformLocation(m_program->getProgram(), "u_origin"), pos.x / m_size.width, pos.y / m_size.height);

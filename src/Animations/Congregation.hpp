@@ -517,7 +517,7 @@ private:
         for (NoobGameObject* object : m_groupObjects.at(79))
             object->setPositionY(object->getPositionY() + 60);
 
-        addChild(CCLayerColor::create({0, 0, 0, 255}, m_size.width, m_size.height), 0);
+        addChild(CCLayerColor::create({0, 0, 0, 255}), 0);
 
         scheduleOnce(schedule_selector(Congregation::secondPointFiveStep), 0.5f / m_speed);
         scheduleOnce(schedule_selector(Congregation::idkAnymore), 1.45f / m_speed);
@@ -787,7 +787,6 @@ private:
         m_player->m_unkA99 = player->m_unkA99;
         m_player->m_totalTime = player->m_totalTime;
         m_player->m_isBeingSpawnedByDualPortal = player->m_isBeingSpawnedByDualPortal;
-        m_player->m_unkAAC = player->m_unkAAC;
         m_player->m_unkAngle1 = player->m_unkAngle1;
         m_player->m_yVelocityRelated3 = player->m_yVelocityRelated3;
         m_player->m_defaultMiniIcon = player->m_defaultMiniIcon;
@@ -1003,7 +1002,7 @@ public:
         m_player->releaseAllButtons();
         m_player->update(0.f);
 
-        m_overlay = CCLayerColor::create({0, 0, 0, 0}, m_size.width, m_size.height);
+        m_overlay = CCLayerColor::create({0, 0, 0, 0});
         m_overlay->runAction(CCSequence::create(
             CCDelayTime::create(0.2f / m_speed),
             CCFadeTo::create(0.55f / m_speed, 255),
@@ -1040,9 +1039,11 @@ public:
         m_secondPlayer->m_parentLayer = nullptr;
 
         Utils::setHighestZ(m_playerContainer2);
+
+        scheduleOnce(schedule_selector(Congregation::preEnd), 4.45f / m_speed + 0.055f);
     }
 
-    void end() override {
+    void preEnd(float) {
         if (!m_isPreview) {
             m_playLayer->m_objectLayer->getParent()->setPosition(m_cameraStartPos);
             m_playLayer->m_gameState.m_cameraOffset = m_startCameraOffset;
@@ -1050,6 +1051,13 @@ public:
             m_delegate->getPlayer()->setOpacity(255);
 
         SoundManager::stop();
+
+        setVisible(false);
+        stopAllActions();
+    }
+
+    void end() override {
+        preEnd(0.f);
 
         BaseAnimation::end();
     }
