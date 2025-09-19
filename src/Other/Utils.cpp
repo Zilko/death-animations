@@ -24,6 +24,7 @@
 #include "../Animations/Blood.hpp"
 #include "../Animations/Poof.hpp"
 #include "../Animations/FadeOut.hpp"
+#include "../Animations/MrHippo.hpp"
 
 #include <random>
 
@@ -351,6 +352,7 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(Blood)
     ANIMATION_CHECK(Poof)
     ANIMATION_CHECK(FadeOut)
+    ANIMATION_CHECK(MrHippo)
     return nullptr;
 }
 

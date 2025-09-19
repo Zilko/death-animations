@@ -38,7 +38,7 @@ enum SettingType {
     Folder,
     Scale,
     Text,
-    PercentToggle
+    PercentToggle,
 };
 
 enum Anim {
@@ -67,6 +67,7 @@ enum Anim {
     Blood = 24,
     Poof = 25,
     FadeOut = 26,
+    MrHippo = 27,
 };
 
 struct NoobHSV {
@@ -118,17 +119,18 @@ struct AnimationSetting {
 
 inline const std::unordered_map<std::string, float> globalFloatDefaults = {
     { "speed", 0.183673f },
-    { "probability", 100.f }
+    { "probability", 100.f },
 };
 
 inline const std::unordered_set<std::string> gloalBoolDefaults = {
-    "play-sound-effects"
+    "play-sound-effects",
+    "play-in-testmode",
 };
 
 inline const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
     { Anim::What, {
         { "top-text", "WHAT" },
-        { "bottom-text", "what" }
+        { "bottom-text", "what" },
     } }
 };
 
@@ -149,7 +151,7 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
     } },
     { Anim::SpeechBubble, {
         { "scale-y", 1.f }
-    } }
+    } },
 };
 
 inline const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
@@ -163,7 +165,7 @@ inline const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::ToBeContinued, { { "yellow-shader", true } } }
 };
 
-inline const std::array<DeathAnimation, 25> animations = {{
+inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .isStopMusic = true, .isDelayNewBest = true },
@@ -189,6 +191,7 @@ inline const std::array<DeathAnimation, 25> animations = {{
     { .id = Anim::Blood, .thumbnail = "none-thumbnail.png", .name = "Blood", .duration = 10.f },
     { .id = Anim::Poof, .thumbnail = "none-thumbnail.png", .name = "Poof", .duration = 10.f, .isNoDeathEffect = true },
     { .id = Anim::FadeOut, .thumbnail = "none-thumbnail.png", .name = "Fade Out", .duration = 10.f },
+    { .id = Anim::MrHippo, .thumbnail = "none-thumbnail.png", .name = "Mr. Hippo", .duration = 180.f },
 }};
 
 inline const std::array<AnimationSetting, 9> defaultSettings = {{
@@ -200,7 +203,7 @@ inline const std::array<AnimationSetting, 9> defaultSettings = {{
     { .id = "play-sound-effects", .name = "Play Sound Effects", .description = "Play any sound effects associated with the animation.", .type = SettingType::Toggle },
     { .id = "play-in-practice", .name = "Play in Practice", .description = "Play the animation in practice mode.", .type = SettingType::Toggle },
     { .id = "play-in-testmode", .name = "Play in Testmode", .description = "Play the animation in test mode.", .type = SettingType::Toggle },
-    { .id = "only-on-new-best", .name = "Only on New Best", .description = "Play the animation only when achieving a new best.", .type = SettingType::Toggle }
+    { .id = "only-on-new-best", .name = "Only on New Best", .description = "Play the animation only when achieving a new best.", .type = SettingType::Toggle },
 }};
 
 inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
@@ -266,4 +269,5 @@ inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSet
     { Anim::Congregation, { "stop-auto-restart", "play-sound-effects" } },
     { Anim::NewBest, { "only-on-new-best", "speed", "play-sound-effects" } },
     { Anim::PracticeComplete, { "play-sound-effects" } },
+    { Anim::MrHippo, { "play-sound-effects", "speed", "stop-auto-restart" } },
 };

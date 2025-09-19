@@ -27,7 +27,7 @@ CPMAddPackage(
     NAME opusfile
     GITHUB_REPOSITORY xiph/opusfile
     GIT_TAG 8890ea3
-    OPTIONS "OP_DISABLE_DOCS ON" "OP_DISABLE_HTTP ON"
+    OPTIONS "OP_DISABLE_DOCS ON" "OP_DISABLE_HTTP ON" "OP_DISABLE_EXAMPLES ON"
 )
 
 target_link_libraries(${PROJECT_NAME} ogg opus opusfile)
