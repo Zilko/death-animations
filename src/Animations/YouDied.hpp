@@ -37,7 +37,7 @@ private:
         m_title->runAction(CCFadeTo::create(0.35f / m_speed, 0));
     }
     
-    ANIMATION_CTOR_CREATE(YouDied)
+    ANIMATION_CTOR_CREATE(YouDied) {}
 
 public:
     

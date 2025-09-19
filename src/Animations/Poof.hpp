@@ -2,7 +2,7 @@
 
 class Poof : public BaseAnimation {
 
-    ANIMATION_CTOR_CREATE(Poof)
+    ANIMATION_CTOR_CREATE(Poof) {}
     
 public:
 

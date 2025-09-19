@@ -184,7 +184,7 @@ private:
         m_wastedSprite->runAction(CCFadeTo::create(2.5f / m_speed, 0));
     }
 
-    ANIMATION_CTOR_CREATE(Wasted)
+    ANIMATION_CTOR_CREATE(Wasted) {}
     
 public:
 

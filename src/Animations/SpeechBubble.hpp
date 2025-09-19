@@ -152,7 +152,7 @@ private:
         #endif
     }
     
-    ANIMATION_CTOR_CREATE(SpeechBubble)
+    ANIMATION_CTOR_CREATE(SpeechBubble) {}
 
     ~SpeechBubble() {
         if (m_cursor) {

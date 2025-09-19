@@ -139,7 +139,7 @@ private:
         player->setOpacity(0);
     }
     
-    ANIMATION_CTOR_CREATE(Pop)
+    ANIMATION_CTOR_CREATE(Pop) {}
     
 public:
 

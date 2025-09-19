@@ -202,7 +202,7 @@ protected:
         }
     }
 
-    ANIMATION_CTOR_CREATE(LevelComplete)
+    ANIMATION_CTOR_CREATE(LevelComplete) {}
     
 public:
 

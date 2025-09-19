@@ -2,23 +2,23 @@
 
 #include "../Includes.hpp"
 
-#define ANIMATION_CTOR(CLASS) \
+#define ANIMATION_CTOR(Class) \
     protected: \
-        CLASS(const AnimationParams& params) \
-            : BaseAnimation(params) {}
+        Class(const AnimationParams& params) \
+            : BaseAnimation(params) \
 
-#define ANIMATION_CREATE(CLASS) \
+#define ANIMATION_CREATE(Class) \
     public: \
-        static CLASS* create(const AnimationParams& params) { \
-            CLASS* ret = new CLASS(params); \
+        static Class* create(const AnimationParams& params) { \
+            Class* ret = new Class(params); \
             ret->autorelease(); \
             ret->init(); \
             return ret; \
-        }
+        } \
 
-#define ANIMATION_CTOR_CREATE(CLASS) \
-    ANIMATION_CTOR(CLASS) \
-    ANIMATION_CREATE(CLASS)
+#define ANIMATION_CTOR_CREATE(Class) \
+    ANIMATION_CREATE(Class) \
+    ANIMATION_CTOR(Class) \
 
 class BaseAnimation : public CCLayer {
 
@@ -29,14 +29,15 @@ protected:
     PlayLayer* m_playLayer = nullptr;
     
     PreviewDelegate* m_delegate = nullptr;
-    
-    ExtraParams m_extras;
-    
+        
     CCSize m_size;
+  
+    ExtraParams m_extras;
     
     bool m_isPreview = false;
     
     float m_speed = 1.f;
+    float m_duration = 1.f;
     
     BaseAnimation(const AnimationParams& params)
         : m_extras(params.extras),
@@ -45,7 +46,8 @@ protected:
           m_delegate(params.delegate),
           m_speed(params.speed),
           m_isPreview(params.delegate != nullptr),
-          m_size(CCDirector::get()->getWinSize()) {}
+          m_size(CCDirector::get()->getWinSize()),
+          m_duration(params.duration) {}
 
     void enableTouch() {
         setTouchEnabled(true);
@@ -71,6 +73,10 @@ protected:
     }
 
 public:
+
+    float getDuration() {
+        return m_duration;
+    }
 
     virtual void startEarly() {}
 

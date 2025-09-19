@@ -2,7 +2,7 @@
 
 class Terraria : public BaseAnimation {
     
-    ANIMATION_CTOR_CREATE(Terraria)
+    ANIMATION_CTOR_CREATE(Terraria) {}
     
 public:
 

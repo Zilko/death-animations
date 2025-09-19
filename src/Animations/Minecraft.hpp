@@ -2,7 +2,7 @@
 
 class Minecraft : public BaseAnimation {
     
-    ANIMATION_CTOR_CREATE(Minecraft)
+    ANIMATION_CTOR_CREATE(Minecraft) {}
     
 public:
 

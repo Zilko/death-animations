@@ -2,7 +2,7 @@
 
 class What : public BaseAnimation {
 
-    ANIMATION_CTOR_CREATE(What)
+    ANIMATION_CTOR_CREATE(What) {}
     
 public:
 

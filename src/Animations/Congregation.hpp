@@ -545,9 +545,7 @@ private:
     }
 
     void thirdStep(float) {
-        FMODAudioEngine* fmod = FMODAudioEngine::get();
-
-        Utils::playSoundManual(Anim::Congregation, "congregation.mp3", m_speed, 1.f);
+        Utils::playSoundManual(Anim::Congregation, "congregation.mp3", m_speed, FMODAudioEngine::get()->m_musicVolume);
 
         for (NoobGameObject* object : m_groupObjects.at(35))
             object->runAction(CCMoveBy::create(100.f / m_speed, {-18000, 0}));
@@ -974,7 +972,7 @@ private:
         }
     }
 
-    ANIMATION_CTOR_CREATE(Congregation)
+    ANIMATION_CTOR_CREATE(Congregation) {}
     
 public:
 
@@ -982,9 +980,8 @@ public:
         Utils::setHighestZ(this);
 
         FMODAudioEngine* fmod = FMODAudioEngine::get();
-
-        fmod->m_backgroundMusicChannel->getVolume(&m_ogMusicVolume);
-        fmod->m_globalChannel->getVolume(&m_ogSFXVolume);
+        m_ogMusicVolume = fmod->m_musicVolume;
+        m_ogSFXVolume = fmod->m_sfxVolume;
 
         m_objectLayer = CCNode::create();
 

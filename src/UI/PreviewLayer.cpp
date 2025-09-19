@@ -78,8 +78,17 @@ void PreviewLayer::playerDied(float) {
 
     m_animationStruct = Utils::getSelectedAnimation(anim);
     m_speed = Utils::getSpeedValue(Utils::getSettingFloat(m_animationStruct.id, "speed"));
-    m_animation = Utils::createAnimation(anim, {m_mainLayer, nullptr, this, m_speed});
-    m_duration = m_animationStruct.duration / m_speed + 0.05f;
+    m_animation = Utils::createAnimation(
+        anim,
+        {
+            .parentNode = m_mainLayer,
+            .playLayer = nullptr,
+            .delegate = this, 
+            .speed = m_speed,
+            .duration = m_animationStruct.duration
+        }
+    );
+    m_duration = m_animation->getDuration() / m_speed + 0.05f;
       
     if (!m_animation) return;
 

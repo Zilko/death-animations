@@ -42,6 +42,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/mr_hippo/*.png",
             "resources/sprites/animations/bsod/*.png",
             "resources/sprites/animations/speech-bubble/*.png",
             "resources/sprites/animations/celeste/*.png",

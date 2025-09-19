@@ -2,7 +2,7 @@
 
 class FadeOut : public BaseAnimation {
 
-    ANIMATION_CTOR_CREATE(FadeOut)
+    ANIMATION_CTOR_CREATE(FadeOut) {}
     
 public:
 

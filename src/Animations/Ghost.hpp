@@ -108,7 +108,7 @@ private:
         player->setOpacity(0);
     }
     
-    ANIMATION_CTOR_CREATE(Ghost)
+    ANIMATION_CTOR_CREATE(Ghost) {}
     
 public:
 

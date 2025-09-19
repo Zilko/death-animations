@@ -436,7 +436,7 @@ private:
         setID("celeste-transition"_spr);
     }
 
-    ANIMATION_CTOR_CREATE(CelesteTransition)
+    ANIMATION_CTOR_CREATE(CelesteTransition) {}
 
 public:
     
@@ -554,7 +554,7 @@ private:
         setID("celeste-revive"_spr);
     }
 
-    ANIMATION_CTOR_CREATE(CelesteRevive);
+    ANIMATION_CTOR_CREATE(CelesteRevive) {}
 
 public:
 
@@ -565,8 +565,13 @@ public:
             Utils::setHighestZ(this);
         
         if (m_extras.transition != 0) {
-            CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, 1.f, { .transition = m_extras.transition, .reverse = true}});
-            transition->start();
+            CelesteTransition::create({
+                .parentNode = this,
+                .playLayer = m_playLayer,
+                .delegate = m_delegate, 
+                .extras = { .transition = m_extras.transition, .reverse = true},
+                .speed = 1.f,
+            })->start();
         }
         
         if (m_isPreview)
@@ -658,7 +663,13 @@ private:
 
     void transitionOut(float) {
         if (!Utils::getSettingBool(Anim::Celeste, "stop-auto-restart"))
-            CelesteRevive::create({m_parentNode, m_playLayer, m_delegate, 1.f, { .transition = m_transition }})->start();
+            CelesteRevive::create({
+                .parentNode = m_parentNode,
+                .playLayer = m_playLayer,
+                .delegate = m_delegate,
+                .extras = { .transition = m_transition },
+                .speed = 1.f,
+            })->start();
     }
     
     void playDeathSound(float) {
@@ -666,8 +677,13 @@ private:
     }
     
     void playTransition(float) {
-        CelesteTransition* transition = CelesteTransition::create({this, m_playLayer, m_delegate, m_speed, { .transition = m_transition }});
-        transition->start();
+        CelesteTransition::create({
+            .parentNode = this,
+            .playLayer = m_playLayer,
+            .delegate = m_delegate,
+            .extras = { .transition = m_transition },
+            .speed = m_speed, 
+        })->start();
     }
 
     void update(float dt) override {
@@ -698,7 +714,7 @@ private:
         m_shockwaveStarted = true;
     }
         
-    ANIMATION_CTOR_CREATE(Celeste)
+    ANIMATION_CTOR_CREATE(Celeste) {}
     
 public:
 

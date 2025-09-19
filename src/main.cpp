@@ -136,7 +136,16 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
-        f->m_animation = Utils::createAnimation(anim, {this, this, nullptr, speed});      
+        f->m_animation = Utils::createAnimation(
+            anim, 
+            {
+                .parentNode = this,
+                .playLayer = this,
+                .delegate = nullptr,
+                .speed = speed,
+                .duration = animation.duration,
+            }
+        );      
 
         if (!f->m_animation)
             return PlayLayer::destroyPlayer(p0, p1);
@@ -181,9 +190,9 @@ class $modify(ProPlayLayer, PlayLayer) {
         
         if (Utils::getSettingBool(anim, "stop-auto-restart"))
             return;
-        
+
         CCSequence* seq = CCSequence::create(
-            CCDelayTime::create(animation.duration / speed + 0.05f),
+            CCDelayTime::create(f->m_animation->getDuration() / speed + 0.05f),
             CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedResetLevelReal)),
             nullptr
         );

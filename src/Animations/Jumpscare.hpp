@@ -15,7 +15,7 @@ private:
             m_jumpcare->runAction(CCFadeOut::create(2.5f));
     }
 
-    ANIMATION_CTOR_CREATE(Jumpscare)
+    ANIMATION_CTOR_CREATE(Jumpscare) {}
     
 public:
 

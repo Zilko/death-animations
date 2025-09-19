@@ -4,13 +4,13 @@
 
 class AnimationSettingsLayer;
 
-#define SETTING_CTOR_CREATE(CLASS, PARENT) \
+#define SETTING_CTOR_CREATE(Class, PARENT) \
     protected: \
-        CLASS(AnimationSettingsLayer* parentLayer, const AnimationSetting& setting, DeathAnimation animation) \
+        Class(AnimationSettingsLayer* parentLayer, const AnimationSetting& setting, DeathAnimation animation) \
             : PARENT(parentLayer, setting, animation) {} \
     public: \
-        static CLASS* create(AnimationSettingsLayer* parentLayer, const AnimationSetting& setting, DeathAnimation animation, float y) { \
-            CLASS* ret = new CLASS(parentLayer, setting, animation); \
+        static Class* create(AnimationSettingsLayer* parentLayer, const AnimationSetting& setting, DeathAnimation animation, float y) { \
+            Class* ret = new Class(parentLayer, setting, animation); \
             ret->autorelease(); \
             ret->init(y); \
             return ret; \

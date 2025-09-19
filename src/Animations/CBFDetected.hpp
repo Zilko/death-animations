@@ -2,7 +2,7 @@
 
 class CBFDetected : public BaseAnimation {
     
-    ANIMATION_CTOR_CREATE(CBFDetected)
+    ANIMATION_CTOR_CREATE(CBFDetected) {}
     
 public:
 

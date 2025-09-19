@@ -189,7 +189,7 @@ private:
         Utils::setHighestZ(spr);
     }
     
-    ANIMATION_CTOR_CREATE(Maro)
+    ANIMATION_CTOR_CREATE(Maro) {}
     
 public:
 

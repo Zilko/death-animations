@@ -4,7 +4,7 @@ class NewBestAnimation : public BaseAnimation {
 
 private:
 
-    ANIMATION_CTOR_CREATE(NewBestAnimation)
+    ANIMATION_CTOR_CREATE(NewBestAnimation) {}
 
 public:
 
@@ -142,13 +142,18 @@ public:
 
 class NewBest : public BaseAnimation {
 
-    ANIMATION_CTOR_CREATE(NewBest)
+    ANIMATION_CTOR_CREATE(NewBest) {}
     
 public:
 
 
     void start() override {
-        NewBestAnimation::create({m_parentNode, m_playLayer, m_delegate, m_speed})->start();
+        NewBestAnimation::create({
+            .parentNode = m_parentNode,
+            .playLayer = m_playLayer,
+            .delegate = m_delegate,
+            .speed = m_speed
+        })->start();
     }
     
     

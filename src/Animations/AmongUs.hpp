@@ -130,7 +130,7 @@ private:
         Utils::playSound(Anim::AmongUs, fmt::format("death-{}-among-us.ogg", m_animation), m_speed, 0.5f);
     }
     
-    ANIMATION_CTOR_CREATE(AmongUs)
+    ANIMATION_CTOR_CREATE(AmongUs) {}
     
 public:
 

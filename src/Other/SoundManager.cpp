@@ -2,18 +2,17 @@
 
 void SoundUpdater::updateSound(float dt) {
     bool isPlaying = true;
+    bool isPaused = false;
 
-    m_totalTime += dt;
+    m_channel->getPaused(&isPaused);
+
+    if (!isPaused)
+        m_totalTime += dt;
     
     m_channel->isPlaying(&isPlaying);
     
-    if ((m_channel && !isPlaying) || m_totalTime >= 60.f) {
-        m_sound->release();
-        this->release();
-        m_channel = nullptr;
-        SoundManager::remove(this);
-        CCScheduler::get()->unscheduleSelector(schedule_selector(SoundUpdater::updateSound), this);
-    }
+    if ((m_channel && !isPlaying) || m_totalTime > m_timeLimit)
+        stop();
 }
 
 void SoundUpdater::pause(bool paused) {
@@ -22,6 +21,11 @@ void SoundUpdater::pause(bool paused) {
 
 void SoundUpdater::stop() {
     m_channel->stop();
+    m_sound->release();
+    this->release();
+    m_channel = nullptr;
+    SoundManager::remove(this);
+    CCScheduler::get()->unscheduleSelector(schedule_selector(SoundUpdater::updateSound), this);
 }
 
 SoundManager& SoundManager::get() {
@@ -29,8 +33,8 @@ SoundManager& SoundManager::get() {
     return instance;
 }
 
-SoundUpdater* SoundManager::add(FMOD::Channel* channel, FMOD::Sound* sound) {
-    SoundUpdater* updater = new SoundUpdater(channel, sound);
+SoundUpdater* SoundManager::add(FMOD::Channel* channel, FMOD::Sound* sound, float timeLimit) {
+    SoundUpdater* updater = new SoundUpdater(channel, sound, timeLimit);
     updater->retain();
     CCScheduler::get()->scheduleSelector(schedule_selector(SoundUpdater::updateSound), updater, 0.2f, kCCRepeatForever, 0, false);
     get().m_sounds.push_back(updater);

@@ -2,7 +2,7 @@
 
 class Blood : public BaseAnimation {
 
-    ANIMATION_CTOR_CREATE(Blood)
+    ANIMATION_CTOR_CREATE(Blood) {}
     
 public:
 

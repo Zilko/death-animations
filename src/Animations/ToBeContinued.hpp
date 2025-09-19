@@ -26,7 +26,7 @@ private:
         }
     )";
         
-    ANIMATION_CTOR_CREATE(ToBeContinued)
+    ANIMATION_CTOR_CREATE(ToBeContinued) {}
     
 public:
 
@@ -45,6 +45,7 @@ public:
         Utils::playSound(Anim::ToBeContinued, "roundabout.mp3", m_speed, 0.7f);
         
         CCSprite* spr = CCSprite::create("to-be-continued.png"_spr);
+        spr->setScale(2.66666f);
         spr->setPosition({m_size.width, 16});
         spr->setAnchorPoint({0, 0});
         spr->runAction(CCMoveTo::create(0.07f, {16, 16}));
