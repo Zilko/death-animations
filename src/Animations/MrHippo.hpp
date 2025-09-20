@@ -22,13 +22,7 @@ private:
 
     int m_speech = 1;
 
-    float m_time = 0.f;
-    float m_ogMusicVolume = 1.f;
-    float m_ogSFXVolume = 1.f;
-
     ~MrHippo() {
-        setVolume(m_ogMusicVolume, m_ogSFXVolume);
-
         SoundManager::stop();
 
         if (m_data)
@@ -106,6 +100,7 @@ private:
         );
 
         system->playSound(sound, nullptr, false, &channel);
+        channel->setVolume(FMODAudioEngine::get()->m_musicVolume * 1.16f);
 
         SoundManager::add(channel, sound, duration + 10.f);
 
@@ -119,30 +114,16 @@ private:
         addChild(overlay);
     }
 
-    void setVolume(float music, float sfx) {
-        FMODAudioEngine* fmod = FMODAudioEngine::get();
-
-        fmod->m_backgroundMusicChannel->setVolume(music);
-        fmod->m_globalChannel->setVolume(sfx);
-    }
-
-    void updateAudio(float dt) {
-        m_time += dt;
-
-        float progress = std::min(m_time / 0.7f, 1.f);
-
-        setVolume(
-            m_ogMusicVolume - progress * m_ogMusicVolume,
-            m_ogSFXVolume - progress * m_ogSFXVolume
-        );
-    }
-
     CCSprite* createSprite(const std::string& file, CCPoint anchor, int opacity) {
         CCSprite* spr = CCSprite::create(file.c_str());
         spr->setPosition(m_size * anchor);
         spr->setAnchorPoint(anchor);
-        spr->setScale(m_size.height / spr->getContentHeight());
         spr->setOpacity(opacity);
+
+        if (m_size.width > m_size.height)
+            spr->setScale(m_size.width / spr->getContentWidth());
+        else
+            spr->setScale(m_size.height / spr->getContentHeight());
 
         addChild(spr);
 
@@ -150,12 +131,14 @@ private:
     }
 
     void showSpeech(const std::string& file1, const std::string& file2) {
-        createSprite(file1, {0, 1}, 0)->runAction(
+        CCSprite* spr = createSprite(file1, {0, 1}, 0);
+
+        spr->runAction(
             CCSequence::create(
                 CCDelayTime::create(6.2f),
                 CCFadeIn::create(25.f),
                 CCDelayTime::create(13.f),
-                CCScaleTo::create(240.f, 1.05f),
+                CCScaleTo::create(240.f, spr->getScale() * 1.7676f),
                 nullptr
             )
         );
@@ -178,10 +161,10 @@ private:
         m_speech = Utils::getRandomInt(1, 4);
 
         switch (m_speech) {
-            case 1: m_duration = 214.f; break;
-            case 2: m_duration = 178.f; break;
-            case 3: m_duration = 145.f; break;
-            case 4: m_duration = 146.f; break;
+            case 1: m_duration = 215.f; break;
+            case 2: m_duration = 180.f; break;
+            case 3: m_duration = 147.f; break;
+            case 4: m_duration = 148.f; break;
             default: break;
         }
     }
@@ -189,10 +172,6 @@ private:
 public:
 
     void start() override {
-        FMODAudioEngine* fmod = FMODAudioEngine::get();
-        m_ogMusicVolume = fmod->m_musicVolume;
-        m_ogSFXVolume = fmod->m_sfxVolume;
-
         Utils::setHighestZ(this);
 
         showSpeech(
@@ -201,7 +180,6 @@ public:
         );
 
         scheduleOnce(schedule_selector(MrHippo::playSpeech), 1.f);
-        schedule(schedule_selector(MrHippo::updateAudio));
     }
 
     };

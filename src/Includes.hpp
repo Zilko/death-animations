@@ -194,7 +194,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Blood, .thumbnail = "none-thumbnail.png", .name = "Blood", .duration = 10.f },
     { .id = Anim::Poof, .thumbnail = "none-thumbnail.png", .name = "Poof", .duration = 10.f, .isNoDeathEffect = true },
     { .id = Anim::FadeOut, .thumbnail = "none-thumbnail.png", .name = "Fade Out", .duration = 10.f },
-    { .id = Anim::MrHippo, .thumbnail = "none-thumbnail.png", .name = "Mr. Hippo", .duration = 600.f, .isNoStopMusic = true },
+    { .id = Anim::MrHippo, .thumbnail = "none-thumbnail.png", .name = "Mr. Hippo", .duration = 600.f },
 }};
 
 inline const std::array<AnimationSetting, 9> defaultSettings = {{
