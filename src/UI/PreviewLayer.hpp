@@ -24,6 +24,8 @@ private:
     float m_speed = 1.f;
     float m_duration = 0.f;
 
+    bool m_isDead = false;
+
     ~PreviewLayer();
 
     bool setup() override;
@@ -42,5 +44,6 @@ public:
     CCNodeRGBA* getPlayer() override;
     CCNode* getBackButton() override;
     void setBackgroundOpacity(int) override;
+    bool isDead() override;
 
 };

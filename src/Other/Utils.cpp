@@ -211,32 +211,9 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     switch (GameManager::get()->m_texQuality) {
         case 1: mult = 0.25f; break;
         case 2: mult = 0.5f; break;
-        default: mult = 1.f;
     };
 
     sprite->setScale(sprite->getScale() * mult);
-}
-
-CCPoint Utils::getNodeScreenPos(PlayLayer* playLayer, CCNode* node, bool isPreview) {
-    if (!node) return {0, 0};
-
-    if (isPreview)
-        return node->getPosition();
-
-    CCPoint pos = node->convertToWorldSpaceAR({0, 0});
-    CCPoint cameraCenter = playLayer->m_cameraObb2->m_center;
-
-    float angle = CC_DEGREES_TO_RADIANS(-playLayer->m_gameState.m_cameraAngle);
-    float cos = cosf(angle);
-    float isn = sinf(angle);
-    float offsetX = pos.x - cameraCenter.x;
-    float offsetY = pos.y - cameraCenter.y;
-    float rotatedX = offsetX * cos - offsetY * isn;
-    float rotatedY = offsetX * isn + offsetY * cos;
-
-    pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
-
-    return pos;
 }
 
 std::vector<std::filesystem::path> Utils::getAllFilesFromFolder(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
@@ -404,14 +381,9 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
 }
 
 CCSprite* Utils::renderPlayerSprite(CCNodeRGBA* player, bool rotation0) {
-    CCSprite* spr = CCSprite::createWithTexture(renderPlayerTexture(player, rotation0)->getSprite()->getTexture());
-    spr->setFlipY(true);
+    CCSize size = ccp(100, 100) * player->getScale();
 
-    return spr;
-}
-
-CCRenderTexture* Utils::renderPlayerTexture(CCNodeRGBA* player, bool rotation0) {
-    CCRenderTexture* texture = CCRenderTexture::create(100, 100);
+    CCRenderTexture* texture = CCRenderTexture::create(size.width, size.height);
 
     CCPoint ogPosition = player->getPosition();
     GLubyte ogOpacity = player->getOpacity();
@@ -435,5 +407,8 @@ CCRenderTexture* Utils::renderPlayerTexture(CCNodeRGBA* player, bool rotation0) 
     
     texture->end();
 
-    return texture;
+    CCSprite* ret = CCSprite::createWithTexture(texture->getSprite()->getTexture());
+    ret->setFlipY(true);
+
+    return ret;
 }

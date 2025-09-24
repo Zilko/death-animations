@@ -116,7 +116,7 @@ public:
             static_cast<int>(demonKey),
             CurrencySpriteType::Icon,
             0,
-            Utils::getNodeScreenPos(m_playLayer, m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1, m_isPreview),
+            getNodeScreenPos(m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1),
             static_cast<CurrencyRewardType>(0),
             0.f,
             0.9f

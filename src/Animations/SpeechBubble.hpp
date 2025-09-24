@@ -17,6 +17,8 @@ private:
     
     int m_currentSpeechBubble = 0;
 
+    bool m_wasQuickKeysDisabled = false;
+
     void loadSpeechBubble(int speechBubble) {
         if (speechBubble >= static_cast<int>(m_speechBubbles.size()))
             speechBubble = 0;

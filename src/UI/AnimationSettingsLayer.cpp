@@ -10,6 +10,7 @@
 #include "ScaleSetting.hpp"
 #include "TextSetting.hpp"
 #include "PercentToggleSetting.hpp"
+#include "SpeechSetting.hpp"
 
 AnimationSettingsLayer::AnimationSettingsLayer(const DeathAnimation& animation) {
     m_animation = animation;
@@ -153,6 +154,7 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::Scale: settingNode = ScaleSetting::create(this, setting, m_animation, y); break;
             case SettingType::Text: settingNode = TextSetting::create(this, setting, m_animation, y); break;
             case SettingType::PercentToggle: settingNode = PercentToggleSetting::create(this, setting, m_animation, y); break;
+            case SettingType::SpeechSelect: settingNode = SpeechSetting::create(this, setting, m_animation, y); break;
             default: break;
         }
 

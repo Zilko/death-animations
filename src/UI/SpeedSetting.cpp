@@ -1,5 +1,5 @@
-#include "AnimationSettingsLayer.hpp"
 #include "SpeedSetting.hpp"
+#include "AnimationSettingsLayer.hpp"
 
 #include "../Other/Utils.hpp"
 

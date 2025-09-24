@@ -1,5 +1,7 @@
 #include "BaseAnimation.hpp"
 
+#include "../Other/Variables.hpp"
+
 class Wasted : public BaseAnimation {
 
 private:
@@ -99,10 +101,12 @@ private:
         if (m_program)
             m_program->release();
 
-        Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
-        Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
-        Utils::setHookEnabled("GJBaseGameLayer::update", false);
-        Utils::setHookEnabled("ExplodeItemNode::update", false);
+        Variables::setSpeed(1.f);
+
+        Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+        Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
+
+        toggleHooks(false);
     }
 
     void update(float dt) override {
@@ -184,22 +188,36 @@ private:
         m_wastedSprite->runAction(CCFadeTo::create(2.5f / m_speed, 0));
     }
 
+    void toggleHooks(bool toggled) {
+        Utils::setHookEnabled("cocos2d::CCParticleSystem::update", toggled);
+        Utils::setHookEnabled("CCCircleWave::updateTweenAction", toggled);
+        Utils::setHookEnabled("GJBaseGameLayer::update", toggled);
+        Utils::setHookEnabled("ExplodeItemNode::update", toggled);
+    }
+
     ANIMATION_CTOR_CREATE(Wasted) {}
     
 public:
 
+    void startEarly() {
+        Variables::setSpeed(0.07f * m_speed);
+
+        Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);
+        Utils::setHookEnabled("cocos2d::CCFadeOut::create", true);
+    }
+
     void start() override {
+        Variables::setSpeed(0.025f * m_speed);
+
         if (m_isPreview)
             m_delegate->setBackgroundOpacity(55);
 
+        Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+        Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
         Utils::playSound(Anim::Wasted, "wasted.wav", m_speed, 1.f);
-
-        Utils::setHookEnabled("cocos2d::CCParticleSystem::update", true);
-        Utils::setHookEnabled("CCCircleWave::updateTweenAction", true);
-        Utils::setHookEnabled("GJBaseGameLayer::update", true);
-        Utils::setHookEnabled("ExplodeItemNode::update", true);
-
         Utils::setHighestZ(this);
+
+        toggleHooks(true);
 
         if (!m_isPreview)
             m_explosionSprite = m_playLayer->m_player1->m_parentLayer->getChildByType<CCSprite>(-1);
@@ -329,6 +347,14 @@ public:
                 nullptr
             )
         );
+    }
+
+    void onPause() override {
+        toggleHooks(false);
+    }
+
+    void onResume() override {
+        toggleHooks(true);
     }
 
     void end() override {

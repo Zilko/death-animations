@@ -7,13 +7,13 @@ private:
     FMOD::Channel* m_channel = nullptr;
     FMOD::Sound* m_sound = nullptr;
 
-    float m_timeLimit = 0.f;
+    float m_timeout = 0.f;
     float m_totalTime = 0.f;
     
 public:
 
-    SoundUpdater(FMOD::Channel* channel, FMOD::Sound* sound, float timeLimit)
-        : m_channel(channel), m_sound(sound), m_timeLimit(timeLimit) {}
+    SoundUpdater(FMOD::Channel* channel, FMOD::Sound* sound, float timeout)
+        : m_channel(channel), m_sound(sound), m_timeout(timeout) {}
     
     void updateSound(float);
 

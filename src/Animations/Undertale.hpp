@@ -105,8 +105,8 @@ private:
     float m_waitTime = 0.f;
 
     void addHeart(CCNodeRGBA* player, bool isSecondPlayer = false) {
-        UndertaleHeart* heart = UndertaleHeart::create(m_speed, m_isPreview ? 1.f : m_playLayer->m_gameState.m_cameraZoom, isSecondPlayer);
-        heart->setPosition(Utils::getNodeScreenPos(m_playLayer, player, m_isPreview));
+        UndertaleHeart* heart = UndertaleHeart::create(m_speed, getCurrentZoom(), isSecondPlayer);
+        heart->setPosition(getNodeScreenPos(player));
 
         addChild(heart);
     }

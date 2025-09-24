@@ -24,6 +24,9 @@
             ],
             "among-us-death-4": [
                 "resources/sprites/animations/among-us/death-4/*.png"
+            ],
+            "poof-particle": [
+                "resources/sprites/animations/poof/*.png"
             ]
         },
         "sprites": [
@@ -42,6 +45,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/blood/*.png",
             "resources/sprites/animations/mr_hippo/*.png",
             "resources/sprites/animations/bsod/*.png",
             "resources/sprites/animations/speech-bubble/*.png",

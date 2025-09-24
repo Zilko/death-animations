@@ -35,6 +35,8 @@ void PreviewLayer::updateCircle(float) {
 }
 
 void PreviewLayer::spawnPlayer(float) {
+    m_isDead = false;
+
     if (m_animation) {
         m_animation->end();
         m_animation = nullptr;
@@ -71,6 +73,8 @@ void PreviewLayer::spawnPlayer(float) {
 }
 
 void PreviewLayer::playerDied(float) {    
+    m_isDead = true;
+    
     Anim anim = Utils::getSelectedAnimationEnum();
     
     if (anim == Anim::Random)
@@ -210,4 +214,8 @@ CCNode* PreviewLayer::getBackButton() {
 
 void PreviewLayer::setBackgroundOpacity(int opacity) {
     setOpacity(opacity);
+}
+
+bool PreviewLayer::isDead() {
+    return m_isDead;
 }

@@ -37,7 +37,6 @@ public:
     static void setHighestZ(CCNode*);
 
     static void fixScaleTextureSizexd(CCNode*);
-    static CCPoint getNodeScreenPos(PlayLayer*, CCNode*, bool);
     static std::vector<std::filesystem::path> getAllFilesFromFolder(const std::filesystem::path&, const std::unordered_set<std::string>);
     static ccColor3B applyHSV(const ccColor3B&, const NoobHSV&);
     static std::vector<std::string> split(const std::string&, char, size_t = 0);
@@ -45,7 +44,6 @@ public:
     static BaseAnimation* createAnimation(Anim, const AnimationParams&);
     static CCGLProgram* createShader(const std::string&, bool);
     static CCTexture2D* takeScreenshot(CCRenderTexture* = nullptr);
-    static CCRenderTexture* renderPlayerTexture(CCNodeRGBA*, bool);
     static CCSprite* renderPlayerSprite(CCNodeRGBA*, bool);
     
 };

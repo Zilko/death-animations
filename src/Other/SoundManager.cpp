@@ -11,7 +11,7 @@ void SoundUpdater::updateSound(float dt) {
     
     m_channel->isPlaying(&isPlaying);
     
-    if ((m_channel && !isPlaying) || m_totalTime > m_timeLimit)
+    if ((m_channel && !isPlaying) || m_totalTime > m_timeout)
         stop();
 }
 
@@ -33,8 +33,8 @@ SoundManager& SoundManager::get() {
     return instance;
 }
 
-SoundUpdater* SoundManager::add(FMOD::Channel* channel, FMOD::Sound* sound, float timeLimit) {
-    SoundUpdater* updater = new SoundUpdater(channel, sound, timeLimit);
+SoundUpdater* SoundManager::add(FMOD::Channel* channel, FMOD::Sound* sound, float timeout) {
+    SoundUpdater* updater = new SoundUpdater(channel, sound, timeout);
     updater->retain();
     CCScheduler::get()->scheduleSelector(schedule_selector(SoundUpdater::updateSound), updater, 0.2f, kCCRepeatForever, 0, false);
     get().m_sounds.push_back(updater);

@@ -2,6 +2,7 @@
 
 #include "Other/Utils.hpp"
 #include "Other/SoundManager.hpp"
+#include "Other/Variables.hpp"
 
 #include "UI/AnimationsLayer.hpp"
 
@@ -19,14 +20,6 @@
 #include <Geode/modify/CCFadeOut.hpp>
 #include <Geode/modify/CCAnimation.hpp>
 #include <Geode/modify/ChannelControl.hpp>
-
-class Vars {
-
-public:
-
-    inline static DeathAnimation selectedAnimation = {};
-
-};
 
 $on_mod(Loaded) {
 
@@ -126,13 +119,13 @@ class $modify(ProPlayLayer, PlayLayer) {
             anim = static_cast<Anim>(animations[Utils::getRandomInt(2, static_cast<int>(animations.size()) - 1)].id);
 
         if (shouldReturn(anim) || p1 == m_anticheatSpike || f->m_animation) {
-            Vars::selectedAnimation = {};
+            Variables::setSelectedAnimation({});
             return PlayLayer::destroyPlayer(p0, p1);
         }
 
         const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
 
-        Vars::selectedAnimation = animation;
+        Variables::setSelectedAnimation(animation);
 
         float speed = Utils::getSpeedValue(Utils::getSettingFloat(anim, "speed"));
         
@@ -157,22 +150,12 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (animation.isNoDeathEffect || animation.isNoDeathSound)
             m_gameState.m_unkBool26 = true;
 
-        if (animation.isSlowDown) {
-            Utils::setHookEnabled("cocos2d::CCFadeOut::create", true);
-            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);
-        }
-
         if (animation.isNoStopMusic) {
             Utils::setHookEnabled("FMOD::ChannelControl::stop", true);
             Utils::setHookEnabled("FMOD::ChannelControl::setPaused", true);
         }
 
         PlayLayer::destroyPlayer(p0, p1);
-
-        if (animation.isSlowDown) {
-            Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
-            Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
-        }
         
         if (animation.isNoStopMusic) {
             Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
@@ -212,7 +195,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (
             f->m_animation
             && !f->m_forceRestart
-            && Utils::getSettingBool(Vars::selectedAnimation.id, "prevent-early-restart")
+            && Utils::getSettingBool(Variables::getSelectedAnimation().id, "prevent-early-restart")
         ) {
             return;
         }
@@ -228,8 +211,8 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         PlayLayer::resetLevel();
 
-        if (endedAnimation && f->m_isNewBest && Vars::selectedAnimation.isDelayNewBest) {
-            Vars::selectedAnimation = {};
+        if (endedAnimation && f->m_isNewBest && Variables::getSelectedAnimation().isDelayNewBest) {
+            Variables::setSelectedAnimation({});
             f->m_isNewBest = false;
             
             showNewBest(
@@ -246,7 +229,7 @@ class $modify(ProPlayLayer, PlayLayer) {
     void showNewBest(bool newReward, int orbs, int diamonds, bool demonKey, bool noRetry, bool noTitle) {
         auto f = m_fields.self();
 
-        if (f->m_animation && Vars::selectedAnimation.isDelayNewBest) {
+        if (f->m_animation && Variables::getSelectedAnimation().isDelayNewBest) {
             f->m_storedNewReward = newReward;
             f->m_storedOrbs = orbs;
             f->m_storedDiamonds = diamonds;
@@ -282,14 +265,20 @@ class $modify(ProPlayLayer, PlayLayer) {
     }
 
     void resume() {
-        PlayLayer::resume();
-
         SoundManager::pause(false);
 
         auto f = m_fields.self();
 
         if (f->m_animation)
             f->m_animation->onResume();
+
+        PlayLayer::resume();
+    }
+
+    void onQuit() {
+        PlayLayer::onQuit();
+
+        SoundManager::stop();
     }
     
 };
@@ -297,7 +286,7 @@ class $modify(ProPlayLayer, PlayLayer) {
 class $modify(CCFadeOut) {
 
     static CCFadeOut* create(float time) { // disabled by defolt
-        return CCFadeOut::create(time / 0.07f);
+        return CCFadeOut::create(time / Variables::getSpeed());
     }
 
 };
@@ -305,7 +294,7 @@ class $modify(CCFadeOut) {
 class $modify(CCAnimation) {
 
     static CCAnimation* createWithSpriteFrames(CCArray* array, float time) { // disabled by defolt
-        return CCAnimation::createWithSpriteFrames(array, time / 0.07f);
+        return CCAnimation::createWithSpriteFrames(array, time / Variables::getSpeed());
     }
 
 };
@@ -313,7 +302,7 @@ class $modify(CCAnimation) {
 class $modify(ExplodeItemNode) {
 
     void update(float dt) { // disabled by defolt
-        ExplodeItemNode::update(dt * 0.025f);
+        ExplodeItemNode::update(dt * Variables::getSpeed());
     }
 
 };
@@ -321,7 +310,7 @@ class $modify(ExplodeItemNode) {
 class $modify(CCParticleSystem) {
 
     void update(float dt) { // disabled by defolt
-        CCParticleSystem::update(dt * 0.025f);
+        CCParticleSystem::update(dt * Variables::getSpeed());
     }
 
 };
@@ -329,7 +318,7 @@ class $modify(CCParticleSystem) {
 class $modify(CCCircleWave) {
 
     void updateTweenAction(float dt, const char* p1) { // disabled by defolt
-        CCCircleWave::updateTweenAction(dt * 0.025f, p1);
+        CCCircleWave::updateTweenAction(dt * Variables::getSpeed(), p1);
     }
 
 };
@@ -337,12 +326,12 @@ class $modify(CCCircleWave) {
 class $modify(GJBaseGameLayer) {
     
     void update(float dt) { // disabled by defolt
-        if (!Vars::selectedAnimation.isFreezeGameLayer)
-            GJBaseGameLayer::update(dt * 0.025f);
+        if (!Variables::getSelectedAnimation().isFreezeGameLayer)
+            GJBaseGameLayer::update(dt * Variables::getSpeed());
     }
 
     void shakeCamera(float duration, float strength, float interval) {
-        if (!Vars::selectedAnimation.isNoDeathEffect && !Vars::selectedAnimation.isNoShakeEffect)
+        if (!Variables::getSelectedAnimation().isNoDeathEffect && !Variables::getSelectedAnimation().isNoShakeEffect)
             GJBaseGameLayer::shakeCamera(duration, strength, interval);
     }
 
@@ -357,14 +346,14 @@ class $modify(PlayerObject) {
         if (this != m_gameLayer->m_player1 && this != m_gameLayer->m_player2)
             return PlayerObject::playDeathEffect();
             
-        if (!Vars::selectedAnimation.isNoDeathEffect)
+        if (!Variables::getSelectedAnimation().isNoDeathEffect)
             return PlayerObject::playDeathEffect();
             
         stopActionByTag(11);
     }
 
     void playSpawnEffect() {
-        if (!Vars::selectedAnimation.isNoSpawnEffect)
+        if (!Variables::getSelectedAnimation().isNoSpawnEffect)
             PlayerObject::playSpawnEffect();
     }
     

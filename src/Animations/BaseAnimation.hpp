@@ -35,6 +35,7 @@ protected:
     ExtraParams m_extras;
     
     bool m_isPreview = false;
+    bool m_wasQuickKeysDisabled = false;
     
     float m_speed = 1.f;
     float m_duration = 1.f;
@@ -48,6 +49,11 @@ protected:
           m_isPreview(params.delegate != nullptr),
           m_size(CCDirector::get()->getWinSize()),
           m_duration(params.duration) {}
+
+    ~BaseAnimation() {
+        if (m_wasQuickKeysDisabled)
+            GameManager::get()->setGameVariable("0163", false);
+    }
 
     void enableTouch() {
         setTouchEnabled(true);
@@ -69,7 +75,38 @@ protected:
         if (m_parentNode)
             m_parentNode->addChild(this);
 
+        if (m_duration >= 5.f && !GameManager::get()->getGameVariable("0163")) {
+            GameManager::get()->setGameVariable("0163", true);
+            m_wasQuickKeysDisabled = true;
+        }
+
         return true;
+    }
+
+    float getCurrentZoom() {
+        return m_isPreview ? 1.f : m_playLayer->m_gameState.m_cameraZoom;
+    }
+
+    CCPoint getNodeScreenPos(CCNode* node) {
+        if (!node) return {0, 0};
+
+        if (m_isPreview)
+            return node->getPosition();
+
+        CCPoint pos = node->convertToWorldSpaceAR({0, 0});
+        CCPoint cameraCenter = m_playLayer->m_cameraObb2->m_center;
+
+        float angle = CC_DEGREES_TO_RADIANS(-m_playLayer->m_gameState.m_cameraAngle);
+        float cos = cosf(angle);
+        float isn = sinf(angle);
+        float offsetX = pos.x - cameraCenter.x;
+        float offsetY = pos.y - cameraCenter.y;
+        float rotatedX = offsetX * cos - offsetY * isn;
+        float rotatedY = offsetX * isn + offsetY * cos;
+
+        pos = ccp(cameraCenter.x + rotatedX, cameraCenter.y + rotatedY);
+
+        return pos;
     }
 
 public:

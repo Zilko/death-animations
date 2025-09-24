@@ -980,6 +980,7 @@ public:
         Utils::setHighestZ(this);
 
         FMODAudioEngine* fmod = FMODAudioEngine::get();
+
         m_ogMusicVolume = fmod->m_musicVolume;
         m_ogSFXVolume = fmod->m_sfxVolume;
 
@@ -1038,6 +1039,17 @@ public:
         Utils::setHighestZ(m_playerContainer2);
 
         scheduleOnce(schedule_selector(Congregation::preEnd), 4.45f / m_speed + 0.055f);
+    }
+
+    void onPause() override {
+        setVolume(m_ogMusicVolume, m_ogSFXVolume);
+    }
+
+    void onResume() override {
+        FMODAudioEngine* fmod = FMODAudioEngine::get();
+        
+        m_ogMusicVolume = fmod->m_musicVolume;
+        m_ogSFXVolume = fmod->m_sfxVolume;
     }
 
     void preEnd(float) {

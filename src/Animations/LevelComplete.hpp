@@ -2,35 +2,7 @@
 
 #include "BaseAnimation.hpp"
 
-class SpeedCCParticleSystemQuad : public CCParticleSystemQuad {
-
-private:
-
-    float m_speed = 1.f;
-
-    virtual void update(float dt) override {
-        CCParticleSystem::update(dt * m_speed);
-    }
-
-public:
-
-    static SpeedCCParticleSystemQuad* create(const char* file, bool p1) {
-        SpeedCCParticleSystemQuad* ret = new SpeedCCParticleSystemQuad();
-
-        if (ret->initWithFile(file, p1)) {
-            ret->autorelease();
-            return ret;
-        }
-
-        delete ret;
-        return nullptr;
-    }
-
-    void setSpeed(float speed) {
-        m_speed = speed;
-    }
-
-};
+#include "../Other/SpeedCCParticleSystemQuad.hpp"
 
 class Shake : public CCActionInterval {
 
@@ -77,8 +49,7 @@ class LevelComplete : public BaseAnimation {
 protected:
 
     CCNode* m_parentLayer = nullptr;
-
-    CCLightFlash* m_lightFlash = nullptr;
+    CCNode* m_effectContainer = nullptr;
     
     ccColor3B m_color1;
     ccColor3B m_color2;
@@ -100,9 +71,8 @@ protected:
         circleWave->m_lineWidth = 4;
         circleWave->m_color = m_color1;
         circleWave->m_circleMode = CircleMode::Outline;
-        circleWave->setPosition(m_position);
 
-        m_parentLayer->addChild(circleWave);
+        m_effectContainer->addChild(circleWave);
     }
 
     void spawnFirework() {
@@ -122,7 +92,7 @@ protected:
         addChild(circleWave, 10);
 
         SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("firework.plist", false);
-        particle->setSpeed(m_speed);
+        particle->setUpdateSpeed(m_speed);
         particle->setAutoRemoveOnFinish(true);
         particle->setPosition(pos);
         particle->setStartColor(ccc4FFromccc3B(m_color1));
@@ -148,7 +118,7 @@ protected:
 
 
         SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist", false);
-        particle->setSpeed(m_speed);
+        particle->setUpdateSpeed(m_speed);
         particle->setAutoRemoveOnFinish(true);
         particle->setPosition(spr->getPosition());
         particle->setStartColor(ccc4FFromccc3B(m_color1));
@@ -157,7 +127,7 @@ protected:
         addChild(particle, 13);
 
         particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist",false);
-        particle->setSpeed(m_speed);
+        particle->setUpdateSpeed(m_speed);
         particle->setAutoRemoveOnFinish(true);
         particle->setPosition(spr->getPosition());
 
@@ -166,11 +136,10 @@ protected:
         if (m_isPractice) return;
 
         CCCircleWave* circleWave = CCCircleWave::create(10.f, m_size.width, 0.8f / m_speed, false, true);
-        circleWave->setPosition(m_position);
         circleWave->m_lineWidth = 4;
         circleWave->m_color = m_color1;
         
-        m_parentLayer->addChild(circleWave, 0);
+        m_effectContainer->addChild(circleWave, 0);
 
         circleWave = CCCircleWave::create(10.f, 250.f, 0.8f / m_speed, false, true);
         circleWave->m_lineWidth = 4;
@@ -194,21 +163,15 @@ protected:
             ));
     }
 
-    ~LevelComplete() {
-        if (m_lightFlash) {
-            m_lightFlash->removeFromParentAndCleanup(true);
-            m_lightFlash->release();
-            m_lightFlash = nullptr;
-        }
-    }
-
     ANIMATION_CTOR_CREATE(LevelComplete) {}
     
 public:
 
     virtual void start() override {
-        m_color1 = {255, 100, 100};
-        m_color2 = {255, 100, 100};
+        GameManager* gm = GameManager::get();
+
+        m_color1 = gm->colorForIdx(gm->getPlayerColor());
+        m_color2 = gm->colorForIdx(gm->getPlayerColor2());
 
         if (!m_isPreview) {
             m_playerWasVisible = m_playLayer->m_player1->isVisible();
@@ -221,10 +184,15 @@ public:
             m_parentLayer = this;
         }
 
+        m_effectContainer = CCNode::create();
+        m_effectContainer->setPosition(m_position);
+
+        m_parentLayer->addChild(m_effectContainer);
+
         SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("explodeEffectVortex.plist", false);
-        particle->setSpeed(m_speed);
+        particle->setPosition({0, 0});
+        particle->setUpdateSpeed(m_speed);
         particle->setPositionType((tCCPositionType)2);
-        particle->setPosition(m_position);
         particle->setAutoRemoveOnFinish(true);
         particle->setStartColor(ccc4FFromccc3B(m_color1));
         particle->setEndColor(ccc4FFromccc3B(m_color1));
@@ -237,27 +205,24 @@ public:
         particle->setEndSize(particle->getEndSize() * 0.4f);
         particle->resetSystem();
 
-        m_parentLayer->addChild(particle, 99);
+        m_effectContainer->addChild(particle, 99);
 
         CCCircleWave* circleWave = CCCircleWave::create(20.f, 80.f, 0.72f / m_speed, false, true);
-        circleWave->setPosition(m_position);
         circleWave->m_color = m_color1;
 
-        m_parentLayer->addChild(circleWave, 99);
+        m_effectContainer->addChild(circleWave, 99);
 
         circleWave = CCCircleWave::create(30.f, 50.f, 0.84f / m_speed, false, true);
-        circleWave->setPosition(m_position);
         circleWave->m_color = m_color2;
         circleWave->m_opacityMod = 0.8f;
 
-        m_parentLayer->addChild(circleWave, 1000);
+        m_effectContainer->addChild(circleWave, 1000);
 
         circleWave = CCCircleWave::create(30.f, 20.f, 0.96f / m_speed, false, true);
-        circleWave->setPosition(m_position);
         circleWave->m_color = m_color1;
         circleWave->m_opacityMod = 0.8;
 
-        m_parentLayer->addChild(circleWave, 1000);
+        m_effectContainer->addChild(circleWave, 1000);
 
         for (int i = 0; i < 5; ++i)
             runAction(CCSequence::create(
@@ -267,13 +232,12 @@ public:
             ));
 
         circleWave = CCCircleWave::create(10.f, 250.f, 0.5f / m_speed, false, true);
-        circleWave->setPosition(m_position);
         circleWave->m_lineWidth = 4;
         circleWave->m_color.r = m_color1.r;
         circleWave->m_color.g = m_color1.g;
         circleWave->m_color.b = m_color1.b;
         
-        m_parentLayer->addChild(circleWave);
+        m_effectContainer->addChild(circleWave);
 
         if (m_isPractice) {
             runAction(CCSequence::create(
@@ -293,18 +257,17 @@ public:
         float stripRotationVariation = 180.f;
         float duration = 0.5f / m_speed;
 
-        m_lightFlash = CCLightFlash::create();
-        m_lightFlash->retain();
-        m_lightFlash->setPosition({0, 0});
-        m_lightFlash->m_mainLayer = m_parentLayer;
-        m_lightFlash->m_layerColorZOrder = 100;
+        CCLightFlash* lightFlash = CCLightFlash::create();
+        lightFlash->setPosition({0, 0});
+        lightFlash->m_mainLayer = m_parentLayer;
+        lightFlash->m_layerColorZOrder = 100;
 
-        m_parentLayer->addChild(m_lightFlash);
+        m_effectContainer->addChild(lightFlash);
 
-        float zoom = m_isPreview ? 1.f : m_playLayer->m_gameState.m_cameraZoom;
+        float zoom = getCurrentZoom();
 
-        m_lightFlash->playEffect(
-            m_position,
+        lightFlash->playEffect(
+            {0, 0},
             m_color1,
             1.f,
             0.f,
@@ -377,6 +340,9 @@ public:
             }
         } else
             m_delegate->getPlayer()->getParent()->stopActionByTag(10);
+
+        if (m_effectContainer)
+            m_effectContainer->removeFromParentAndCleanup(true);
 
         BaseAnimation::end();
     }

@@ -68,14 +68,21 @@ public:
 
         Utils::fixScaleTextureSizexd(lbl);
 
+        CCNode* player = nullptr;
+
+        if (!m_isPreview) {
+            if (m_playLayer->m_gameState.m_isDualMode && Utils::getSettingBool(Anim::What, "target-p2"))
+                player = m_playLayer->m_player2;
+            else
+                player = m_playLayer->m_player1;
+        } else
+            player = m_delegate->getPlayer();
+
         CCRect innerRect = CCRectMake(leftBorderWidth, bottomBorderHeight, m_size.width - leftBorderWidth * 2, m_size.height - bottomBorderHeight - topBorderHeight);
-        CCPoint playerPos = Utils::getNodeScreenPos(m_playLayer, m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1, m_isPreview);
+        CCPoint playerPos = getNodeScreenPos(player);
         CCPoint desiredPosition = ccp(innerRect.origin.x + innerRect.size.width / 2, innerRect.origin.y + innerRect.size.height / 2) - playerPos;
 
-        spr->setScale(1.1f);
-
-        if (!m_isPreview)
-            spr->setScale(spr->getScale() * 1.f / m_playLayer->m_gameState.m_cameraZoom);
+        spr->setScale(1.1f / getCurrentZoom());
 
         desiredPosition -= playerPos * spr->getScale() - playerPos;
 

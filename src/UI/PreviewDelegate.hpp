@@ -11,5 +11,7 @@ public:
     virtual CCNode* getBackButton() { return nullptr; }
 
     virtual void setBackgroundOpacity(int) {}
+
+    virtual bool isDead() { return false; }
     
 };

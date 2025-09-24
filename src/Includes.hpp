@@ -39,6 +39,7 @@ enum SettingType {
     Scale,
     Text,
     PercentToggle,
+    SpeechSelect,
 };
 
 enum Anim {
@@ -102,7 +103,6 @@ struct DeathAnimation {
     bool isNoDeathSound = false;
     bool isNoShakeEffect = false;
     bool isFreezeGameLayer = false;
-    bool isSlowDown = false;
     bool isStopMusic = false;
     bool isNoStopMusic = false;
     bool isDelayNewBest = false;
@@ -128,6 +128,7 @@ inline const std::unordered_map<std::string, float> globalFloatDefaults = {
 inline const std::unordered_set<std::string> gloalBoolDefaults = {
     "play-sound-effects",
     "play-in-testmode",
+    "second-player",
 };
 
 inline const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
@@ -158,14 +159,13 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
 };
 
 inline const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
-    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true }, { "shockwave", true } } },
+    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true }, { "shockwave", true }, { "speed-affects-respawn", true } } },
     { Anim::CBFDetected, { { "use-level-name", true } } },
-    { Anim::Maro, { { "second-player", true } } },
-    { Anim::Undertale, { { "second-player", true } } },
-    { Anim::Ghost, { { "second-player", true } } },
-    { Anim::Pop, { { "second-player", true } } },
-    { Anim::SpeechBubble, { { "stop-auto-restart", true } } },
-    { Anim::ToBeContinued, { { "yellow-shader", true } } }
+    { Anim::ToBeContinued, { { "yellow-shader", true } } },
+    { Anim::Blood, { { "blood-spatter", true }, { "play-in-practice", true } } },
+    { Anim::Poof, { { "play-in-practice", true } } },
+    { Anim::Ghost, { { "play-in-practice", true } } },
+    { Anim::Pop, { { "play-in-practice", true } } },
 };
 
 inline const std::array<DeathAnimation, 26> animations = {{
@@ -177,7 +177,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true, .isNoSpawnEffect = true },
     { .id = Anim::ToBeContinued, .thumbnail = "to-be-continued-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .isNoDeathEffect = true, .isStopMusic = true },
     { .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .isNoDeathSound = true, .isStopMusic = true },
-    { .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .isNoDeathSound = true, .isNoShakeEffect = true, .isSlowDown = true, .isStopMusic = true, .isDelayNewBest = true },
+    { .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .isNoDeathSound = true, .isNoShakeEffect = true, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true, .isStopMusic = true },
     { .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f },
     { .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true, .isStopMusic = true, .isDelayNewBest = true },
@@ -185,16 +185,16 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     { .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
     { .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true },
-    { .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 5.f, .isNoDeathEffect = true, .isDelayNewBest = true },
-    { .id = Anim::What, .thumbnail = "none-thumbnail.png", .name = "What", .duration = 4.5f, .isNoDeathEffect = true, .isDelayNewBest = true },   
-    { .id = Anim::Congregation, .thumbnail = "none-thumbnail.png", .name = "Congregation Jumpscare", .duration = 4.45f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true, .isStopSoundsOnEnd = true },
-    { .id = Anim::LevelComplete, .thumbnail = "none-thumbnail.png", .name = "Level Complete", .duration = 3.9f, .isNoDeathEffect = true, .isNoStopMusic = true },
-    { .id = Anim::PracticeComplete, .thumbnail = "none-thumbnail.png", .name = "Practice Complete", .duration = 2.3f, .isNoDeathEffect = true, .isNoStopMusic = true },
-    { .id = Anim::NewBest, .thumbnail = "none-thumbnail.png", .name = "New Best", .duration = 1.8f },
-    { .id = Anim::Blood, .thumbnail = "none-thumbnail.png", .name = "Blood", .duration = 10.f },
-    { .id = Anim::Poof, .thumbnail = "none-thumbnail.png", .name = "Poof", .duration = 10.f, .isNoDeathEffect = true },
-    { .id = Anim::FadeOut, .thumbnail = "none-thumbnail.png", .name = "Fade Out", .duration = 10.f },
-    { .id = Anim::MrHippo, .thumbnail = "none-thumbnail.png", .name = "Mr. Hippo", .duration = 600.f },
+    { .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 15.f, .isNoDeathEffect = true, .isDelayNewBest = true },
+    { .id = Anim::What, .thumbnail = "what-thumbnail.png", .name = "What", .duration = 4.5f, .isNoDeathEffect = true, .isStopMusic = true, .isDelayNewBest = true },   
+    { .id = Anim::Congregation, .thumbnail = "congregation-thumbnail.png", .name = "Congregation Jumpscare", .duration = 4.45f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true, .isStopSoundsOnEnd = true },
+    { .id = Anim::LevelComplete, .thumbnail = "level-complete-thumbnail.png", .name = "Level Complete", .duration = 3.9f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true },
+    { .id = Anim::PracticeComplete, .thumbnail = "practice-complete-thumbnail.png", .name = "Practice Complete", .duration = 2.3f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true },
+    { .id = Anim::NewBest, .thumbnail = "new-best-thumbnail.png", .name = "New Best", .duration = 2.f },
+    { .id = Anim::Blood, .thumbnail = "none-thumbnail.png", .name = "Blood", .duration = 1.2f, .isNoDeathEffect = true },
+    { .id = Anim::Poof, .thumbnail = "none-thumbnail.png", .name = "Poof", .duration = 1.2f, .isNoDeathEffect = true },
+    { .id = Anim::FadeOut, .thumbnail = "none-thumbnail.png", .name = "Song Fade Out", .duration = 1.2f, .isNoStopMusic = true },
+    { .id = Anim::MrHippo, .thumbnail = "mr-hippo-thumbnail.png", .name = "Mr. Hippo", .duration = 999.f, .isStopMusic = true },
 }};
 
 inline const std::array<AnimationSetting, 9> defaultSettings = {{
@@ -218,7 +218,8 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player as well.", .type = SettingType::Toggle },
         { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the Celeste respawn animation.", .type = SettingType::Toggle },
         { .id = "shockwave", .name = "Shockwave", .description = "Play the shockwave effect.", .type = SettingType::Toggle },
-        { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4" } }
+        { .id = "speed-affects-respawn", .name = "Speed Affects Respawn", .description = "The Speed setting will affect the respawn animation (if enabled) as well.", .type = SettingType::Toggle },
+        { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8" } }
     } },
     { Anim::Jumpscare, {
         { .id = "static", .name = "Static", .description = "Stop the image from zooming in.", .type = SettingType::Toggle },
@@ -259,12 +260,26 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "images-folder", .name = "Images Folder", .description = "Folder containing the images you have saved.", .type = SettingType::Folder, .folder = Mod::get()->getSaveDir() / "screenshots" }
     } },
     { Anim::What, {
+        { .id = "target-p2", .name = "Target Player 2", .description = "", .type = SettingType::Toggle },
         { .id = "top-text", .name = "Top Text", .description = "", .type = SettingType::Text },
         { .id = "bottom-text", .name = "Bottom Text", .description = "", .type = SettingType::Text }
     } },
     { Anim::NewBest, {
         { .id = "use-custom-percent", .name = "Use Custom Percent", .description = "", .type = SettingType::PercentToggle },
         { .type = SettingType::Empty },
+    } },
+    { Anim::Poof, {
+        { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle }
+    } },
+    { Anim::Blood, {
+        { .id = "second-player", .name = "Second Player", .description = "Play the animation on the second player as well.", .type = SettingType::Toggle },
+        { .id = "blood-spatter", .name = "Blood Spatter", .description = "Show the blood spatter on screen.", .type = SettingType::Toggle }
+    } },
+    { Anim::MrHippo, {
+        { .id = "monologue", .name = "Monologue", .description = "", .type = SettingType::SpeechSelect, .elements = { "Random", "Monologue 1", "Monologue 2", "Monologue 3", "Monologue 4" } }
+    } },
+    { Anim::FadeOut, {
+        { .id = "audio-only", .name = "Audio Only", .description = "", .type = SettingType::Toggle }
     } },
 };
 

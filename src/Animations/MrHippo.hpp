@@ -100,7 +100,7 @@ private:
         );
 
         system->playSound(sound, nullptr, false, &channel);
-        channel->setVolume(FMODAudioEngine::get()->m_musicVolume * 1.16f);
+        channel->setVolume(FMODAudioEngine::get()->m_musicVolume * 0.5f + 0.5f);
 
         SoundManager::add(channel, sound, duration + 10.f);
 
@@ -158,14 +158,16 @@ private:
     }
 
     ANIMATION_CTOR_CREATE(MrHippo) {
-        m_speech = Utils::getRandomInt(1, 4);
+        m_speech = Utils::getSettingBool(Anim::MrHippo, "monologue");
+
+        if (m_speech == 0)
+            m_speech = Utils::getRandomInt(1, 4);
 
         switch (m_speech) {
             case 1: m_duration = 215.f; break;
             case 2: m_duration = 180.f; break;
             case 3: m_duration = 147.f; break;
             case 4: m_duration = 148.f; break;
-            default: break;
         }
     }
     
