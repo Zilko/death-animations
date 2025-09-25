@@ -103,7 +103,7 @@ private:
     void onSaveImage(CCObject*) {
         if (!m_currentSprite) return;
 
-        #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MAC) 
+        #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS) 
 
         m_buttonMenu->setVisible(false);
 
@@ -274,17 +274,17 @@ public:
 
             m_buttonMenu->addChild(toggle);
 
-            #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MAC) 
+            #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS) 
 
             ButtonSprite* btnSpr = ButtonSprite::create("Hide UI");
-            btnSpr->setScale(0.7f);
 
             #else
 
             ButtonSprite* btnSpr = ButtonSprite::create("Save Image");
-            btnSpr->setScale(0.7f);
 
             #endif
+
+            btnSpr->setScale(0.7f);
 
             btn = CCMenuItemSpriteExtra::create(btnSpr, this, menu_selector(SpeechBubble::onSaveImage));
             btn->setPosition({486, 23});
