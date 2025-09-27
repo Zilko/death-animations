@@ -45,6 +45,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/minecraft/*.png",
             "resources/sprites/animations/blood/*.png",
             "resources/sprites/animations/mr_hippo/*.png",
             "resources/sprites/animations/bsod/*.png",

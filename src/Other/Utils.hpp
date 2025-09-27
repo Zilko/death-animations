@@ -21,7 +21,7 @@ public:
     
     static Anim getSelectedAnimationEnum();
     static const DeathAnimation& getSelectedAnimation();
-    static const DeathAnimation& getSelectedAnimation(Anim anim);
+    static const DeathAnimation& getAnimationByID(Anim anim);
 
     static float getSpeedValue(float);
     static std::string getSettingString(int, const std::string&);

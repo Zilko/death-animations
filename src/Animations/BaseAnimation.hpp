@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Includes.hpp"
+#include "../Other/PreviewDelegate.hpp"
 
 #define ANIMATION_CTOR(Class) \
     protected: \
@@ -31,11 +32,16 @@ protected:
     PreviewDelegate* m_delegate = nullptr;
         
     CCSize m_size;
-  
+
     ExtraParams m_extras;
+
+    Anim m_id = Anim::None;
     
     bool m_isPreview = false;
-    bool m_wasQuickKeysDisabled = false;
+    bool m_forcedRestartSettings = false;
+    bool m_forceRestart = false;
+    bool m_isRestarting = false;
+    bool m_isDelayRestart = false;
     
     float m_speed = 1.f;
     float m_duration = 1.f;
@@ -48,11 +54,20 @@ protected:
           m_speed(params.speed),
           m_isPreview(params.delegate != nullptr),
           m_size(CCDirector::get()->getWinSize()),
-          m_duration(params.duration) {}
+          m_id(params.id)
+          {
+            for (const DeathAnimation& animation : animations)
+                if (params.id == animation.id) {
+                    m_duration = animation.duration;
+                    break;
+                }
+          }
 
     ~BaseAnimation() {
-        if (m_wasQuickKeysDisabled)
+        if (m_forcedRestartSettings) {
             GameManager::get()->setGameVariable("0163", false);
+            GameManager::get()->setGameVariable("0074", false);
+        }
     }
 
     void enableTouch() {
@@ -77,7 +92,8 @@ protected:
 
         if (m_duration >= 5.f && !GameManager::get()->getGameVariable("0163")) {
             GameManager::get()->setGameVariable("0163", true);
-            m_wasQuickKeysDisabled = true;
+            GameManager::get()->setGameVariable("0074", true);
+            m_forcedRestartSettings = true;
         }
 
         return true;
@@ -109,22 +125,49 @@ protected:
         return pos;
     }
 
-public:
+    void resetLevel() {
+        if (m_isPreview)
+            return m_delegate->reset();
 
-    float getDuration() {
-        return m_duration;
+        m_forceRestart = true;
+        
+        m_playLayer->m_inResetDelay = true;
+        m_playLayer->stopActionByTag(16);
+        m_playLayer->delayedResetLevel();
     }
+
+public:
 
     virtual void startEarly() {}
 
+    virtual void startWithObject(GameObject*) {}
+
     virtual void start() {}
+
+    virtual void onPause() {}
+
+    virtual void onResume() {}
+
+    virtual void onRestart() {}
 
     virtual void end() {
         removeFromParentAndCleanup(true);
     }
 
-    virtual void onPause() {}
+    float getDuration() {
+        return m_duration;
+    }
 
-    virtual void onResume() {}
+    bool isForceRestart() {
+        return m_forceRestart;
+    }
+
+    bool isDelayRestart() {
+        return m_isDelayRestart;
+    }
+
+    bool isRestarting() {
+        return m_isRestarting;
+    }
   
 };

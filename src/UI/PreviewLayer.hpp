@@ -1,6 +1,6 @@
 #include "../Includes.hpp"
-
 #include "../Animations/BaseAnimation.hpp"
+#include "../Other/PreviewDelegate.hpp"
 
 class PreviewLayer : public geode::Popup<>, public PreviewDelegate {
   
@@ -42,8 +42,9 @@ public:
     static PreviewLayer* create();
     
     CCNodeRGBA* getPlayer() override;
-    CCNode* getBackButton() override;
+    CCMenuItemSpriteExtra* getBackButton() override;
     void setBackgroundOpacity(int) override;
     bool isDead() override;
+    void reset() override;
 
 };

@@ -86,12 +86,13 @@ class $modify(ProPlayLayer, PlayLayer) {
     struct Fields {
         BaseAnimation* m_animation = nullptr;
 
+        bool m_forceRetryLayer = false;
+
         bool m_isNewBest = false;
         bool m_forceRestart = false;
         bool m_storedNewReward = false;
         bool m_storedDemonKey = false;
         bool m_storedNoTitle = false;
-
         int m_storedOrbs = 0;
         int m_storedDiamonds = 0;
     };
@@ -110,7 +111,12 @@ class $modify(ProPlayLayer, PlayLayer) {
             || (getCurrentPercentInt() > m_level->m_normalPercent.value() && anim == Anim::NewBest);
     }
 
-    void destroyPlayer(PlayerObject* p0, GameObject* p1) {
+    void delayedResetLevelReal() {
+        m_fields->m_forceRestart = true;
+        delayedResetLevel();
+    }
+
+    void destroyPlayer(PlayerObject* player, GameObject* obj) {
         auto f = m_fields.self();
 
         Anim anim = Utils::getSelectedAnimationEnum();
@@ -118,12 +124,12 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (anim == Anim::Random)
             anim = static_cast<Anim>(animations[Utils::getRandomInt(2, static_cast<int>(animations.size()) - 1)].id);
 
-        if (shouldReturn(anim) || p1 == m_anticheatSpike || f->m_animation) {
+        if (shouldReturn(anim) || obj == m_anticheatSpike || f->m_animation) {
             Variables::setSelectedAnimation({});
-            return PlayLayer::destroyPlayer(p0, p1);
+            return PlayLayer::destroyPlayer(player, obj);
         }
 
-        const DeathAnimation& animation = Utils::getSelectedAnimation(anim);
+        const DeathAnimation& animation = Utils::getAnimationByID(anim);
 
         Variables::setSelectedAnimation(animation);
 
@@ -136,12 +142,12 @@ class $modify(ProPlayLayer, PlayLayer) {
                 .playLayer = this,
                 .delegate = nullptr,
                 .speed = speed,
-                .duration = animation.duration,
+                .id = anim
             }
         );      
 
         if (!f->m_animation)
-            return PlayLayer::destroyPlayer(p0, p1);
+            return PlayLayer::destroyPlayer(player, obj);
 
         f->m_animation->startEarly();
 
@@ -155,8 +161,10 @@ class $modify(ProPlayLayer, PlayLayer) {
             Utils::setHookEnabled("FMOD::ChannelControl::setPaused", true);
         }
 
-        PlayLayer::destroyPlayer(p0, p1);
+        PlayLayer::destroyPlayer(player, obj);
         
+        // thi is for delaying
+
         if (animation.isNoStopMusic) {
             Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
             Utils::setHookEnabled("FMOD::ChannelControl::setPaused", false);
@@ -164,15 +172,13 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         m_gameState.m_unkBool26 = og;
         
+        f->m_animation->startWithObject(obj);
         f->m_animation->start();
 
         if (!getActionByTag(16))
             return;
         
         stopActionByTag(16);
-        
-        if (Utils::getSettingBool(anim, "stop-auto-restart"))
-            return;
 
         CCSequence* seq = CCSequence::create(
             CCDelayTime::create(f->m_animation->getDuration() / speed + 0.05f),
@@ -184,9 +190,34 @@ class $modify(ProPlayLayer, PlayLayer) {
         runAction(seq);
     }
 
-    void delayedResetLevelReal() {
-        m_fields->m_forceRestart = true;
-        delayedResetLevel();
+    void delayedShowRetryLayer() {
+        auto f = m_fields.self();
+
+        f->m_forceRetryLayer = true;
+
+        showRetryLayer();
+
+        f->m_forceRetryLayer = false;
+    }
+
+    void showRetryLayer() {
+        const DeathAnimation& anim = Variables::getSelectedAnimation();
+        auto f = m_fields.self();
+
+        if (
+            (!anim.isNoRetryLayer && anim.retryLayerDelay <= 0.f)
+            || f->m_forceRetryLayer
+            || !f->m_animation
+        ) {
+            return PlayLayer::showRetryLayer();
+        }
+
+        if (anim.retryLayerDelay > 0.f)
+            runAction(CCSequence::create(
+                CCDelayTime::create(anim.retryLayerDelay / Utils::getSpeedValue(Utils::getSettingFloat(anim.id, "speed"))),
+                CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedShowRetryLayer)),
+                nullptr
+            ));
     }
     
     void resetLevel() {
@@ -195,9 +226,18 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (
             f->m_animation
             && !f->m_forceRestart
+            && !f->m_animation->isForceRestart()
             && Utils::getSettingBool(Variables::getSelectedAnimation().id, "prevent-early-restart")
         ) {
             return;
+        }
+
+        if (f->m_animation) {
+            if (f->m_animation->isRestarting())
+                return;
+
+            if (f->m_animation->isDelayRestart())
+                return f->m_animation->onRestart();
         }
 
         f->m_forceRestart = false;

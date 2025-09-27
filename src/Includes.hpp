@@ -2,7 +2,7 @@
 
 using namespace geode::prelude;
 
-#include "UI/PreviewDelegate.hpp"
+class PreviewDelegate;
 
 inline const std::string vertexShader = R"(
     attribute vec4 a_position;
@@ -87,11 +87,9 @@ struct AnimationParams {
     CCNode* parentNode = nullptr;
     PlayLayer* playLayer = nullptr;
     PreviewDelegate* delegate = nullptr;
-
     ExtraParams extras = {};
-
     float speed = 1.f;
-    float duration = 1.f;
+    Anim id = Anim::None;
 };
 
 struct DeathAnimation {
@@ -99,6 +97,7 @@ struct DeathAnimation {
     std::string thumbnail = "";
     std::string name = "";
     float duration = 1.f;
+    float retryLayerDelay = 0.f;
     bool isNoDeathEffect = false;
     bool isNoDeathSound = false;
     bool isNoShakeEffect = false;
@@ -108,6 +107,7 @@ struct DeathAnimation {
     bool isDelayNewBest = false;
     bool isNoSpawnEffect = false;
     bool isStopSoundsOnEnd = false;
+    bool isNoRetryLayer = false;
 };
 
 struct AnimationSetting {
@@ -166,12 +166,13 @@ inline const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Poof, { { "play-in-practice", true } } },
     { Anim::Ghost, { { "play-in-practice", true } } },
     { Anim::Pop, { { "play-in-practice", true } } },
+    { Anim::FadeOut, { { "desaturate", true }, { "slow-down", true } } },
 };
 
 inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
-    { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .isStopMusic = true, .isDelayNewBest = true },
+    { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .retryLayerDelay = 5.f, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f, .isStopMusic = true  },
     { .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .isNoDeathEffect = true, .isNoSpawnEffect = true },
@@ -181,7 +182,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .isNoDeathEffect = true, .isFreezeGameLayer = true, .isStopMusic = true },
     { .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f },
     { .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true, .isStopMusic = true, .isDelayNewBest = true },
-    { .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 10.f },
+    { .id = Anim::Minecraft, .thumbnail = "none-thumbnail.png", .name = "Minecraft", .duration = 1.2f, .isNoDeathEffect = true, .isNoRetryLayer = true },
     { .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     { .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
     { .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .isNoDeathEffect = true },
@@ -202,7 +203,6 @@ inline const std::array<AnimationSetting, 9> defaultSettings = {{
     { .id = "only-after", .name = "Only After", .description = "Play the animation only if you die after a certain percentage.", .type = SettingType::Percent },
     { .id = "probability", .name = "Probability", .description = "The probability that the animation will play.", .type = SettingType::Percent },
     { .id = "prevent-early-restart", .name = "Prevent Early Restart", .description = "Prevent restarting the level while the animation is playing.", .type = SettingType::Toggle },
-    { .id = "stop-auto-restart", .name = "Stop Auto Restart", .description = "Prevent automatic restart after you die.", .type = SettingType::Toggle },
     { .id = "play-sound-effects", .name = "Play Sound Effects", .description = "Play any sound effects associated with the animation.", .type = SettingType::Toggle },
     { .id = "play-in-practice", .name = "Play in Practice", .description = "Play the animation in practice mode.", .type = SettingType::Toggle },
     { .id = "play-in-testmode", .name = "Play in Testmode", .description = "Play the animation in test mode.", .type = SettingType::Toggle },
@@ -279,13 +279,18 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "monologue", .name = "Monologue", .description = "", .type = SettingType::SpeechSelect, .elements = { "Random", "Monologue 1", "Monologue 2", "Monologue 3", "Monologue 4" } }
     } },
     { Anim::FadeOut, {
-        { .id = "audio-only", .name = "Audio Only", .description = "", .type = SettingType::Toggle }
+        { .id = "slow-down", .name = "Slow Down", .description = "", .type = SettingType::Toggle },
+        { .id = "desaturate", .name = "Desaturate", .description = "", .type = SettingType::Toggle },
+    } },
+    { Anim::Minecraft, {
+        { .id = "no-overlay", .name = "No Overlay", .description = "Disables the \"You Died!\" overlay, leaving only the player animation.", .type = SettingType::Toggle },
     } },
 };
 
 inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSettings = {
-    { Anim::Congregation, { "stop-auto-restart", "play-sound-effects" } },
+    { Anim::Congregation, { "play-sound-effects" } },
     { Anim::NewBest, { "only-on-new-best", "speed", "play-sound-effects" } },
     { Anim::PracticeComplete, { "play-sound-effects" } },
-    { Anim::MrHippo, { "play-sound-effects", "speed", "stop-auto-restart" } },
+    { Anim::MrHippo, { "play-sound-effects", "speed" } },
+    { Anim::Minecraft, { "speed" } },
 };

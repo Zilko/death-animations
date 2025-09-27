@@ -98,10 +98,10 @@ Anim Utils::getSelectedAnimationEnum() {
 }
 
 const DeathAnimation& Utils::getSelectedAnimation() {
-    return getSelectedAnimation(getSelectedAnimationEnum());
+    return getAnimationByID(getSelectedAnimationEnum());
 }
 
-const DeathAnimation& Utils::getSelectedAnimation(Anim anim) {
+const DeathAnimation& Utils::getAnimationByID(Anim anim) {
     for (const DeathAnimation& animation : animations)
         if (anim == animation.id)
             return animation;
@@ -305,7 +305,7 @@ std::vector<std::string> Utils::split(const std::string& str, char c, size_t siz
     return ret;
 }
 
-BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {
+BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& params) {    
     ANIMATION_CHECK(YouDied)
     ANIMATION_CHECK(Bsod)
     ANIMATION_CHECK(AmongUs)

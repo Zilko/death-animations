@@ -39,6 +39,8 @@ private:
         }
     )";
 
+    inline static const ParticleStruct m_particleStruct = {137,1,1,0,3000,-90,180,230,132,11,0,0,-1000,0,0,0,0,3,4,0,0,0.4,0,0,0,0,0,1,0,0,3,0,0,0.4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,false,false,false,false,2,false,0,0,0,0,false,false,false,false,false,0,0,0,0,"particle_02_001.png"};
+
     CCNodeRGBA* m_player = nullptr;
 
     CCSprite* m_playerSprite = nullptr;
@@ -58,19 +60,13 @@ private:
         glUniform1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time);
     }
 
-    void blood(float) {
-        static const std::array<ParticleStruct, 1> m_particles = {{
-            {137,1,1,0,3000,-90,180,230,132,11,0,0,-1000,0,0,0,0,3,4,0,0,0.4,0,0,0,0,0,1,0,0,3,0,0,0.4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,false,false,false,false,2,false,0,0,0,0,false,false,false,false,false,0,0,0,0,"particle_02_001.png"},
-        }};
+    void blood(float) {        
+        SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create(m_particleStruct);
+        particle->setUpdateSpeed(m_speed);
+        particle->resetSystem();
+        particle->setAutoRemoveOnFinish(true);
 
-        for (const ParticleStruct& struct_ : m_particles) {
-            SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create(struct_);
-            particle->setUpdateSpeed(m_speed);
-            particle->resetSystem();
-            particle->setAutoRemoveOnFinish(true);
-
-            addChild(particle);
-        }
+        addChild(particle);
     }
 
     bool init() {

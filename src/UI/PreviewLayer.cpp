@@ -80,7 +80,7 @@ void PreviewLayer::playerDied(float) {
     if (anim == Anim::Random)
         anim = static_cast<Anim>(animations[Utils::getRandomInt(2, static_cast<int>(animations.size()) - 1)].id);
 
-    m_animationStruct = Utils::getSelectedAnimation(anim);
+    m_animationStruct = Utils::getAnimationByID(anim);
     m_speed = Utils::getSpeedValue(Utils::getSettingFloat(m_animationStruct.id, "speed"));
     m_animation = Utils::createAnimation(
         anim,
@@ -89,7 +89,7 @@ void PreviewLayer::playerDied(float) {
             .playLayer = nullptr,
             .delegate = this, 
             .speed = m_speed,
-            .duration = m_animationStruct.duration
+            .id = anim
         }
     );
     m_duration = m_animation->getDuration() / m_speed + 0.05f;
@@ -135,10 +135,8 @@ void PreviewLayer::playDeathEffect() {
 }
 
 void PreviewLayer::keyDown(enumKeyCodes key) {
-    if (key == enumKeyCodes::KEY_R) {
-        spawnPlayer(0.f);
-        unschedule(schedule_selector(PreviewLayer::spawnPlayer));
-    }
+    if (key == enumKeyCodes::KEY_R)
+        reset();
 
     geode::Popup<>::keyDown(key);
 }
@@ -208,7 +206,7 @@ CCNodeRGBA* PreviewLayer::getPlayer() {
     return m_player;
 }
 
-CCNode* PreviewLayer::getBackButton() {
+CCMenuItemSpriteExtra* PreviewLayer::getBackButton() {
     return m_backButton;
 }
 
@@ -218,4 +216,9 @@ void PreviewLayer::setBackgroundOpacity(int opacity) {
 
 bool PreviewLayer::isDead() {
     return m_isDead;
+}
+
+void PreviewLayer::reset() {
+    spawnPlayer(0.f);
+    unschedule(schedule_selector(PreviewLayer::spawnPlayer));
 }
