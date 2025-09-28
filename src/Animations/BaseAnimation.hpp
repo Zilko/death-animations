@@ -38,10 +38,11 @@ protected:
     Anim m_id = Anim::None;
     
     bool m_isPreview = false;
-    bool m_forcedRestartSettings = false;
     bool m_forceRestart = false;
-    bool m_isRestarting = false;
+    bool m_dontRestart = false;
     bool m_isDelayRestart = false;
+    bool m_isNoRetryLayer = false;
+    bool m_didFinish = false;
     
     float m_speed = 1.f;
     float m_duration = 1.f;
@@ -63,13 +64,6 @@ protected:
                 }
           }
 
-    ~BaseAnimation() {
-        if (m_forcedRestartSettings) {
-            GameManager::get()->setGameVariable("0163", false);
-            GameManager::get()->setGameVariable("0074", false);
-        }
-    }
-
     void enableTouch() {
         setTouchEnabled(true);
         registerWithTouchDispatcher();
@@ -90,11 +84,14 @@ protected:
         if (m_parentNode)
             m_parentNode->addChild(this);
 
-        if (m_duration >= 5.f && !GameManager::get()->getGameVariable("0163")) {
-            GameManager::get()->setGameVariable("0163", true);
-            GameManager::get()->setGameVariable("0074", true);
-            m_forcedRestartSettings = true;
-        }
+        runAction(CCSequence::create(
+            CCDelayTime::create(m_duration / m_speed + 0.1f),
+            CallFuncExt::create([this]{
+                setVisible(false);
+                m_didFinish = true;
+            }),
+            nullptr
+        ));
 
         return true;
     }
@@ -166,8 +163,16 @@ public:
         return m_isDelayRestart;
     }
 
-    bool isRestarting() {
-        return m_isRestarting;
+    bool isDontRestart() {
+        return m_dontRestart;
+    }
+
+    bool isNoRetryLayer() {
+        return m_isNoRetryLayer;
+    }
+
+    bool didFinish() {
+        return m_didFinish;
     }
   
 };

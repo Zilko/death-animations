@@ -18,7 +18,6 @@ private:
         m_sprite->getTexture()->setAliasTexParameters();
         m_sprite->setFlipX(Utils::getRandomInt(0, 1));
         m_sprite->setFlipY(Utils::getRandomInt(0, 1));
-        m_sprite->setScale(Utils::getRandomInt(0, 1) ? 1.2f : 2.1f);
         m_sprite->runAction(CCSpawn::create(
             CCMoveBy::create(10.f, {0, 300.f}),
             CCEaseOut::create(CCMoveBy::create(1.2f, {0, shouldFall ? -15.f : 0.f}), 2.f),
@@ -26,8 +25,16 @@ private:
             nullptr
         ));
 
-        if (Utils::getRandomInt(1, 10) <= 2) {
-            m_sprite->setColor({150, 150, 150});
+        Utils::fixScaleTextureSizexd(m_sprite);
+
+        float scale = Utils::getRandomInt(1, 10) <= 2
+            ? (Utils::getRandomInt(0, 1) ? 1.2f : 2.1f)
+            : 0.8f;
+
+        m_sprite->setScale(4 * m_sprite->getScale() * scale);
+
+        if (Utils::getRandomInt(1, 10) <= 4) {
+            m_sprite->setColor({ 190, 190, 190 });
             setZOrder(-1);
         }
 
@@ -43,7 +50,6 @@ private:
     }
 
     void nextStep() {
-        if (++m_currentStep > 9) log::debug("ded");
         if (++m_currentStep > 9)
             return removeFromParentAndCleanup(true);
 
@@ -266,6 +272,8 @@ private:
     void enableButtons(float) {
         m_respawnButton->setDisabled(false);
         m_titleScreenButton->setDisabled(false);
+
+        m_dontRestart = false;
     }
 
     void checkButtons(const CCPoint& pos) {
@@ -276,7 +284,8 @@ private:
     void update(float dt) {
         checkButtons(getMousePos());
 
-        PlatformToolbox::showCursor();
+        if (!m_isPreview)
+            PlatformToolbox::showCursor();
     }
 
     bool ccTouchBegan(CCTouch* touch, CCEvent* event) override {
@@ -350,36 +359,36 @@ public:
 
     void start() override {
         Utils::setHighestZ(this);
-
         Utils::playSound(Anim::Minecraft, "minecraft-hurt.mp3", 1.f, 0, 0, 9999, 1.f, false, 90);
 
-        m_playLayer->m_player1->setVisible(false);
+        CCNodeRGBA* player = m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1;
 
-        m_playerSprite = Utils::renderPlayerSprite(m_playLayer->m_player1, false);
-        m_playerSprite->setPosition(m_playLayer->m_player1->getPosition());
+        player->setVisible(false);
+
+        m_playerSprite = Utils::renderPlayerSprite(player, false);
+        m_playerSprite->setPosition(player->getPosition());
         m_playerSprite->setShaderProgram(Utils::createShader(m_shader, true));
 
-        m_playLayer->m_player1->getParent()->addChild(m_playerSprite);
-
+        player->getParent()->addChild(m_playerSprite);
 
         m_playerSprite->runAction(CCSpawn::create(
             CCSequence::create(
                 CCDelayTime::create(0.55f),
                 CCHide::create(),
-                CallFuncExt::create([this] {
+                CallFuncExt::create([this, player] {
                     MinecraftParticle* particle = MinecraftParticle::create();
-                    particle->setPosition(m_playLayer->m_player1->getPosition());
+                    particle->setPosition(player->getPosition());
 
-                    m_playLayer->m_player1->getParent()->addChild(particle);
+                    player->getParent()->addChild(particle);
 
                     for (int i = 0; i < Utils::getRandomInt(6, 8); i++) {
                         MinecraftParticle* particle = MinecraftParticle::create();
                         particle->setPosition(
-                            m_playLayer->m_player1->getPosition()
+                            player->getPosition()
                             + ccp(Utils::getRandomInt(-30, 30), Utils::getRandomInt(-5, 25))
                         );
 
-                        m_playLayer->m_player1->getParent()->addChild(particle);
+                        player->getParent()->addChild(particle);
                     }
                 }),
                 nullptr
@@ -390,6 +399,13 @@ public:
 
         if (Utils::getSettingBool(Anim::Minecraft, "no-overlay"))
             return;
+
+        m_isNoRetryLayer = true;
+        
+        if (!m_isPreview)
+            m_playLayer->stopActionByTag(16);
+        else
+            m_delegate->stopReset();
 
         std::string username = GJAccountManager::get()->m_username;
         if (username.empty())
@@ -451,18 +467,24 @@ public:
         
         m_respawnButton = MinecraftButton::create("Respawn");
         m_respawnButton->setPosition(m_size / 2.f + ccp(0, 7));
-        m_respawnButton->setDisabled(true);
 
         addChild(m_respawnButton);
 
         m_titleScreenButton = MinecraftButton::create("Title Screen");
         m_titleScreenButton->setPosition(m_size / 2.f - ccp(0, 14));
-        m_titleScreenButton->setDisabled(true);
     
         addChild(m_titleScreenButton);
 
         enableTouch();
-        scheduleOnce(schedule_selector(Minecraft::enableButtons), 1.f);
+
+        if (!Utils::getSettingBool(Anim::Minecraft, "no-cooldown")) {
+            m_titleScreenButton->setDisabled(true);
+            m_respawnButton->setDisabled(true);
+
+            m_dontRestart = true;
+
+            scheduleOnce(schedule_selector(Minecraft::enableButtons), 1.f);
+        }
 
         #ifndef GEODE_IS_MOBILE
 
@@ -477,7 +499,7 @@ public:
 
         #ifndef GEODE_IS_MOBILE
 
-        if (!GameManager::get()->getGameVariable("0024"))
+        if (!GameManager::get()->getGameVariable("0024") && !m_isPreview)
             PlatformToolbox::hideCursor();
         
         #endif

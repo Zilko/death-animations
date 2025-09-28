@@ -1,10 +1,10 @@
 #include "BaseAnimation.hpp"
 
-class NewBestAnimation : public BaseAnimation {
+class NewBest : public BaseAnimation {
 
 private:
 
-    ANIMATION_CTOR_CREATE(NewBestAnimation) {}
+    ANIMATION_CTOR_CREATE(NewBest) {}
 
 public:
 
@@ -131,30 +131,17 @@ public:
             CCDelayTime::create(fadeTime + 0.3f),
             CCFadeTo::create(0.4f, 0),
             CCDelayTime::create(1.f),
-            CCCallFunc::create(this, callfunc_selector(NewBestAnimation::end)),
+            CCCallFunc::create(this, callfunc_selector(NewBest::realEnd)),
             nullptr
         ));
 
         addChild(overlay, -1);
     }
 
-};
-
-class NewBest : public BaseAnimation {
-
-    ANIMATION_CTOR_CREATE(NewBest) {}
-    
-public:
-
-
-    void start() override {
-        NewBestAnimation::create({
-            .parentNode = m_parentNode,
-            .playLayer = m_playLayer,
-            .delegate = m_delegate,
-            .speed = m_speed
-        })->start();
+    void realEnd() {
+        removeFromParentAndCleanup(true);
     }
-    
-    
+
+    void end() override {}
+
 };

@@ -10,7 +10,7 @@
     "name": "Death Animations",
     "version": "v1.0.0",
     "developer": "Zilko",
-    "description": "Animates ur deaths",
+    "description": "it animates ur deaths",
     "resources": {
         "spritesheets": {
             "among-us-death-1": [
@@ -35,8 +35,7 @@
             "resources/sprites/animations/among-us/*.png",
             "resources/sprites/animations/jumpscare/*.png",
             "resources/sprites/animations/to-be-continued/*.png",
-            "resources/sprites/animations/you-died/*.png",
-            "resources/sprites/animations/wasted/*.png"
+            "resources/sprites/animations/you-died/*.png"
         ],
         "files": [
             "resources/sounds/*.mp3",
@@ -45,6 +44,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/wasted/*.png",
             "resources/sprites/animations/minecraft/*.png",
             "resources/sprites/animations/blood/*.png",
             "resources/sprites/animations/mr_hippo/*.png",

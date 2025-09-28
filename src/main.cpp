@@ -11,8 +11,6 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PlayerObject.hpp>
-#include <Geode/modify/UILayer.hpp>
-#include <Geode/modify/FMODAudioEngine.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/CCCircleWave.hpp>
 #include <Geode/modify/CCParticleSystem.hpp>
@@ -38,19 +36,22 @@ $on_mod(Loaded) {
     if (!Mod::get()->setSavedValue("created-jumpscare-folders", true)) {
         std::filesystem::path soundsFolder = Mod::get()->getSaveDir() / "jumpscare-sounds";
         std::filesystem::path imagesFolder = Mod::get()->getSaveDir() / "jumpscare-images";
+        std::error_code ec;
         
         if (!utils::file::createDirectoryAll(soundsFolder).isErr())
             std::filesystem::copy_file(
                 Mod::get()->getResourcesDir() / "jumpscare.mp3",
                 soundsFolder / "jumpscare.mp3",
-                std::filesystem::copy_options::overwrite_existing
+                std::filesystem::copy_options::overwrite_existing,
+                ec
             );
 
         if (!utils::file::createDirectoryAll(imagesFolder).isErr())
             std::filesystem::copy_file(
                 Mod::get()->getResourcesDir() / "jumpscare.png",
                 imagesFolder / "jumpscare.png",
-                std::filesystem::copy_options::overwrite_existing
+                std::filesystem::copy_options::overwrite_existing,
+                ec
             );
     }
 
@@ -87,6 +88,10 @@ class $modify(ProPlayLayer, PlayLayer) {
         BaseAnimation* m_animation = nullptr;
 
         bool m_forceRetryLayer = false;
+        bool m_keyPressHookEnabled = false;
+        bool m_didShowRetryLayer = false;
+
+        int m_accumulatedRetryLayers = false;
 
         bool m_isNewBest = false;
         bool m_forceRestart = false;
@@ -163,14 +168,14 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         PlayLayer::destroyPlayer(player, obj);
         
-        // thi is for delaying
-
         if (animation.isNoStopMusic) {
             Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
             Utils::setHookEnabled("FMOD::ChannelControl::setPaused", false);
         }
 
         m_gameState.m_unkBool26 = og;
+        m_uiLayer->m_pauseBtn->setEnabled(true);
+        f->m_didShowRetryLayer = false;
         
         f->m_animation->startWithObject(obj);
         f->m_animation->start();
@@ -204,20 +209,34 @@ class $modify(ProPlayLayer, PlayLayer) {
         const DeathAnimation& anim = Variables::getSelectedAnimation();
         auto f = m_fields.self();
 
+        if (f->m_accumulatedRetryLayers > 0) {
+            f->m_accumulatedRetryLayers--;
+            return;
+        }
+
+        f->m_didShowRetryLayer = true;
+
+        if (!f->m_animation)
+            return PlayLayer::showRetryLayer();
+
         if (
-            (!anim.isNoRetryLayer && anim.retryLayerDelay <= 0.f)
+            (anim.retryLayerDelay <= 0.f && !f->m_animation->isNoRetryLayer())
             || f->m_forceRetryLayer
-            || !f->m_animation
         ) {
             return PlayLayer::showRetryLayer();
         }
 
-        if (anim.retryLayerDelay > 0.f)
-            runAction(CCSequence::create(
+        if (anim.retryLayerDelay > 0.f && !f->m_animation->isNoRetryLayer()) {
+            CCAction* action = CCSequence::create(
                 CCDelayTime::create(anim.retryLayerDelay / Utils::getSpeedValue(Utils::getSettingFloat(anim.id, "speed"))),
                 CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedShowRetryLayer)),
                 nullptr
-            ));
+            );
+
+            action->setTag(472);
+
+            runAction(action);
+        }
     }
     
     void resetLevel() {
@@ -227,13 +246,14 @@ class $modify(ProPlayLayer, PlayLayer) {
             f->m_animation
             && !f->m_forceRestart
             && !f->m_animation->isForceRestart()
+            && !f->m_animation->didFinish()
             && Utils::getSettingBool(Variables::getSelectedAnimation().id, "prevent-early-restart")
         ) {
             return;
         }
 
         if (f->m_animation) {
-            if (f->m_animation->isRestarting())
+            if (f->m_animation->isDontRestart())
                 return;
 
             if (f->m_animation->isDelayRestart())
@@ -247,9 +267,14 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (f->m_animation) {
             f->m_animation->end();
             f->m_animation = nullptr;
+
+            if (!f->m_didShowRetryLayer)
+                f->m_accumulatedRetryLayers++;
         }
 
         PlayLayer::resetLevel();
+
+        stopActionByTag(472);
 
         if (endedAnimation && f->m_isNewBest && Variables::getSelectedAnimation().isDelayNewBest) {
             Variables::setSelectedAnimation({});
@@ -406,9 +431,7 @@ class $modify(FMOD::ChannelControl) {
     }
 
     FMOD_RESULT setPaused(bool paused) { // disabled by defolt
-        paused = false;
-
-        return FMOD::ChannelControl::setPaused(paused);
+        return FMOD::ChannelControl::setPaused(false);
     }
 
 };

@@ -15,5 +15,7 @@ public:
     virtual bool isDead() { return false; }
 
     virtual void reset() {}
+
+    virtual void stopReset() {}
     
 };

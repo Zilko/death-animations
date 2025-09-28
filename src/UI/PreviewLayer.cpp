@@ -99,13 +99,13 @@ void PreviewLayer::playerDied(float) {
     if (m_animationStruct.isStopMusic)
         FMODAudioEngine::get()->pauseAllMusic(true);
     
+    scheduleOnce(schedule_selector(PreviewLayer::spawnPlayer), m_duration);
+
     m_animation->startEarly();
     m_animation->start();
     m_animation->setZOrder(10);
     
-    playDeathEffect();
-    
-    scheduleOnce(schedule_selector(PreviewLayer::spawnPlayer), m_duration);
+    playDeathEffect();    
 }
 
 void PreviewLayer::playDeathEffect() {
@@ -135,10 +135,16 @@ void PreviewLayer::playDeathEffect() {
 }
 
 void PreviewLayer::keyDown(enumKeyCodes key) {
-    if (key == enumKeyCodes::KEY_R)
-        reset();
-
     geode::Popup<>::keyDown(key);
+
+    if (
+        (m_animation && m_animation->isDontRestart())
+        || key == enumKeyCodes::KEY_R
+    ) {
+        return;
+    }
+        
+    reset();
 }
 
 bool PreviewLayer::setup() {
@@ -220,5 +226,9 @@ bool PreviewLayer::isDead() {
 
 void PreviewLayer::reset() {
     spawnPlayer(0.f);
+    unschedule(schedule_selector(PreviewLayer::spawnPlayer));
+}
+
+void PreviewLayer::stopReset() {
     unschedule(schedule_selector(PreviewLayer::spawnPlayer));
 }

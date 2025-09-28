@@ -36,8 +36,8 @@ private:
             m_freezeSprite->removeFromParentAndCleanup(true);
             m_freezeSprite = nullptr;
             
-            Loader::get()->queueInMainThread([this] {
-                scheduleOnce(schedule_selector(Bsod::freeze), 0.02f);
+            Loader::get()->queueInMainThread([self = Ref(this)] {
+                self->scheduleOnce(schedule_selector(Bsod::freeze), 0.02f);
             });
             
             for (const auto& [id, channel] : FMODAudioEngine::get()->m_channelIDToChannel)
@@ -64,8 +64,8 @@ private:
         if (!m_didFreeze) {
             m_didFreeze = true;
             
-            Loader::get()->queueInMainThread([this] {
-                scheduleOnce(schedule_selector(Bsod::freeze), 0.012f / m_speed);
+            Loader::get()->queueInMainThread([self = Ref(this)] {
+                self->scheduleOnce(schedule_selector(Bsod::freeze), 0.012f / self->m_speed);
             });
         }
     }
@@ -78,7 +78,6 @@ private:
             m_fpsLabel->removeFromParentAndCleanup(true);
             m_fpsLabel = nullptr;
         }
-
         
         CCLayerColor* m_bg = CCLayerColor::create({0, 120, 215, 255});
         
@@ -144,7 +143,6 @@ private:
             else if (n < 85) p = 21;
             else if (n < 95) p = 22;
             else p = Utils::getRandomInt(0, 1) == 0 ? 19 : 23;
-
             
             if (!m_percentProgresses.empty())
                 m_percentProgresses.push_back(std::clamp(m_percentProgresses.back() + p, 0, 100));
@@ -175,8 +173,8 @@ private:
         m_coverLayers.back()->setVisible(false);
         m_coverLayers.pop_back();
         
-        Loader::get()->queueInMainThread([this] {
-            scheduleOnce(schedule_selector(Bsod::updateCovers), Utils::getRandomInt(5, 10) / 1000.f / m_speed);
+        Loader::get()->queueInMainThread([self = Ref(this)] {
+            self->scheduleOnce(schedule_selector(Bsod::updateCovers), Utils::getRandomInt(5, 10) / 1000.f / self->m_speed);
         });
     }
     
@@ -187,8 +185,8 @@ private:
         
         m_currentPercent++;
         
-        Loader::get()->queueInMainThread([this] {
-            scheduleOnce(schedule_selector(Bsod::updatePercent), m_percentTimes[m_currentPercent]);
+        Loader::get()->queueInMainThread([self = Ref(this)] {
+            self->scheduleOnce(schedule_selector(Bsod::updatePercent), self->m_percentTimes[self->m_currentPercent]);
         });
     }
     
@@ -232,15 +230,18 @@ public:
     }
     
     void end() override {
-        Loader::get()->queueInMainThread([this] {            
-            BaseAnimation::end();
-            
-            if (m_fpsLabel)
-                m_fpsLabel->removeFromParentAndCleanup(true);
+        Loader::get()->queueInMainThread([self = Ref(this)] {                        
+            if (self->m_fpsLabel) {
+                self->m_fpsLabel->removeFromParentAndCleanup(true);
+                self->m_fpsLabel = nullptr;
+            }
                 
-            if (m_wasFPSVisible)
+            if (self->m_wasFPSVisible) {
                 if (CCLabelBMFont* lbl = CCDirector::get()->m_pFPSNode)
                     lbl->setVisible(true);
+            }
+            
+            self->removeFromParentAndCleanup(true);
         });
     }
 

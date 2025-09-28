@@ -906,7 +906,7 @@ private:
         })->start();
 
         if (m_isDelayRestart) {
-            m_isRestarting = false;
+            m_dontRestart = false;
             m_isDelayRestart = false;
 
             resetLevel();
@@ -975,9 +975,9 @@ private:
 public:
 
     void onRestart() override {
-        if (!m_isDelayRestart || m_isRestarting) return;
+        if (!m_isDelayRestart || m_dontRestart) return;
 
-        m_isRestarting = true;
+        m_dontRestart = true;
 
         playTransition(0.f);
     }

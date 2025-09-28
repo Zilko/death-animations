@@ -92,22 +92,7 @@ private:
     CCNode* m_wastedContainer = nullptr;
     CCNode* m_explosionSprite = nullptr;
 
-     float m_time = 0.f;
-
-    ~Wasted() {
-        if (m_renderTexture)
-            m_renderTexture->release();
-        
-        if (m_program)
-            m_program->release();
-
-        Variables::setSpeed(1.f);
-
-        Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
-        Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
-
-        toggleHooks(false);
-    }
+    float m_time = 0.f;
 
     void update(float dt) override {
         if (m_frameSprite) m_frameSprite->setVisible(false);
@@ -131,48 +116,32 @@ private:
 
     void addWasted(float) {
         m_wastedContainer = CCNode::create();
-
         addChild(m_wastedContainer);
 
-        CCLayerColor* layer1 = CCLayerColor::create({0, 0, 0, 255}, m_size.width + 5, 15);
-        layer1->setPositionY(181);
-        layer1->setRotation(-1);
+        CCSprite* spr = CCSprite::create("wasted-banner-half.png"_spr);
+        spr->setScale(m_size.width / spr->getContentWidth());
+        spr->setPosition(m_size / 2.f - ccp(0, 4));
+        spr->setAnchorPoint({0.5f, 0});
+        spr->setOpacity(100);
 
-        m_wastedContainer->addChild(layer1);
+        m_wastedContainer->addChild(spr);
 
-        CCLayerColor* layer2 = CCLayerColor::create({0, 0, 0, 255}, m_size.width + 5, 15);
-        layer2->setPositionY(132);
-        layer2->setRotation(1);
-     
-        m_wastedContainer->addChild(layer2);
+        spr = CCSprite::create("wasted-banner-half.png"_spr);
+        spr->setScale(m_size.width / spr->getContentWidth());
+        spr->setPosition(m_size / 2.f - ccp(0, 4));
+        spr->setFlipY(true);
+        spr->setAnchorPoint({0.5f, 1});
+        spr->setOpacity(100);
 
-        CCLayerColor* layer3 = CCLayerColor::create({0, 0, 0, 255}, m_size.width, 46);
-        layer3->setPositionY(140);
-     
-        m_wastedContainer->addChild(layer3);
-
-        CCRenderTexture* texture = CCRenderTexture::create(m_size.width, m_size.height);
-        texture->getSprite()->setAnchorPoint({0, 0});
-        texture->getSprite()->setOpacity(100);
-        texture->getSprite()->setScaleY(1);
-
-        texture->begin();
-
-        m_wastedContainer->visit();
-
-        texture->end();
-
-        m_wastedContainer->addChild(texture);
-
-        layer1->removeFromParentAndCleanup(true);
-        layer2->removeFromParentAndCleanup(true);
-        layer3->removeFromParentAndCleanup(true);
+        m_wastedContainer->addChild(spr);
 
         m_wastedSprite = CCSprite::create("wasted.png"_spr);
         m_wastedSprite->setColor({187, 57, 57});
         m_wastedSprite->setOpacity(230);
         m_wastedSprite->setScale(1.06f);
         m_wastedSprite->setPosition(m_size / 2.f - ccp(0, 2));
+
+        Utils::fixScaleTextureSizexd(m_wastedSprite);
 
         m_wastedContainer->addChild(m_wastedSprite);
         m_wastedContainer->setPositionY(8);
@@ -193,6 +162,21 @@ private:
         Utils::setHookEnabled("CCCircleWave::updateTweenAction", toggled);
         Utils::setHookEnabled("GJBaseGameLayer::update", toggled);
         Utils::setHookEnabled("ExplodeItemNode::update", toggled);
+    }
+
+    ~Wasted() {
+        if (m_renderTexture)
+            m_renderTexture->release();
+        
+        if (m_program)
+            m_program->release();
+
+        Variables::setSpeed(1.f);
+
+        Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
+        Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
+
+        toggleHooks(false);
     }
 
     ANIMATION_CTOR_CREATE(Wasted) {}

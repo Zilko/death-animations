@@ -46,5 +46,6 @@ public:
     void setBackgroundOpacity(int) override;
     bool isDead() override;
     void reset() override;
+    void stopReset() override;
 
 };
