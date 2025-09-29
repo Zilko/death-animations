@@ -906,8 +906,6 @@ private:
 
     float m_time = 0.f;
 
-    bool m_updateShockwave = false;
-    
     int m_transition = 0;
 
     void transitionOut(float) {
@@ -949,23 +947,20 @@ private:
         m_transitionNode->start();
     }
 
-    void update(float dt) override {
-        if (m_updateShockwave && m_frameSprite) m_frameSprite->setVisible(false);
+    void updateShockwave(float dt) {
+        if (m_frameSprite) m_frameSprite->setVisible(false);
         if (m_transitionNode) m_transitionNode->setVisible(false);
         
         Utils::takeScreenshot(m_renderTexture);
-
-        if (m_updateShockwave && m_frameSprite) m_frameSprite->setVisible(true);
+        
+        if (m_frameSprite) m_frameSprite->setVisible(true);
         if (m_transitionNode) m_transitionNode->setVisible(true);
 
-        if (!m_updateShockwave) return;
-    
         m_time += dt * m_speed;
 
         if (m_time > 1.f) {
             m_frameSprite->setVisible(false);
-            m_updateShockwave = false;
-            return;
+            return CCScheduler::get()->unscheduleSelector(schedule_selector(Celeste::updateShockwave), this);
         }
 
         m_program->use();
@@ -973,6 +968,9 @@ private:
     }
 
     void startShockwave(float) {
+        // m_frameSprite->setShaderProgram(m_program);
+        m_frameSprite->setVisible(true);
+
         m_program->use();
 
         CCPoint pos = getNodeScreenPos(m_explosion1);
@@ -988,9 +986,7 @@ private:
             pos.y / m_size.height
         );
 
-        // m_frameSprite->setShaderProgram(m_program);
-
-        m_updateShockwave = true;
+        schedule(schedule_selector(Celeste::updateShockwave));
     }
 
     void onAnimationEnd() override {
@@ -1027,6 +1023,7 @@ public:
             update(0.f);
 
             m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+            m_frameSprite->setVisible(false);
             m_frameSprite->setFlipY(true);
             m_frameSprite->setPosition(m_size / 2.f);
             m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
@@ -1034,7 +1031,6 @@ public:
             addChild(m_frameSprite);
 
             scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
-            schedule(schedule_selector(Celeste::update));
         }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
