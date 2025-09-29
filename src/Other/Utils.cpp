@@ -209,12 +209,16 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     float mult = 1.f;
 
     switch (GameManager::get()->m_texQuality) {
-        case 0: mult = 0.5f; break;
         case 1: mult = 0.25f; break;
         case 2: mult = 0.5f; break;
     };
 
-    log::debug("{} {}", GameManager::get()->m_texQuality, mult);
+    #ifdef GEODE_IS_MOBILE
+
+    if (!Loader::get()->isModLoaded("weebify.high-graphics-android"))
+        mult = 0.5f;
+
+    #endif
 
     sprite->setScale(sprite->getScale() * mult);
 }
