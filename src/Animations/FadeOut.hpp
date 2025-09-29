@@ -55,8 +55,12 @@ private:
     }
 
     void updateShader(float dt) {
+        m_frameSprite->setVisible(false);
+
         if (m_renderTexture)
             Utils::takeScreenshot(m_renderTexture);
+
+        m_frameSprite->setVisible(true);
 
         if (m_program) {
             m_program->use();
@@ -81,12 +85,10 @@ private:
     }
 
     ~FadeOut() {
-        m_frameSprite->setVisible(false);
-
-        if (m_renderTexture)
+        if (m_renderTexture) {
             m_renderTexture->release();
-
-        m_frameSprite->setVisible(true);
+            m_renderTexture = nullptr;
+        }
 
         FMODAudioEngine* fmod = FMODAudioEngine::get();
 
