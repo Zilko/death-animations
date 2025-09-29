@@ -208,10 +208,9 @@ void Utils::setHighestZ(CCNode* node) {
 void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     float mult = 1.f;
 
-    log::debug("Tex Quality: {}", GameManager::get()->m_texQuality);
-
     switch (GameManager::get()->m_texQuality) {
         case 1: mult = 0.25f; break;
+        case 0:
         case 2: mult = 0.5f; break;
     };
 

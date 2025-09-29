@@ -102,36 +102,36 @@ protected:
     }
 
     void showCompleteText() {
-        CCSprite* spr = CCSprite::createWithSpriteFrameName(m_isPractice ? "GJ_practiceComplete_001.png" : "GJ_levelComplete_001.png");
-        spr->setPosition(m_size / 2.f + ccp(0, 35.f));
-        spr->setScale(0.01f);
+        // CCSprite* spr = CCSprite::createWithSpriteFrameName(m_isPractice ? "GJ_practiceComplete_001.png" : "GJ_levelComplete_001.png");
+        // spr->setPosition(m_size / 2.f + ccp(0, 35.f));
+        // spr->setScale(0.01f);
 
-        addChild(spr, 15);
+        // addChild(spr, 15);
 
-        spr->runAction(CCSequence::create(
-            CCEaseElasticOut::create(CCScaleTo::create(0.66f / m_speed, 1.1f), 0.6f),
-            CCDelayTime::create(0.88f / m_speed),
-            CCEaseIn::create(CCScaleTo::create(0.22f / m_speed, 0.01f, 0.01f), 2.f),
-            CCHide::create(),
-            nullptr
-        ));
+        // spr->runAction(CCSequence::create(
+        //     CCEaseElasticOut::create(CCScaleTo::create(0.66f / m_speed, 1.1f), 0.6f),
+        //     CCDelayTime::create(0.88f / m_speed),
+        //     CCEaseIn::create(CCScaleTo::create(0.22f / m_speed, 0.01f, 0.01f), 2.f),
+        //     CCHide::create(),
+        //     nullptr
+        // ));
 
 
-        SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist", false);
-        particle->setUpdateSpeed(m_speed);
-        particle->setAutoRemoveOnFinish(true);
-        particle->setPosition(spr->getPosition());
-        particle->setStartColor(ccc4FFromccc3B(m_color1));
-        particle->setEndColor(ccc4FFromccc3B(m_color1));
+        // SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist", false);
+        // particle->setUpdateSpeed(m_speed);
+        // particle->setAutoRemoveOnFinish(true);
+        // particle->setPosition(spr->getPosition());
+        // particle->setStartColor(ccc4FFromccc3B(m_color1));
+        // particle->setEndColor(ccc4FFromccc3B(m_color1));
 
-        addChild(particle, 13);
+        // addChild(particle, 13);
 
-        particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist",false);
-        particle->setUpdateSpeed(m_speed);
-        particle->setAutoRemoveOnFinish(true);
-        particle->setPosition(spr->getPosition());
+        // particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist",false);
+        // particle->setUpdateSpeed(m_speed);
+        // particle->setAutoRemoveOnFinish(true);
+        // particle->setPosition(spr->getPosition());
 
-        addChild(particle, 13);
+        // addChild(particle, 13);
 
         if (m_isPractice) return;
 
