@@ -17,9 +17,9 @@ private:
 
         void main() {
             vec4 c = texture2D(u_texture, v_texCoord);
-            float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-            vec3 bw = vec3(g);
-            gl_FragColor = vec4(mix(c.rgb, bw, u_progress), c.a);
+            float g = c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+            vec3 wa = c.rgb + (vec3(g) - c.rgb) * u_progress;
+            gl_FragColor = vec4(wa, c.a);
         }
     )";
 
@@ -55,14 +55,18 @@ private:
     }
 
     void updateShader(float dt) {
+        if (m_frameSprite) m_frameSprite->setVisible(false);
+
         if (m_renderTexture)
             Utils::takeScreenshot(m_renderTexture);
+
+        if (m_frameSprite) m_frameSprite->setVisible(true);
 
         if (m_program) {
             m_program->use();
             m_program->setUniformLocationWith1f(
                 glGetUniformLocation(m_program->getProgram(), "u_progress"),
-                std::min(m_time / 1.f, 1.f) * 0.5f
+                std::min(m_time / 1.f, 1.f) * 0.65f
             );
         }
     }
@@ -81,8 +85,12 @@ private:
     }
 
     ~FadeOut() {
-        if (m_renderTexture)
+        m_frameSprite = nullptr;
+
+        if (m_renderTexture) {
             m_renderTexture->release();
+            m_renderTexture = nullptr;
+        }
 
         FMODAudioEngine* fmod = FMODAudioEngine::get();
 
@@ -117,9 +125,7 @@ public:
             m_frameSprite->setShaderProgram(m_program);
 
             addChild(m_frameSprite);
-
-            float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
-            schedule(schedule_selector(FadeOut::updateShader), 1.f / fps, kCCRepeatForever, 1.f / fps);
+            schedule(schedule_selector(FadeOut::updateShader));
         }
 
         m_audioOnly = !Utils::getSettingBool(Anim::FadeOut, "slow-down");

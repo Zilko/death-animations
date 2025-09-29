@@ -850,18 +850,19 @@ private:
         uniform sampler2D u_texture;
 
         uniform float u_time;
-        uniform vec2 u_resolution;
+        uniform float u_aspectRatio;
         uniform vec2 u_origin;
         
         void main() {
             vec4 baseColor = texture2D(u_texture, v_texCoord);
             float t = clamp(u_time / 1.0, 0.0, 1.0);
-            vec2 aspect = vec2(u_resolution.x / u_resolution.y, 1.0);
+            vec2 aspect = vec2(u_aspectRatio, 1.0);
             float d = distance((v_texCoord - u_origin) * aspect, vec2(0.0));
             float radius = u_time * 3.5;
             float thickness = u_time < 0.3 ? 0.17 : 0.04;
             float edge = smoothstep(radius - thickness, radius, d) - smoothstep(radius, radius + thickness, d);
-            vec2 dir = normalize(v_texCoord - u_origin);
+            vec2 diff = v_texCoord - u_origin;
+            vec2 dir = diff == vec2(0.0) ? vec2(0.0) : normalize(diff);
             vec2 distortedCoord = v_texCoord + dir * edge * 0.02;
 
             gl_FragColor = mix(baseColor, texture2D(u_texture, distortedCoord), edge);
@@ -963,8 +964,16 @@ private:
 
         CCPoint pos = getNodeScreenPos(m_explosion1);
 
-        glUniform2f(glGetUniformLocation(m_program->getProgram(), "u_resolution"), m_size.width, m_size.height);
-        glUniform2f(glGetUniformLocation(m_program->getProgram(), "u_origin"), pos.x / m_size.width, pos.y / m_size.height);
+        m_program->setUniformLocationWith1f(
+            glGetUniformLocation(m_program->getProgram(), "u_aspectRatio"),
+            m_size.width / m_size.height
+        );
+
+        m_program->setUniformLocationWith2f(
+            glGetUniformLocation(m_program->getProgram(), "u_origin"),
+            pos.x / m_size.width,
+            pos.y / m_size.height
+        );
 
         m_frameSprite->setShaderProgram(m_program);
 
@@ -1012,9 +1021,7 @@ public:
             addChild(m_frameSprite);
 
             scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
-
-            float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
-            schedule(schedule_selector(Celeste::update), 1.f / fps, kCCRepeatForever, 1.f / fps);
+            schedule(schedule_selector(Celeste::update));
         }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");

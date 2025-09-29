@@ -285,7 +285,7 @@ public:
             100.f,
             stripCount,
             true,
-            true,
+            false,
             0.4f / m_speed
         );
 
