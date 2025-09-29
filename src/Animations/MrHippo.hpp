@@ -35,6 +35,8 @@ private:
 
         OggOpusFile* opusFile = op_open_file(utils::string::pathToString(path).c_str(), &err);
 
+        log::debug("{} | {}", path, utils::string::pathToString(path));
+
         if (err != 0) return log::error("Opus has failed you, boy. {}", err);
 
         int channels = op_head(opusFile, 0)->channel_count;
