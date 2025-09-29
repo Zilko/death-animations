@@ -351,8 +351,10 @@ public:
         if (m_isPreview)
             m_delegate->setBackgroundOpacity(200);
 
-        if (m_explosionSprite)
+        if (m_explosionSprite) {
             m_explosionSprite->removeFromParentAndCleanup(true);
+            m_explosionSprite = nullptr;
+        }
 
         BaseAnimation::end();
     }
