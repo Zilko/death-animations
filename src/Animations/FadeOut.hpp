@@ -81,8 +81,12 @@ private:
     }
 
     ~FadeOut() {
+        m_frameSprite->setVisible(false);
+
         if (m_renderTexture)
             m_renderTexture->release();
+
+        m_frameSprite->setVisible(true);
 
         FMODAudioEngine* fmod = FMODAudioEngine::get();
 
