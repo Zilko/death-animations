@@ -209,8 +209,8 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
     float mult = 1.f;
 
     switch (GameManager::get()->m_texQuality) {
-        case 1: mult = 0.25f; break;
         case 0:
+        case 1: mult = 0.25f; break;
         case 2: mult = 0.5f; break;
     };
 

@@ -257,37 +257,38 @@ public:
         float stripRotationVariation = 180.f;
         float duration = 0.5f / m_speed;
 
-        // CCLightFlash* lightFlash = CCLightFlash::create();
-        // lightFlash->setPosition({0, 0});
-        // lightFlash->m_mainLayer = m_parentLayer;
-        // lightFlash->m_layerColorZOrder = 100;
+        CCLightFlash* lightFlash = CCLightFlash::create();
+        lightFlash->setPosition({0, 0});
+        lightFlash->m_mainLayer = m_parentLayer;
+        lightFlash->m_layerColorZOrder = 100;
+        lightFlash->m_dontFadeOut = false;
 
-        // m_effectContainer->addChild(lightFlash);
+        m_effectContainer->addChild(lightFlash);
 
-        // float zoom = getCurrentZoom();
+        float zoom = getCurrentZoom();
 
-        // lightFlash->playEffect(
-        //     {0, 0},
-        //     m_color1,
-        //     1.f,
-        //     0.f,
-        //     30.f,
-        //     20.f,
-        //     std::max(m_size.width * zoom, m_size.height * zoom) * 2.f,
-        //     duration * 0.18f,
-        //     duration * 0.04f,
-        //     duration * 0.195f,
-        //     duration * 0.04f,
-        //     duration * 0.04f,
-        //     stripRotation,
-        //     stripRotationVariation,
-        //     155.f,
-        //     100.f,
-        //     stripCount,
-        //     true,
-        //     true,
-        //     0.4f / m_speed
-        // );
+        lightFlash->playEffect(
+            {0, 0},
+            m_color1,
+            1.f,
+            0.f,
+            30.f,
+            20.f,
+            std::max(m_size.width * zoom, m_size.height * zoom) * 2.f,
+            duration * 0.18f,
+            duration * 0.04f,
+            duration * 0.195f,
+            duration * 0.04f,
+            duration * 0.04f,
+            stripRotation,
+            stripRotationVariation,
+            155.f,
+            100.f,
+            stripCount,
+            true,
+            true,
+            0.4f / m_speed
+        );
 
         float shakeDuration = ((stripCount + 2.f) * 0.195f * duration);
 
