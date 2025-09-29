@@ -988,7 +988,7 @@ private:
             pos.y / m_size.height
         );
 
-        m_frameSprite->setShaderProgram(m_program);
+        // m_frameSprite->setShaderProgram(m_program);
 
         m_updateShockwave = true;
     }
