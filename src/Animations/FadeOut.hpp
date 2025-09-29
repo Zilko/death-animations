@@ -17,9 +17,9 @@ private:
 
         void main() {
             vec4 c = texture2D(u_texture, v_texCoord);
-            float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-            vec3 wa = mix(c.rgb, vec3(g, g, g), u_progress);
-            gl_FragColor = vec4(wa.r, wa.g, wa.b, c.a);
+            float g = c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+            vec3 wa = c.rgb + (vec3(g) - c.rgb) * u_progress;
+            gl_FragColor = vec4(wa, c.a);
         }
     )";
 
@@ -55,18 +55,18 @@ private:
     }
 
     void updateShader(float dt) {
-        m_frameSprite->setVisible(false);
+        if (m_frameSprite) m_frameSprite->setVisible(false);
 
         if (m_renderTexture)
             Utils::takeScreenshot(m_renderTexture);
 
-        m_frameSprite->setVisible(true);
+        if (m_frameSprite) m_frameSprite->setVisible(true);
 
         if (m_program) {
             m_program->use();
             m_program->setUniformLocationWith1f(
                 glGetUniformLocation(m_program->getProgram(), "u_progress"),
-                std::min(m_time / 1.f, 1.f) * 0.5f
+                std::min(m_time / 1.f, 1.f) * 0.65f
             );
         }
     }
@@ -85,6 +85,8 @@ private:
     }
 
     ~FadeOut() {
+        m_frameSprite = nullptr;
+
         if (m_renderTexture) {
             m_renderTexture->release();
             m_renderTexture = nullptr;
@@ -120,7 +122,7 @@ public:
             m_frameSprite->setFlipY(true);
             m_frameSprite->setPosition(m_size / 2.f);
             m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
-            // m_frameSprite->setShaderProgram(m_program);
+            m_frameSprite->setShaderProgram(m_program);
 
             addChild(m_frameSprite);
 
