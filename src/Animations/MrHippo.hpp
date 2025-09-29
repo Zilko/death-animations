@@ -33,6 +33,12 @@ private:
         int err = 0;
         std::filesystem::path path = Mod::get()->getResourcesDir() / fmt::format("hippo_{}.opus", m_speech);
 
+        FILE* fp = fopen(utils::string::pathToString(path).c_str(), "rb");
+
+        log::debug("{}", fp == nullptr);
+
+        return;
+
         OggOpusFile* opusFile = op_open_file(utils::string::pathToString(path).c_str(), &err);
 
         if (err != 0) return log::error("Opus has failed you, boy. {}", err);
