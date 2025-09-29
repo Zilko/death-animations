@@ -126,8 +126,9 @@ public:
 
             addChild(m_frameSprite);
 
-            float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
-            schedule(schedule_selector(FadeOut::updateShader), 1.f / fps, kCCRepeatForever, 1.f / fps);
+            // float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
+            // schedule(schedule_selector(FadeOut::updateShader), 1.f / fps, kCCRepeatForever, 1.f / fps);
+            schedule(schedule_selector(FadeOut::updateShader));
         }
 
         m_audioOnly = !Utils::getSettingBool(Anim::FadeOut, "slow-down");
