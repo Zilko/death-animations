@@ -102,65 +102,65 @@ protected:
     }
 
     void showCompleteText() {
-        // CCSprite* spr = CCSprite::createWithSpriteFrameName(m_isPractice ? "GJ_practiceComplete_001.png" : "GJ_levelComplete_001.png");
-        // spr->setPosition(m_size / 2.f + ccp(0, 35.f));
-        // spr->setScale(0.01f);
+        CCSprite* spr = CCSprite::createWithSpriteFrameName(m_isPractice ? "GJ_practiceComplete_001.png" : "GJ_levelComplete_001.png");
+        spr->setPosition(m_size / 2.f + ccp(0, 35.f));
+        spr->setScale(0.01f);
 
-        // addChild(spr, 15);
+        addChild(spr, 15);
 
-        // spr->runAction(CCSequence::create(
-        //     CCEaseElasticOut::create(CCScaleTo::create(0.66f / m_speed, 1.1f), 0.6f),
-        //     CCDelayTime::create(0.88f / m_speed),
-        //     CCEaseIn::create(CCScaleTo::create(0.22f / m_speed, 0.01f, 0.01f), 2.f),
-        //     CCHide::create(),
-        //     nullptr
-        // ));
+        spr->runAction(CCSequence::create(
+            CCEaseElasticOut::create(CCScaleTo::create(0.66f / m_speed, 1.1f), 0.6f),
+            CCDelayTime::create(0.88f / m_speed),
+            CCEaseIn::create(CCScaleTo::create(0.22f / m_speed, 0.01f, 0.01f), 2.f),
+            CCHide::create(),
+            nullptr
+        ));
 
 
-        // SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist", false);
-        // particle->setUpdateSpeed(m_speed);
-        // particle->setAutoRemoveOnFinish(true);
-        // particle->setPosition(spr->getPosition());
-        // particle->setStartColor(ccc4FFromccc3B(m_color1));
-        // particle->setEndColor(ccc4FFromccc3B(m_color1));
+        SpeedCCParticleSystemQuad* particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist", false);
+        particle->setUpdateSpeed(m_speed);
+        particle->setAutoRemoveOnFinish(true);
+        particle->setPosition(spr->getPosition());
+        particle->setStartColor(ccc4FFromccc3B(m_color1));
+        particle->setEndColor(ccc4FFromccc3B(m_color1));
 
-        // addChild(particle, 13);
+        addChild(particle, 13);
 
-        // particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist",false);
-        // particle->setUpdateSpeed(m_speed);
-        // particle->setAutoRemoveOnFinish(true);
-        // particle->setPosition(spr->getPosition());
+        particle = SpeedCCParticleSystemQuad::create("levelComplete01.plist",false);
+        particle->setUpdateSpeed(m_speed);
+        particle->setAutoRemoveOnFinish(true);
+        particle->setPosition(spr->getPosition());
 
-        // addChild(particle, 13);
+        addChild(particle, 13);
 
         if (m_isPractice) return;
 
-        // CCCircleWave* circleWave = CCCircleWave::create(10.f, m_size.width, 0.8f / m_speed, false, true);
-        // circleWave->m_lineWidth = 4;
-        // circleWave->m_color = m_color1;
+        CCCircleWave* circleWave = CCCircleWave::create(10.f, m_size.width, 0.8f / m_speed, false, true);
+        circleWave->m_lineWidth = 4;
+        circleWave->m_color = m_color1;
         
-        // m_effectContainer->addChild(circleWave, 0);
+        m_effectContainer->addChild(circleWave, 0);
 
-        // circleWave = CCCircleWave::create(10.f, 250.f, 0.8f / m_speed, false, true);
-        // circleWave->m_lineWidth = 4;
-        // circleWave->m_color = m_color1;
-        // circleWave->setPosition(spr->getPosition());
+        circleWave = CCCircleWave::create(10.f, 250.f, 0.8f / m_speed, false, true);
+        circleWave->m_lineWidth = 4;
+        circleWave->m_color = m_color1;
+        circleWave->setPosition(spr->getPosition());
         
-        // addChild(circleWave, 9);
+        addChild(circleWave, 9);
 
-        // for (int i = 0; i < 5; ++i)
-        //     runAction(CCSequence::create(
-        //         CCDelayTime::create(i * 0.05f / m_speed),
-        //         CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnCircle)),
-        //         nullptr
-        //     ));
+        for (int i = 0; i < 5; ++i)
+            runAction(CCSequence::create(
+                CCDelayTime::create(i * 0.05f / m_speed),
+                CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnCircle)),
+                nullptr
+            ));
 
-        // for (int i = 0; i < 10; ++i)
-        //     CCNode::runAction(CCSequence::create(
-        //         CCDelayTime::create((static_cast<float>(rand()) / RAND_MAX * 1.6f - 0.8f + 0.15f * i) / m_speed),
-        //         CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnFirework)),
-        //         nullptr
-        //     ));
+        for (int i = 0; i < 10; ++i)
+            CCNode::runAction(CCSequence::create(
+                CCDelayTime::create((static_cast<float>(rand()) / RAND_MAX * 1.6f - 0.8f + 0.15f * i) / m_speed),
+                CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnFirework)),
+                nullptr
+            ));
     }
 
     ANIMATION_CTOR_CREATE(LevelComplete) {}
@@ -257,37 +257,37 @@ public:
         float stripRotationVariation = 180.f;
         float duration = 0.5f / m_speed;
 
-        CCLightFlash* lightFlash = CCLightFlash::create();
-        lightFlash->setPosition({0, 0});
-        lightFlash->m_mainLayer = m_parentLayer;
-        lightFlash->m_layerColorZOrder = 100;
+        // CCLightFlash* lightFlash = CCLightFlash::create();
+        // lightFlash->setPosition({0, 0});
+        // lightFlash->m_mainLayer = m_parentLayer;
+        // lightFlash->m_layerColorZOrder = 100;
 
-        m_effectContainer->addChild(lightFlash);
+        // m_effectContainer->addChild(lightFlash);
 
-        float zoom = getCurrentZoom();
+        // float zoom = getCurrentZoom();
 
-        lightFlash->playEffect(
-            {0, 0},
-            m_color1,
-            1.f,
-            0.f,
-            30.f,
-            20.f,
-            std::max(m_size.width * zoom, m_size.height * zoom) * 2.f,
-            duration * 0.18f,
-            duration * 0.04f,
-            duration * 0.195f,
-            duration * 0.04f,
-            duration * 0.04f,
-            stripRotation,
-            stripRotationVariation,
-            155.f,
-            100.f,
-            stripCount,
-            true,
-            true,
-            0.4f / m_speed
-        );
+        // lightFlash->playEffect(
+        //     {0, 0},
+        //     m_color1,
+        //     1.f,
+        //     0.f,
+        //     30.f,
+        //     20.f,
+        //     std::max(m_size.width * zoom, m_size.height * zoom) * 2.f,
+        //     duration * 0.18f,
+        //     duration * 0.04f,
+        //     duration * 0.195f,
+        //     duration * 0.04f,
+        //     duration * 0.04f,
+        //     stripRotation,
+        //     stripRotationVariation,
+        //     155.f,
+        //     100.f,
+        //     stripCount,
+        //     true,
+        //     true,
+        //     0.4f / m_speed
+        // );
 
         float shakeDuration = ((stripCount + 2.f) * 0.195f * duration);
 
