@@ -863,6 +863,9 @@ private:
             float radius = u_time * 3.5;
             float thickness = u_time < 0.3 ? 0.17 : 0.04;
 
+            if (radius < 0.1)
+                radius = 0.1;
+
             float r1 = radius - thickness;
             float r2 = radius;
             float r3 = radius + thickness;
@@ -985,6 +988,11 @@ private:
             m_size.width / m_size.height
         );
 
+        m_program->setUniformLocationWith1f(
+            glGetUniformLocation(m_program->getProgram(), "u_time"),
+            0.f
+        );
+
         m_program->setUniformLocationWith2f(
             glGetUniformLocation(m_program->getProgram(), "u_origin"),
             pos.x / m_size.width,
@@ -992,8 +1000,6 @@ private:
         );
 
         m_shockwaveStarted = true;
-
-        schedule(schedule_selector(Celeste::updateShockwave));
     }
 
     void onAnimationEnd() override {
@@ -1038,7 +1044,7 @@ public:
             addChild(m_frameSprite);
 
             scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
-            scheduleOnce(schedule_selector(Celeste::updateShockwave), 1.f / 240.f);
+            schedule(schedule_selector(Celeste::updateShockwave));
         }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
