@@ -852,17 +852,30 @@ private:
         uniform float u_time;
         uniform float u_aspectRatio;
         uniform vec2 u_origin;
-        
+
         void main() {
             vec4 baseColor = texture2D(u_texture, v_texCoord);
-            float t = clamp(u_time / 1.0, 0.0, 1.0);
-            vec2 aspect = vec2(u_aspectRatio, 1.0);
-            float d = distance((v_texCoord - u_origin) * aspect, vec2(0.0));
+
+            vec2 diff = (v_texCoord - u_origin) * vec2(u_aspectRatio, 1.0);
+
+            float d2 = dot(diff, diff);
+
             float radius = u_time * 3.5;
             float thickness = u_time < 0.3 ? 0.17 : 0.04;
-            float edge = smoothstep(radius - thickness, radius, d) - smoothstep(radius, radius + thickness, d);
-            vec2 diff = v_texCoord - u_origin;
-            vec2 dir = diff == vec2(0.0) ? vec2(0.0) : normalize(diff);
+
+            float r1 = radius - thickness;
+            float r2 = radius;
+            float r3 = radius + thickness;
+
+            float r1sq = r1 * r1;
+            float r2sq = r2 * r2;
+            float r3sq = r3 * r3;
+
+            float edge = smoothstep(r1sq, r2sq, d2) - smoothstep(r2sq, r3sq, d2);
+
+            vec2 dir = diff;
+            if (d2 > 0.0) dir /= sqrt(d2);
+
             vec2 distortedCoord = v_texCoord + dir * edge * 0.02;
 
             gl_FragColor = mix(baseColor, texture2D(u_texture, distortedCoord), edge);
