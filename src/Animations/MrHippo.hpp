@@ -35,7 +35,12 @@ private:
 
         FILE* fp = fopen(utils::string::pathToString(path).c_str(), "rb");
 
-        log::debug("{}", fp == nullptr);
+        if (!fp) return log::debug("Fail");
+
+        unsigned char buf[16];
+        size_t r = fread(buf, 1, sizeof(buf), fp);
+
+        log::debug("P: {}", r);
 
         return;
 
