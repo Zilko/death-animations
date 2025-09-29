@@ -33,20 +33,9 @@ private:
         int err = 0;
         std::filesystem::path path = Mod::get()->getResourcesDir() / fmt::format("hippo_{}.opus", m_speech);
 
-        FILE* fp = fopen(utils::string::pathToString(path).c_str(), "rb");
-
-        if (!fp) return log::debug("Fail");
-
-        unsigned char buf[16];
-        size_t r = fread(buf, 1, sizeof(buf), fp);
-
-        log::debug("P: {}", r);
-
-        return;
-
         OggOpusFile* opusFile = op_open_file(utils::string::pathToString(path).c_str(), &err);
 
-        if (err != 0) return log::error("Opus has failed you, boy. {}", err);
+        // if (err != 0) return log::error("Opus has failed you, boy. {}", err);
 
         int channels = op_head(opusFile, 0)->channel_count;
         ogg_int64_t pcmTotal = op_pcm_total(opusFile, -1);
