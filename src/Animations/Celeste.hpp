@@ -1021,9 +1021,7 @@ public:
             addChild(m_frameSprite);
 
             scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
-
-            float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
-            schedule(schedule_selector(Celeste::update), 1.f / fps, kCCRepeatForever, 1.f / fps);
+            schedule(schedule_selector(Celeste::update));
         }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");

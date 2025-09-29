@@ -261,8 +261,7 @@ public:
 
         m_frameSprite->addChild(copy);
 
-        float fps = std::min(static_cast<int>(GameManager::get()->m_customFPSTarget), 240);
-        schedule(schedule_selector(Wasted::update), 1.f / fps, kCCRepeatForever, 1.f / fps);
+        schedule(schedule_selector(Wasted::update));
 
         CCPoint pos = m_frameSprite->getPosition();
 
