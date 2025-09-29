@@ -29,16 +29,57 @@ private:
             delete m_data;
     }
 
+    # if OP_GNUC_PREREQ(3,0)
+        #  define OP_UNLIKELY(_x) (__builtin_expect(!!(_x),0))
+        # else
+        #  define OP_UNLIKELY(_x) (!!(_x))
+        # endif
+
+            #  define OP_FATAL(_str) (op_fatal_impl(_str,__FILE__,__LINE__))
+
+    #  define OP_ASSERT(_cond) \
+        do{ \
+            if(OP_UNLIKELY(!(_cond)))OP_FATAL("assertion failed: " #_cond); \
+        } \
+        while(0)
+
+    static void op_fatal_impl(const char *_str,const char *_file,int _line){
+        fprintf(stderr,"Fatal (internal) error in %s, line %i: %s\n",
+        _file,_line,_str);
+        abort();
+    }
+
+    static int op_fread(void *_stream,unsigned char *_ptr,int _buf_size){
+        FILE   *stream;
+        size_t  ret;
+        /*Check for empty read.*/
+        if(_buf_size<=0)return 0;
+        stream=(FILE *)_stream;
+        ret=fread(_ptr,1,_buf_size,stream);
+        OP_ASSERT(ret<=(size_t)_buf_size);
+        /*If ret==0 and !feof(stream), there was a read error.*/
+        return ret>0||feof(stream)?(int)ret:OP_EREAD;
+    }
+
     void playSpeech(float) {
         int err = 0;
         std::filesystem::path path = Mod::get()->getResourcesDir() / fmt::format("hippo_{}.opus", m_speech);
 
-        OggOpusFile* opusFile = op_open_file(utils::string::pathToString(path).c_str(), &err);
+        FILE* fp = fopen(utils::string::pathToString(path).c_str(), "rb");
+
+        OpusFileCallbacks cb = {
+            op_fread,
+            NULL,
+            NULL,
+            (op_close_func)fclose
+        };
+        OggOpusFile* opusFile = op_open_callbacks(fp, &cb, NULL, 0, &err);
 
         // if (err != 0) return log::error("Opus has failed you, boy. {}", err);
 
         int channels = op_head(opusFile, 0)->channel_count;
-        ogg_int64_t pcmTotal = op_pcm_total(opusFile, -1);
+        // ogg_int64_t pcmTotal = op_pcm_total(opusFile, -1);
+        ogg_int64_t pcmTotal = 9936000;
         float duration = static_cast<float>(pcmTotal) / 48000.f;
 
         m_data = new OpusData(opusFile, channels);
