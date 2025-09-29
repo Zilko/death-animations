@@ -14,28 +14,28 @@ private:
         uniform float u_time;
 
         void main() {
-            vec2 uv = v_texCoord;
+            // float freq = 10.5;
+            // float speed = 4.0;
+            // float amp = 0.02;
 
-            float freq = 10.5;
-            float speed = 4.0;
-            float amp = 0.02;
+            // vec2 offset = vec2(
+            //     sin(v_texCoord.y * freq + u_time * speed) * amp,
+            //     cos(uv_texCoordv.x * freq + u_time * speed * 0.9) * amp
+            // );
 
-            vec2 offset = vec2(
-                sin(uv.y * freq + u_time * speed) * amp,
-                cos(uv.x * freq + u_time * speed * 0.9) * amp
-            );
+            // vec4 color = texture2D(u_texture, v_texCoord + offset);
+            vec4 color = texture2D(u_texture, v_texCoord);
 
-            vec4 color = texture2D(u_texture, uv + offset);
+            // float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+            // color.rgb = mix(color.rgb, vec3(gray), 0.75);
 
-            float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-            color.rgb = mix(color.rgb, vec3(gray), 0.75);
-
-            // if (color.a != 0.0) {
-                color.a = 0.7 - 0.7 * min(u_time / 1.5, 1.0);
-                color.r = min(color.r * 2, 1.0);
-                color.g = min(color.g * 2, 1.0);
-                color.b = min(color.b * 2, 1.0);
-            // }
+            if (color.a != 0.0) {
+                // color.a = 0.7 - 0.7 * min(u_time / 1.5, 1.0);
+                // color.r = min(color.r * 2, 1.0);
+                // color.g = min(color.g * 2, 1.0);
+                // color.b = min(color.b * 2, 1.0);
+                color.r = 1.0;
+            }
             
             gl_FragColor = color;
         }
