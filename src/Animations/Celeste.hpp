@@ -911,8 +911,6 @@ private:
 
     int m_transition = 0;
 
-    bool m_shockwaveStarted = false;
-
     void transitionOut(float) {
         CelesteRevive::create({
             .parentNode = m_parentNode,
@@ -953,14 +951,11 @@ private:
     }
 
     void updateShockwave(float dt) {
-        if (m_shockwaveStarted && m_frameSprite) m_frameSprite->setVisible(false);
-        if (m_shockwaveStarted && m_transitionNode) m_transitionNode->setVisible(false);
+        if (m_frameSprite) m_frameSprite->setVisible(false);
+        if (m_transitionNode) m_transitionNode->setVisible(false);
         
         Utils::takeScreenshot(m_renderTexture);
 
-        if (!m_shockwaveStarted)
-            return;
-        
         if (m_frameSprite) m_frameSprite->setVisible(true);
         if (m_transitionNode) m_transitionNode->setVisible(true);
 
@@ -976,8 +971,21 @@ private:
     }
 
     void startShockwave(float) {
+        m_program = Utils::createShader(m_shader, false);
+
+        m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
+        m_renderTexture->retain();
+
+        update(0.f);
+
+        m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        m_frameSprite->setVisible(false);
+        m_frameSprite->setFlipY(true);
+        m_frameSprite->setPosition(m_size / 2.f);
+        m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         m_frameSprite->setShaderProgram(m_program);
-        m_frameSprite->setVisible(true);
+
+        addChild(m_frameSprite);
 
         m_program->use();
 
@@ -999,7 +1007,13 @@ private:
             pos.y / m_size.height
         );
 
-        m_shockwaveStarted = true;
+        runAction(CCSequence::create(
+            CCDelayTime::create(1.f / 240.f),
+            CallFuncExt::create([this] {
+                schedule(schedule_selector(Celeste::updateShockwave));
+            }),
+            nullptr
+        ));
     }
 
     void onAnimationEnd() override {
@@ -1027,25 +1041,8 @@ public:
         if (!m_isPreview)
             Utils::setHighestZ(this);
 
-        if (Utils::getSettingBool(Anim::Celeste, "shockwave")) {
-            m_program = Utils::createShader(m_shader, false);
-
-            m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
-            m_renderTexture->retain();
-
-            update(0.f);
-
-            m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
-            m_frameSprite->setVisible(false);
-            m_frameSprite->setFlipY(true);
-            m_frameSprite->setPosition(m_size / 2.f);
-            m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
-
-            addChild(m_frameSprite);
-
+        if (Utils::getSettingBool(Anim::Celeste, "shockwave"))
             scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
-            schedule(schedule_selector(Celeste::updateShockwave));
-        }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
