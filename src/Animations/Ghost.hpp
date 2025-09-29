@@ -30,11 +30,10 @@ private:
             // color.rgb = mix(color.rgb, vec3(gray), 0.75);
 
             if (color.a != 0.0) {
-                // color.a = 0.7 - 0.7 * min(u_time / 1.5, 1.0);
-                // color.r = min(color.r * 2, 1.0);
-                // color.g = min(color.g * 2, 1.0);
-                // color.b = min(color.b * 2, 1.0);
-                color.r = 1.0;
+                color.a = 0.7 - 0.7 * min(u_time / 1.5, 1.0);
+                color.r = min(color.r * 2, 1.0);
+                color.g = min(color.g * 2, 1.0);
+                color.b = min(color.b * 2, 1.0);
             }
             
             gl_FragColor = color;
