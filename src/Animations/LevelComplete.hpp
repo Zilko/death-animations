@@ -135,32 +135,32 @@ protected:
 
         if (m_isPractice) return;
 
-        CCCircleWave* circleWave = CCCircleWave::create(10.f, m_size.width, 0.8f / m_speed, false, true);
-        circleWave->m_lineWidth = 4;
-        circleWave->m_color = m_color1;
+        // CCCircleWave* circleWave = CCCircleWave::create(10.f, m_size.width, 0.8f / m_speed, false, true);
+        // circleWave->m_lineWidth = 4;
+        // circleWave->m_color = m_color1;
         
-        m_effectContainer->addChild(circleWave, 0);
+        // m_effectContainer->addChild(circleWave, 0);
 
-        circleWave = CCCircleWave::create(10.f, 250.f, 0.8f / m_speed, false, true);
-        circleWave->m_lineWidth = 4;
-        circleWave->m_color = m_color1;
-        circleWave->setPosition(spr->getPosition());
+        // circleWave = CCCircleWave::create(10.f, 250.f, 0.8f / m_speed, false, true);
+        // circleWave->m_lineWidth = 4;
+        // circleWave->m_color = m_color1;
+        // circleWave->setPosition(spr->getPosition());
         
-        addChild(circleWave, 9);
+        // addChild(circleWave, 9);
 
-        for (int i = 0; i < 5; ++i)
-            runAction(CCSequence::create(
-                CCDelayTime::create(i * 0.05f / m_speed),
-                CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnCircle)),
-                nullptr
-            ));
+        // for (int i = 0; i < 5; ++i)
+        //     runAction(CCSequence::create(
+        //         CCDelayTime::create(i * 0.05f / m_speed),
+        //         CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnCircle)),
+        //         nullptr
+        //     ));
 
-        for (int i = 0; i < 10; ++i)
-            CCNode::runAction(CCSequence::create(
-                CCDelayTime::create((static_cast<float>(rand()) / RAND_MAX * 1.6f - 0.8f + 0.15f * i) / m_speed),
-                CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnFirework)),
-                nullptr
-            ));
+        // for (int i = 0; i < 10; ++i)
+        //     CCNode::runAction(CCSequence::create(
+        //         CCDelayTime::create((static_cast<float>(rand()) / RAND_MAX * 1.6f - 0.8f + 0.15f * i) / m_speed),
+        //         CCCallFunc::create(this, callfunc_selector(LevelComplete::spawnFirework)),
+        //         nullptr
+        //     ));
     }
 
     ANIMATION_CTOR_CREATE(LevelComplete) {}
