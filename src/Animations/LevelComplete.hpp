@@ -261,7 +261,6 @@ public:
         lightFlash->setPosition({0, 0});
         lightFlash->m_mainLayer = m_parentLayer;
         lightFlash->m_layerColorZOrder = 100;
-        lightFlash->m_dontFadeOut = false;
 
         m_effectContainer->addChild(lightFlash);
 
@@ -286,7 +285,7 @@ public:
             100.f,
             stripCount,
             true,
-            true,
+            false,
             0.4f / m_speed
         );
 
