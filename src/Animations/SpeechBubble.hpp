@@ -8,7 +8,6 @@ private:
 
     CCSprite* m_freezeSprite = nullptr;
     CCSprite* m_currentSprite = nullptr;
-    CCSprite* m_cursor = nullptr;
 
     FLAlertLayer* m_layer = nullptr;
 
@@ -17,7 +16,8 @@ private:
     
     int m_currentSpeechBubble = 0;
 
-    bool m_wasQuickKeysDisabled = false;
+    bool m_canChangeSpeechBubble = true;
+    bool m_uiEnabled = false;
 
     void loadSpeechBubble(int speechBubble) {
         if (speechBubble >= static_cast<int>(m_speechBubbles.size()))
@@ -27,6 +27,9 @@ private:
             speechBubble = static_cast<int>(m_speechBubbles.size()) - 1;
 
         m_currentSpeechBubble = speechBubble;
+
+        if (m_canChangeSpeechBubble)
+            Utils::saveSetting(Anim::SpeechBubble, "speech-bubble", m_currentSpeechBubble + 1);
 
         if (m_currentSprite)
             m_currentSprite->setVisible(false);
@@ -78,8 +81,9 @@ private:
         loadSpeechBubble(m_currentSpeechBubble - 1);
     }
 
-    void updatePointer(float) {
-        m_cursor->setPosition(getMousePos());
+    void update(float) {
+        if (m_uiEnabled && !m_isPreview)
+            PlatformToolbox::showCursor();
     }
 
     void onFlipX(CCObject*) {
@@ -148,24 +152,24 @@ private:
         
         m_layer->show();
 
-        if (m_cursor)
-            Utils::setHighestZ(m_cursor);
-
         #endif
     }
+
+    void onBack(CCObject*) {
+        resetLevel();
+    }
+
+    void onAnimationEnd() override {
+        m_didFinish = true;
+    }
     
-    ANIMATION_CTOR_CREATE(SpeechBubble) {}
-
     ~SpeechBubble() {
-        if (m_cursor) {
-            m_cursor->removeFromParentAndCleanup(true);
-            m_cursor = nullptr;
-        }
-
         if (m_layer)
             m_layer->keyBackClicked();
     }
     
+    ANIMATION_CTOR_CREATE(SpeechBubble) {}
+
 public:
 
     void FLAlert_Clicked(FLAlertLayer*, bool p1) override {
@@ -184,6 +188,18 @@ public:
                 return;
         }
 
+        int id = static_cast<int>(Utils::getSettingFloat(Anim::SpeechBubble, "speech-bubble"));
+
+        if (id == 0) {
+            m_currentSpeechBubble = Utils::getRandomInt(0, m_speechBubbles.size() - 1);
+            m_canChangeSpeechBubble = false;
+        } else
+            m_currentSpeechBubble = id - 1;
+
+
+        if (m_currentSpeechBubble >= static_cast<int>(m_speechBubbles.size()))
+            m_currentSpeechBubble = static_cast<int>(m_speechBubbles.size()) - 1;
+
         m_freezeSprite = CCSprite::createWithTexture(Utils::takeScreenshot());
         m_freezeSprite->setFlipY(true);
         m_freezeSprite->setScale(m_size.width / m_freezeSprite->getContentWidth());
@@ -192,135 +208,136 @@ public:
         
         addChild(m_freezeSprite, -2);
 
-        loadSpeechBubble(0);
+        loadSpeechBubble(m_currentSpeechBubble);
+
+        Utils::getSettingBool(Anim::SpeechBubble, "show-ui");
+
+        m_uiEnabled = Utils::getSettingBool(Anim::SpeechBubble, "show-ui");
+
+        if (!m_uiEnabled) return;
+
+        #ifndef GEODE_IS_MOBILE
+        
+        schedule(schedule_selector(SpeechBubble::update));
+
+        #endif
+
+        CCSprite* spr = nullptr;
+        CCMenuItemSpriteExtra* btn = nullptr;
+
+        disableRetryLayer();
 
         m_buttonMenu = CCMenu::create();
         m_buttonMenu->setPosition({0, 0});
 
         addChild(m_buttonMenu, 10);
 
-        CCSprite* spr = nullptr;
-        CCMenuItemSpriteExtra* btn = nullptr;
+        spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+        spr->setScale(1.1f);
 
-        if (!Utils::getSettingBool(Anim::SpeechBubble, "hide-arrows")) {
-            spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-            spr->setScale(1.1f);
+        btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowLeft));
+        btn->setPosition({29, m_size.height / 2.f});
 
-            btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowLeft));
-            btn->setPosition({29, m_size.height / 2.f});
+        m_buttonMenu->addChild(btn);
 
-            m_buttonMenu->addChild(btn);
+        spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+        spr->setScale(1.1f);
+        spr->setFlipX(true);
 
-            spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-            spr->setScale(1.1f);
-            spr->setFlipX(true);
+        btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowRight));
+        btn->setPosition({m_size.width - 29, m_size.height / 2.f});
 
-            btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowRight));
-            btn->setPosition({m_size.width - 29, m_size.height / 2.f});
+        m_buttonMenu->addChild(btn);
 
-            m_buttonMenu->addChild(btn);
-        }
-
-        if (!Utils::getSettingBool(Anim::SpeechBubble, "hide-ui")) {
-            m_buttonMenu->addChild(CCLayerColor::create({0, 0, 0, 122}, m_size.width, 46.2f));
-
-            CCLabelBMFont* lbl = CCLabelBMFont::create("Flip X", "bigFont.fnt");
-            lbl->setPosition({59, 23});
-            lbl->setScale(0.55f);
-
-            m_buttonMenu->addChild(lbl);
-
-            lbl = CCLabelBMFont::create("Flip Y", "bigFont.fnt");
-            lbl->setPosition({181, 23});
-            lbl->setScale(0.55f);
-
-            m_buttonMenu->addChild(lbl);
-
-            lbl = CCLabelBMFont::create("Scale Y", "bigFont.fnt");
-            lbl->setPosition({334, 31});
-            lbl->setScale(0.47f);
-
-            m_buttonMenu->addChild(lbl);
-
-            Slider* slider = Slider::create(this, menu_selector(SpeechBubble::onSlider));
-            slider->setPosition({334, 15});
-            slider->setAnchorPoint({ 0.f, 0.f });
-            slider->setScale(0.55f);
-            slider->setValue(Utils::getSettingFloat(Anim::SpeechBubble, "scale-y"));
+        if (!m_isPreview) {
+            spr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
+            spr->setScale(0.8f);
             
-            m_buttonMenu->addChild(slider);
-
-            CCMenuItemToggler* toggle = CCMenuItemToggler::create(
-                CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
-                CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
-                this,
-                menu_selector(SpeechBubble::onFlipX)
-            );
-            toggle->setScale(0.6f);
-            toggle->setPosition({113, 23});
-            toggle->toggle(Utils::getSettingBool(Anim::SpeechBubble, "flip-x"));
-
-            m_buttonMenu->addChild(toggle);
-
-            toggle = CCMenuItemToggler::create(
-                CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
-                CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
-                this,
-                menu_selector(SpeechBubble::onFlipY)
-            );
-            toggle->setScale(0.6f);
-            toggle->setPosition({235, 23});
-            toggle->toggle(Utils::getSettingBool(Anim::SpeechBubble, "flip-y"));
-
-            m_buttonMenu->addChild(toggle);
-
-            #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS) 
-
-            ButtonSprite* btnSpr = ButtonSprite::create("Hide UI");
-
-            #else
-
-            ButtonSprite* btnSpr = ButtonSprite::create("Save Image");
-
-            #endif
-
-            btnSpr->setScale(0.7f);
-
-            btn = CCMenuItemSpriteExtra::create(btnSpr, this, menu_selector(SpeechBubble::onSaveImage));
-            btn->setPosition({486, 23});
+            btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onBack));
+            btn->setPosition({20, m_size.height - 20});
 
             m_buttonMenu->addChild(btn);
-        }        
-
-        #ifndef GEODE_IS_MOBILE
-
-        if (!Utils::getSettingBool(Anim::SpeechBubble, "hide-arrows") || !Utils::getSettingBool(Anim::SpeechBubble, "hide-ui")) {
-            m_cursor = CCSprite::create("smallDot.png");
-            m_cursor->setScale(0.57f);
-            m_cursor->setColor({0, 0, 0});
-            m_cursor->retain();
-
-            spr = CCSprite::create("smallDot.png");
-            spr->setScale(0.6f);
-            spr->setPosition(m_cursor->getContentSize() / 2.f);
-
-            m_cursor->addChild(spr);
-            CCScene::get()->addChild(m_cursor, 20);
-
-            schedule(schedule_selector(SpeechBubble::updatePointer));
         }
+
+        m_buttonMenu->addChild(CCLayerColor::create({0, 0, 0, 122}, m_size.width, 46.2f));
+
+        CCLabelBMFont* lbl = CCLabelBMFont::create("Flip X", "bigFont.fnt");
+        lbl->setPosition({59, 23});
+        lbl->setScale(0.55f);
+
+        m_buttonMenu->addChild(lbl);
+
+        lbl = CCLabelBMFont::create("Flip Y", "bigFont.fnt");
+        lbl->setPosition({181, 23});
+        lbl->setScale(0.55f);
+
+        m_buttonMenu->addChild(lbl);
+
+        lbl = CCLabelBMFont::create("Scale Y", "bigFont.fnt");
+        lbl->setPosition({334, 31});
+        lbl->setScale(0.47f);
+
+        m_buttonMenu->addChild(lbl);
+
+        Slider* slider = Slider::create(this, menu_selector(SpeechBubble::onSlider));
+        slider->setPosition({334, 15});
+        slider->setAnchorPoint({ 0.f, 0.f });
+        slider->setScale(0.55f);
+        slider->setValue(Utils::getSettingFloat(Anim::SpeechBubble, "scale-y"));
+        
+        m_buttonMenu->addChild(slider);
+
+        CCMenuItemToggler* toggle = CCMenuItemToggler::create(
+            CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
+            CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
+            this,
+            menu_selector(SpeechBubble::onFlipX)
+        );
+        toggle->setScale(0.6f);
+        toggle->setPosition({113, 23});
+        toggle->toggle(Utils::getSettingBool(Anim::SpeechBubble, "flip-x"));
+
+        m_buttonMenu->addChild(toggle);
+
+        toggle = CCMenuItemToggler::create(
+            CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"),
+            CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
+            this,
+            menu_selector(SpeechBubble::onFlipY)
+        );
+        toggle->setScale(0.6f);
+        toggle->setPosition({235, 23});
+        toggle->toggle(Utils::getSettingBool(Anim::SpeechBubble, "flip-y"));
+
+        m_buttonMenu->addChild(toggle);
+
+        #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS) 
+
+        ButtonSprite* btnSpr = ButtonSprite::create("Hide UI");
+
+        #else
+
+        ButtonSprite* btnSpr = ButtonSprite::create("Save Image");
 
         #endif
+
+        btnSpr->setScale(0.7f);
+
+        btn = CCMenuItemSpriteExtra::create(btnSpr, this, menu_selector(SpeechBubble::onSaveImage));
+        btn->setPosition({486, 23});
+
+        m_buttonMenu->addChild(btn);
     }
 
-    void onPause() override {
-        if (m_cursor)
-            m_cursor->setVisible(false);
-    }
+    void end() override {
+        #ifndef GEODE_IS_MOBILE
 
-    void onResume() override {
-        if (m_cursor)
-            m_cursor->setVisible(true);
+        if (m_uiEnabled && !GameManager::get()->getGameVariable("0024") && !m_isPreview)
+            PlatformToolbox::hideCursor();
+        
+        #endif
+
+        BaseAnimation::end();
     }
 
 };

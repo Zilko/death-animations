@@ -1,6 +1,6 @@
 #include "SelectSetting.hpp"
 
-class SpeechSetting : public SelectSetting {
+class MonologueSetting : public SelectSetting {
 
 private:
 
@@ -8,6 +8,6 @@ private:
 
     void init(float) override;
 
-    SETTING_CTOR_CREATE(SpeechSetting, SelectSetting)
+    SETTING_CTOR_CREATE(MonologueSetting, SelectSetting)
 
 };

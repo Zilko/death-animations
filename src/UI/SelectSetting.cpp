@@ -21,16 +21,21 @@ void SelectSetting::init(float y) {
 
     float xOffset = m_nameLabel->getContentWidth() * m_nameLabel->getScale() - 60;
     
-    CCScale9Sprite* bg = CCScale9Sprite::create("square02b_001.png");
-    bg->setColor({0, 0, 0});
-    bg->setOpacity(90);
-    bg->setScale(0.275f);
-    bg->setPosition({125 + xOffset, 10});
-    bg->setContentSize({237, 69});
+    m_bg = CCScale9Sprite::create("square02b_001.png");
+    m_bg->setColor({0, 0, 0});
+    m_bg->setOpacity(90);
+    m_bg->setScale(0.275f);
+    m_bg->setPosition({xOffset + 125, 10});
+    m_bg->setContentSize({237, 69});
     
-    addChild(bg);
+    addChild(m_bg);
 
-    m_label = CCLabelBMFont::create(m_setting.elements[static_cast<int>(Utils::getSettingFloat(m_animation.id, m_setting.id))].c_str(), "bigFont.fnt");
+    int element = static_cast<int>(Utils::getSettingFloat(m_animation.id, m_setting.id));
+
+    if (element >= static_cast<int>(m_setting.elements.size()))
+        element = static_cast<int>(m_setting.elements.size()) - 1;
+
+    m_label = CCLabelBMFont::create(m_setting.elements[element].c_str(), "bigFont.fnt");
     m_label->setPosition({125 + xOffset, 10});
     m_label->limitLabelWidth(58.f, 0.35f, 0.0001f);
     

@@ -43,7 +43,8 @@ protected:
     bool m_isDelayRestart = false;
     bool m_isNoRetryLayer = false;
     bool m_didFinish = false;
-    
+
+    float m_retryLayerDelay = 0.f;
     float m_speed = 1.f;
     float m_duration = 1.f;
     
@@ -64,16 +65,6 @@ protected:
                 }
           }
 
-    void enableTouch() {
-        setTouchEnabled(true);
-        registerWithTouchDispatcher();
-        setTouchMode(kCCTouchesOneByOne);
-    }
-
-    virtual void setAnimationID() {
-        setID("death-animation"_spr);
-    }
-
     virtual bool init() override {
         CCLayer::init();
 
@@ -84,16 +75,43 @@ protected:
         if (m_parentNode)
             m_parentNode->addChild(this);
 
-        runAction(CCSequence::create(
+        CCAction* action = CCSequence::create(
             CCDelayTime::create(m_duration / m_speed + 0.1f),
-            CallFuncExt::create([this]{
-                setVisible(false);
-                m_didFinish = true;
-            }),
+            CCCallFunc::create(this, callfunc_selector(BaseAnimation::onAnimationEnd)),
             nullptr
-        ));
+        );
+
+        action->setTag(534);
+
+        runAction(action);
 
         return true;
+    }
+
+    virtual void setAnimationID() {
+        setID("death-animation"_spr);
+    }
+
+    virtual void onAnimationEnd() {
+        setVisible(false);
+        m_didFinish = true;
+    }
+
+    void enableTouch() {
+        setTouchEnabled(true);
+        registerWithTouchDispatcher();
+        setTouchMode(kCCTouchesOneByOne);
+    }
+
+    void disableRetryLayer() {
+        m_isNoRetryLayer = true;
+
+        stopActionByTag(534);
+        
+        if (!m_isPreview)
+            m_playLayer->stopActionByTag(16);
+        else
+            m_delegate->stopReset();
     }
 
     float getCurrentZoom() {
@@ -173,6 +191,10 @@ public:
 
     bool didFinish() {
         return m_didFinish;
+    }
+
+    float getRetryLayerDelay() {
+        return m_retryLayerDelay;
     }
   
 };

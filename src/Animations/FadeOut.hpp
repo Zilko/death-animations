@@ -76,6 +76,10 @@ private:
         Utils::setHookEnabled("ExplodeItemNode::update", toggled);
     }
 
+    void onAnimationEnd() override {
+        m_didFinish = true;
+    }
+
     ~FadeOut() {
         if (m_renderTexture)
             m_renderTexture->release();

@@ -1,9 +1,9 @@
-#include "SpeechSetting.hpp"
+#include "MonologueSetting.hpp"
 #include "AnimationSettingsLayer.hpp"
 
 #include "../Other/Utils.hpp"
 
-void SpeechSetting::onSelectorArrow(CCObject* obj) {
+void MonologueSetting::onSelectorArrow(CCObject* obj) {
     if (obj)
         SelectSetting::onSelectorArrow(obj);
 
@@ -36,7 +36,7 @@ void SpeechSetting::onSelectorArrow(CCObject* obj) {
     );
 }
 
-void SpeechSetting::init(float y) {
+void MonologueSetting::init(float y) {
     SelectSetting::init(y);
 
     onSelectorArrow(nullptr);

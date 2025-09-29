@@ -117,8 +117,6 @@ private:
 
     std::vector<BloodDrop> m_bloodDrops;
 
-    ANIMATION_CTOR_CREATE(Blood) {}
-
     void addSpatter(CCNode* player) {
         CCPoint velocity = {0, 0};
 
@@ -193,7 +191,13 @@ private:
         if (Utils::getSettingBool(Anim::Blood, "blood-spatter"))
             addSpatter(player);
     }
+
+    void onAnimationEnd() override {
+        m_didFinish = true;
+    }
     
+    ANIMATION_CTOR_CREATE(Blood) {}
+
 public:
 
     void start() override {

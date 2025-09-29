@@ -49,6 +49,8 @@ public:
         spr->setPosition({m_size.width, 16});
         spr->setAnchorPoint({0, 0});
         spr->runAction(CCMoveTo::create(0.07f, {16, 16}));
+
+        Utils::fixScaleTextureSizexd(spr);
         
         addChild(spr);
     }

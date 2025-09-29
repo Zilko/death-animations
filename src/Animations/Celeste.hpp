@@ -892,7 +892,7 @@ private:
 
     float m_time = 0.f;
 
-    bool m_shockwaveStarted = false;
+    bool m_updateShockwave = false;
     
     int m_transition = 0;
 
@@ -936,17 +936,23 @@ private:
     }
 
     void update(float dt) override {
-        if (m_frameSprite) m_frameSprite->setVisible(false);
+        if (m_updateShockwave && m_frameSprite) m_frameSprite->setVisible(false);
         if (m_transitionNode) m_transitionNode->setVisible(false);
         
         Utils::takeScreenshot(m_renderTexture);
 
-        if (m_frameSprite) m_frameSprite->setVisible(true);
+        if (m_updateShockwave && m_frameSprite) m_frameSprite->setVisible(true);
         if (m_transitionNode) m_transitionNode->setVisible(true);
 
-        if (!m_shockwaveStarted) return;
+        if (!m_updateShockwave) return;
     
         m_time += dt * m_speed;
+
+        if (m_time > 1.f) {
+            m_frameSprite->setVisible(false);
+            m_updateShockwave = false;
+            return;
+        }
 
         m_program->use();
         m_program->setUniformLocationWith1f(glGetUniformLocation(m_program->getProgram(), "u_time"), m_time);
@@ -962,7 +968,11 @@ private:
 
         m_frameSprite->setShaderProgram(m_program);
 
-        m_shockwaveStarted = true;
+        m_updateShockwave = true;
+    }
+
+    void onAnimationEnd() override {
+        m_didFinish = true;
     }
 
     ~Celeste() {
@@ -1016,7 +1026,7 @@ public:
         if (
             m_transition != 0
             && Utils::getSettingBool(Anim::Celeste, "respawn-animation")
-            && GameManager::get()->getGameVariable("0026")
+            && (GameManager::get()->getGameVariable("0026") || m_isPreview)
         ) {
             scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelays.at(m_transition) / m_speed);
         } else {

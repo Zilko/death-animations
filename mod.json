@@ -34,7 +34,6 @@
             "resources/sprites/ui/thumbnails/*.png",
             "resources/sprites/animations/among-us/*.png",
             "resources/sprites/animations/jumpscare/*.png",
-            "resources/sprites/animations/to-be-continued/*.png",
             "resources/sprites/animations/you-died/*.png"
         ],
         "files": [
@@ -44,6 +43,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/to-be-continued/*.png",
             "resources/sprites/animations/wasted/*.png",
             "resources/sprites/animations/minecraft/*.png",
             "resources/sprites/animations/blood/*.png",

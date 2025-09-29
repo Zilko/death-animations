@@ -27,11 +27,7 @@ private:
 
         Utils::fixScaleTextureSizexd(m_sprite);
 
-        float scale = Utils::getRandomInt(1, 10) <= 2
-            ? (Utils::getRandomInt(0, 1) ? 1.2f : 2.1f)
-            : 0.8f;
-
-        m_sprite->setScale(4 * m_sprite->getScale() * scale);
+        m_sprite->setScale(4 * m_sprite->getScale() * (Utils::getRandomInt(0, 1) ? 1.f : 1.9f));
 
         if (Utils::getRandomInt(1, 10) <= 4) {
             m_sprite->setColor({ 190, 190, 190 });
@@ -400,12 +396,7 @@ public:
         if (Utils::getSettingBool(Anim::Minecraft, "no-overlay"))
             return;
 
-        m_isNoRetryLayer = true;
-        
-        if (!m_isPreview)
-            m_playLayer->stopActionByTag(16);
-        else
-            m_delegate->stopReset();
+        disableRetryLayer();
 
         std::string username = GJAccountManager::get()->m_username;
         if (username.empty())

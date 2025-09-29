@@ -2,6 +2,12 @@
 
 class CBFDetected : public BaseAnimation {
     
+private:
+
+    void onAnimationEnd() override {
+        m_didFinish = true;
+    }
+
     ANIMATION_CTOR_CREATE(CBFDetected) {}
     
 public:
@@ -26,11 +32,11 @@ public:
 
         addChild(realLbl);
 
-        CCLabelBMFont* lbl = CCLabelBMFont::create(fmt::format("CBF Detected{}!", Utils::getSettingBool(Anim::CBFDetected, "include-loser") ? ", loser" : "").c_str(), "bigFont.fnt");
+        CCLabelBMFont* lbl = CCLabelBMFont::create(fmt::format("CBF Detected{}", Utils::getSettingBool(Anim::CBFDetected, "include-loser") ? ", loser!" : "").c_str(), "bigFont.fnt");
         lbl->setColor(Utils::getSettingBool(Anim::CBFDetected, "yellow-color") ? ccc3(250, 237, 114) : ccc3(255, 56, 35));
         lbl->setScale(0.6f);
         lbl->setPosition({5.5f, 41});
-        lbl->setAnchorPoint({0, 1});
+        lbl->setAnchorPoint({0, 0.5f});
 
         addChild(lbl);
 

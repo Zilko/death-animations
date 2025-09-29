@@ -169,6 +169,8 @@ private:
             case 3: m_duration = 147.f; break;
             case 4: m_duration = 148.f; break;
         }
+
+        m_retryLayerDelay = m_duration - 0.3f;
     }
     
 public:

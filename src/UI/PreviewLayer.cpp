@@ -139,7 +139,7 @@ void PreviewLayer::keyDown(enumKeyCodes key) {
 
     if (
         (m_animation && m_animation->isDontRestart())
-        || key == enumKeyCodes::KEY_R
+        || key != enumKeyCodes::KEY_R
     ) {
         return;
     }

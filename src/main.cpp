@@ -218,17 +218,21 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         if (!f->m_animation)
             return PlayLayer::showRetryLayer();
+    
+        float delay = f->m_animation->getRetryLayerDelay() > 0.f
+            ? f->m_animation->getRetryLayerDelay()
+            : anim.retryLayerDelay;
 
         if (
-            (anim.retryLayerDelay <= 0.f && !f->m_animation->isNoRetryLayer())
+            (delay <= 0.f && !f->m_animation->isNoRetryLayer())
             || f->m_forceRetryLayer
         ) {
             return PlayLayer::showRetryLayer();
         }
 
-        if (anim.retryLayerDelay > 0.f && !f->m_animation->isNoRetryLayer()) {
+        if (delay > 0.f && !f->m_animation->isNoRetryLayer()) {
             CCAction* action = CCSequence::create(
-                CCDelayTime::create(anim.retryLayerDelay / Utils::getSpeedValue(Utils::getSettingFloat(anim.id, "speed"))),
+                CCDelayTime::create(delay / Utils::getSpeedValue(Utils::getSettingFloat(anim.id, "speed"))),
                 CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedShowRetryLayer)),
                 nullptr
             );
@@ -256,8 +260,10 @@ class $modify(ProPlayLayer, PlayLayer) {
             if (f->m_animation->isDontRestart())
                 return;
 
-            if (f->m_animation->isDelayRestart())
+            if (f->m_animation->isDelayRestart()) {
+                stopActionByTag(472);
                 return f->m_animation->onRestart();
+            }
         }
 
         f->m_forceRestart = false;
@@ -430,7 +436,7 @@ class $modify(FMOD::ChannelControl) {
         return (FMOD_RESULT)0;
     }
 
-    FMOD_RESULT setPaused(bool paused) { // disabled by defolt
+    FMOD_RESULT setPaused(bool) { // disabled by defolt
         return FMOD::ChannelControl::setPaused(false);
     }
 

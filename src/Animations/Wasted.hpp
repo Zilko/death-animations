@@ -164,6 +164,12 @@ private:
         Utils::setHookEnabled("ExplodeItemNode::update", toggled);
     }
 
+    void onAnimationEnd() override {
+        BaseAnimation::onAnimationEnd();
+
+        toggleHooks(false);
+    }
+
     ~Wasted() {
         if (m_renderTexture)
             m_renderTexture->release();
