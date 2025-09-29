@@ -908,6 +908,8 @@ private:
 
     int m_transition = 0;
 
+    bool m_shockwaveStarted = false;
+
     void transitionOut(float) {
         CelesteRevive::create({
             .parentNode = m_parentNode,
@@ -948,10 +950,13 @@ private:
     }
 
     void updateShockwave(float dt) {
-        if (m_frameSprite) m_frameSprite->setVisible(false);
-        if (m_transitionNode) m_transitionNode->setVisible(false);
+        if (m_shockwaveStarted && m_frameSprite) m_frameSprite->setVisible(false);
+        if (m_shockwaveStarted && m_transitionNode) m_transitionNode->setVisible(false);
         
         Utils::takeScreenshot(m_renderTexture);
+
+        if (!m_shockwaveStarted)
+            return;
         
         if (m_frameSprite) m_frameSprite->setVisible(true);
         if (m_transitionNode) m_transitionNode->setVisible(true);
@@ -968,7 +973,7 @@ private:
     }
 
     void startShockwave(float) {
-        // m_frameSprite->setShaderProgram(m_program);
+        m_frameSprite->setShaderProgram(m_program);
         m_frameSprite->setVisible(true);
 
         m_program->use();
@@ -985,6 +990,8 @@ private:
             pos.x / m_size.width,
             pos.y / m_size.height
         );
+
+        m_shockwaveStarted = true;
 
         schedule(schedule_selector(Celeste::updateShockwave));
     }
@@ -1031,6 +1038,7 @@ public:
             addChild(m_frameSprite);
 
             scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
+            scheduleOnce(schedule_selector(Celeste::updateShockwave), 1.f / 240.f);
         }
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
