@@ -18,8 +18,8 @@ private:
         void main() {
             vec4 c = texture2D(u_texture, v_texCoord);
             float g = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-            vec3 bw = vec3(g);
-            gl_FragColor = vec4(mix(c.rgb, bw, u_progress), c.a);
+            vec3 wa = mix(c.rgb, vec3(g, g, g), u_progress);
+            gl_FragColor = vec4(wa.r, wa.g, wa.b, c.a);
         }
     )";
 
