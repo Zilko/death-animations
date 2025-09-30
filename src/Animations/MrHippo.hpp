@@ -73,9 +73,10 @@ private:
             NULL,
             (op_close_func)fclose
         };
+
         OggOpusFile* opusFile = op_open_callbacks(fp, &cb, NULL, 0, &err);
 
-        // if (err != 0) return log::error("Opus has failed you, boy. {}", err);
+        if (err != 0) return log::error("Opus has failed you, boy. {}", err);
 
         int channels = op_head(opusFile, 0)->channel_count;
         // ogg_int64_t pcmTotal = op_pcm_total(opusFile, -1);
