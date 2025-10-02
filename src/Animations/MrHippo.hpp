@@ -27,7 +27,7 @@ private:
     }
 
     void playSpeech(float) {
-        std::filesystem::path path = Mod::get()->getResourcesDir() / fmt::format("hippo_{}.opus", m_speech);
+        std::filesystem::path path = Mod::get()->getResourcesDir() / fmt::format("hippo-{}.opus", m_speech);
 
         FILE* fp = fopen(utils::string::pathToString(path).c_str(), "rb");
 
@@ -203,8 +203,8 @@ public:
         Utils::setHighestZ(this);
 
         showSpeech(
-            fmt::format("hippo_{}.png"_spr, Utils::getRandomInt(1, 3)),
-            fmt::format("hippo_{}.png"_spr, Utils::getRandomInt(4, 6))
+            fmt::format("hippo-{}.png"_spr, Utils::getRandomInt(1, 3)),
+            fmt::format("hippo-{}.png"_spr, Utils::getRandomInt(4, 6))
         );
 
         scheduleOnce(schedule_selector(MrHippo::playSpeech), 1.f);

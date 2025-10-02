@@ -155,6 +155,8 @@ private:
     }
 
     void loadLabel(CCLabelBMFont* lbl) {
+        if (!lbl) return;
+        
         CCArrayExt<CCNode*> children = CCArrayExt<CCNode*>(lbl->getChildren());
         std::string string = lbl->getString();
 
@@ -261,6 +263,9 @@ private:
 
         m_label1->removeFromParentAndCleanup(true);
         m_label2->removeFromParentAndCleanup(true);
+        
+        m_label1 = nullptr;
+        m_label2 = nullptr;
 
         std::string name = GJAccountManager::get()->m_username;
 
@@ -296,6 +301,9 @@ private:
 
         m_label1->removeFromParentAndCleanup(true);
         m_label2->removeFromParentAndCleanup(true);
+        
+        m_label1 = nullptr;
+        m_label2 = nullptr;
         
         scheduleOnce(schedule_selector(Undertale::seventhStep), 1.9f / m_speed);
     }

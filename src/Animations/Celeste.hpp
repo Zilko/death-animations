@@ -218,6 +218,7 @@ private:
     CCLayerColor* m_overlay = nullptr;
     
     bool m_reverse = false;
+    bool m_didRevive = false;
     
     void chapter1Transition() {
         CCNode* container = CCNode::create();
@@ -650,6 +651,22 @@ private:
             case 9: chapter8Transition(); break;
         }
     }
+    
+    bool playerIsDead() {
+        return (!m_isPreview && m_playLayer->m_player1->m_isDead)
+            || (m_isPreview && m_delegate->isDead());
+    }
+    
+    void update(float) override {
+        if (m_didRevive && playerIsDead())
+            setVisible(false);
+        else if (!playerIsDead())
+            m_didRevive = true;
+    }
+    
+    void transitionEnded(float) {
+        end();
+    }
 
     ANIMATION_CTOR_CREATE(CelesteTransition) {}
 
@@ -672,6 +689,9 @@ public:
         }
         else
             startTransition(0.f);
+        
+        schedule(schedule_selector(CelesteTransition::update));
+        scheduleOnce(schedule_selector(CelesteTransition::transitionEnded), 1.f / m_speed);
     }
 
 };
@@ -686,7 +706,6 @@ private:
     std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
     
     bool m_isWhite = false;
-    bool m_didRevive = false;
 
     ~CelesteRevive() {
         SoundManager::release(m_sound);
@@ -736,23 +755,12 @@ private:
         player->setVisible(false);
         player->getParent()->addChild(sprite);
     }
-
-    bool playerIsDead() {
-        return (!m_isPreview && m_playLayer->m_player1->m_isDead)
-            || (m_isPreview && m_delegate->isDead());
-    }
     
     void update(float) override {
         for (CCSprite* sprite : m_animationSprites) {
             sprite->setPosition(m_players.at(sprite)->getPosition() + ccp(27, 4));
             m_players.at(sprite)->setVisible(false);
         }
-
-        if (m_didRevive && playerIsDead()) {
-            transitionEnded(0.f);
-        }
-        else if (!playerIsDead())
-            m_didRevive = true;
     }
     
     void updateColors(float) {
@@ -769,14 +777,6 @@ private:
         }
         
         m_animationSprites.clear();
-    }
-    
-    void transitionEnded(float) {
-        unscheduleAllSelectors();
-            
-        Loader::get()->queueInMainThread([self = Ref(this)] {
-            self->end();
-        });
     }
     
     void playSound(float) {
@@ -811,7 +811,6 @@ public:
         
         scheduleOnce(schedule_selector(CelesteRevive::playSound), (hasTransition ? 0.12f : 0.05f) / m_speed);
         scheduleOnce(schedule_selector(CelesteRevive::startAnimations), (hasTransition ? 0.25f : 0.18f) / m_speed);
-        scheduleOnce(schedule_selector(CelesteRevive::transitionEnded), 1.f / m_speed);
         schedule(schedule_selector(CelesteRevive::updateColors), 5.f / 60.f / m_speed, kCCRepeatForever, 5.f / 60.f / m_speed);
         schedule(schedule_selector(CelesteRevive::update));
     }
