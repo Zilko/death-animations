@@ -57,11 +57,11 @@ $on_mod(Loaded) {
             );
     }
 
-    if (!Mod::get()->setSavedValue("created-speech-bubble-folder", true)) {
+    if (!Mod::get()->setSavedValue("created-speech-bubble-folder2", true)) {
         std::filesystem::path folder = Mod::get()->getSaveDir() / "speech-bubbles";
         
         if (!utils::file::createDirectoryAll(folder).isErr())
-            for (int i = 1; i < 3; i++) {
+            for (int i = 1; i < 6; i++) {
                 std::string name = fmt::format("speech-bubble-{}.png", i);
                 std::error_code ec;
                 
@@ -182,7 +182,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         f->m_animation->startWithObject(obj);
         f->m_animation->start();
 
-        if (!getActionByTag(16))
+        if (!GameManager::get()->getGameVariable("0026"))
             return;
         
         stopActionByTag(16);
@@ -192,8 +192,8 @@ class $modify(ProPlayLayer, PlayLayer) {
             CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedResetLevelReal)),
             nullptr
         );
-        
         seq->setTag(16);
+        
         runAction(seq);
     }
 
@@ -233,21 +233,20 @@ class $modify(ProPlayLayer, PlayLayer) {
         }
 
         if (delay > 0.f && !f->m_animation->isNoRetryLayer()) {
-            CCAction* action = CCSequence::create(
+            CCSequence* seq = CCSequence::create(
                 CCDelayTime::create(delay / Utils::getSpeedValue(Utils::getSettingFloat(anim.id, "speed"))),
                 CCCallFunc::create(this, callfunc_selector(ProPlayLayer::delayedShowRetryLayer)),
                 nullptr
             );
+            seq->setTag(472);
 
-            action->setTag(472);
-
-            runAction(action);
+            runAction(seq);
         }
     }
     
     void resetLevel() {
         auto f = m_fields.self();
-
+        
         if (
             f->m_animation
             && !f->m_forceRestart
@@ -276,13 +275,13 @@ class $modify(ProPlayLayer, PlayLayer) {
             f->m_animation->end();
             f->m_animation = nullptr;
 
-            if (!f->m_didShowRetryLayer)
+            if (!f->m_didShowRetryLayer && !GameManager::get()->getGameVariable("0026"))
                 f->m_accumulatedRetryLayers++;
         }
 
-        PlayLayer::resetLevel();
-
         stopActionByTag(472);
+        
+        PlayLayer::resetLevel();
 
         if (endedAnimation && f->m_isNewBest && Variables::getSelectedAnimation().isDelayNewBest) {
             Variables::setSelectedAnimation({});

@@ -156,7 +156,8 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
         { "probability", 10.f }
     } },
     { Anim::SpeechBubble, {
-        { "scale-y", 1.f }
+        { "scale-y", 0.81f },
+        { "speech-bubble", 1.f }
     } },
 };
 
@@ -169,12 +170,13 @@ inline const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Ghost, { { "play-in-practice", true } } },
     { Anim::Pop, { { "play-in-practice", true } } },
     { Anim::FadeOut, { { "desaturate", true }, { "slow-down", true } } },
+    { Anim::SpeechBubble, { { "show-ui", true } } },
 };
 
 inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
-    { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 5.f, .retryLayerDelay = 4.1f, .isStopMusic = true, .isDelayNewBest = true },
+    { .id = Anim::YouDied, .thumbnail = "you-died-thumbnail.png", .name = "Dark Souls - You Died", .duration = 4.8f, .retryLayerDelay = 3.9f, .isStopMusic = true },
     { .id = Anim::Bsod, .thumbnail = "bsod-thumbnail.png", .name = "Blue Screen of Death", .duration = 12.f, .retryLayerDelay = 11.5f, .isStopMusic = true  },
     { .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f, .retryLayerDelay = 2.4f, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .retryLayerDelay = 0.94f, .isNoDeathEffect = true, .isNoSpawnEffect = true },

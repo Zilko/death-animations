@@ -672,7 +672,6 @@ private:
         m_player->m_wasTeleported = player->m_wasTeleported;
         m_player->m_fixGravityBug = player->m_fixGravityBug;
         m_player->m_reverseSync = player->m_reverseSync;
-        m_player->m_justPlacedStreak = player->m_justPlacedStreak;
         m_player->m_lastCollisionBottom = player->m_lastCollisionBottom;
         m_player->m_lastCollisionTop = player->m_lastCollisionTop;
         m_player->m_lastCollisionLeft = player->m_lastCollisionLeft;
@@ -699,7 +698,6 @@ private:
         m_player->m_speedMultiplier = player->m_speedMultiplier;
         m_player->m_yStart = player->m_yStart;
         m_player->m_gravity = player->m_gravity;
-        m_player->m_trailingParticleLife = player->m_trailingParticleLife;
         m_player->m_unk648 = player->m_unk648;
         m_player->m_gameModeChangedTime = player->m_gameModeChangedTime;
         m_player->m_padRingRelated = player->m_padRingRelated;
@@ -726,10 +724,6 @@ private:
         m_player->m_useLandParticles0 = player->m_useLandParticles0;
         m_player->m_landParticlesAngle = player->m_landParticlesAngle;
         m_player->m_landParticleRelatedY = player->m_landParticleRelatedY;
-        m_player->m_playerStreak = player->m_playerStreak;
-        m_player->m_streakStrokeWidth = player->m_streakStrokeWidth;
-        m_player->m_disableStreakTint = player->m_disableStreakTint;
-        m_player->m_alwaysShowStreak = player->m_alwaysShowStreak;
         m_player->m_unk3d0 = player->m_unk3d0;
         m_player->m_blackOrbRelated = player->m_blackOrbRelated;
         m_player->m_unk3e0 = player->m_unk3e0;
@@ -739,7 +733,6 @@ private:
         m_player->m_collidedBottomMaxY = player->m_collidedBottomMaxY;
         m_player->m_collidedLeftMaxX = player->m_collidedLeftMaxX;
         m_player->m_collidedRightMinX = player->m_collidedRightMinX;
-        m_player->m_fadeOutStreak = player->m_fadeOutStreak;
         m_player->m_canPlaceCheckpoint = player->m_canPlaceCheckpoint;
         m_player->m_maybeIsColliding = player->m_maybeIsColliding;
         m_player->m_jumpBuffered = player->m_jumpBuffered;

@@ -6,6 +6,9 @@ private:
 
     CCMenu* m_buttonMenu = nullptr;
 
+    CCMenuItemSpriteExtra* m_leftArrow = nullptr;
+    CCMenuItemSpriteExtra* m_rightArrow = nullptr;
+
     CCSprite* m_freezeSprite = nullptr;
     CCSprite* m_currentSprite = nullptr;
 
@@ -27,6 +30,14 @@ private:
             speechBubble = static_cast<int>(m_speechBubbles.size()) - 1;
 
         m_currentSpeechBubble = speechBubble;
+        
+        if (m_uiEnabled) {
+            m_leftArrow->setOpacity(static_cast<int>(m_speechBubbles.size()) == 1 ? 140 : 255);
+            m_rightArrow->setOpacity(static_cast<int>(m_speechBubbles.size()) == 1 ? 140 : 255);
+            
+            m_leftArrow->setEnabled(static_cast<int>(m_speechBubbles.size()) != 1);
+            m_rightArrow->setEnabled(static_cast<int>(m_speechBubbles.size()) != 1);
+        }
 
         if (m_canChangeSpeechBubble)
             Utils::saveSetting(Anim::SpeechBubble, "speech-bubble", m_currentSpeechBubble + 1);
@@ -81,7 +92,7 @@ private:
         loadSpeechBubble(m_currentSpeechBubble - 1);
     }
 
-    void update(float) {
+    void update(float) override {
         if (m_uiEnabled && !m_isPreview)
             PlatformToolbox::showCursor();
     }
@@ -106,12 +117,6 @@ private:
 
     void onSaveImage(CCObject*) {
         if (!m_currentSprite) return;
-
-        #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS) 
-
-        m_buttonMenu->setVisible(false);
-
-        #else
 
         std::filesystem::path folder = Mod::get()->getSaveDir() / "screenshots";
 
@@ -151,8 +156,6 @@ private:
         );
         
         m_layer->show();
-
-        #endif
     }
 
     void onBack(CCObject*) {
@@ -185,7 +188,7 @@ public:
             );
 
             if (!std::filesystem::exists(m_speechBubbles.front()))
-                return;
+                return log::error("What did you do boy");
         }
 
         int id = static_cast<int>(Utils::getSettingFloat(Anim::SpeechBubble, "speech-bubble"));
@@ -208,13 +211,11 @@ public:
         
         addChild(m_freezeSprite, -2);
 
-        loadSpeechBubble(m_currentSpeechBubble);
-
         Utils::getSettingBool(Anim::SpeechBubble, "show-ui");
 
         m_uiEnabled = Utils::getSettingBool(Anim::SpeechBubble, "show-ui");
 
-        if (!m_uiEnabled) return;
+        if (!m_uiEnabled) return loadSpeechBubble(m_currentSpeechBubble);;
 
         #ifndef GEODE_IS_MOBILE
         
@@ -235,19 +236,21 @@ public:
         spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
         spr->setScale(1.1f);
 
-        btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowLeft));
-        btn->setPosition({29, m_size.height / 2.f});
+        m_leftArrow = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowLeft));
+        m_leftArrow->setPosition({29, m_size.height / 2.f});
+        m_leftArrow->setCascadeOpacityEnabled(true);
 
-        m_buttonMenu->addChild(btn);
+        m_buttonMenu->addChild(m_leftArrow);
 
         spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
         spr->setScale(1.1f);
         spr->setFlipX(true);
 
-        btn = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowRight));
-        btn->setPosition({m_size.width - 29, m_size.height / 2.f});
+        m_rightArrow = CCMenuItemSpriteExtra::create(spr, this, menu_selector(SpeechBubble::onArrowRight));
+        m_rightArrow->setPosition({m_size.width - 29, m_size.height / 2.f});
+        m_rightArrow->setCascadeOpacityEnabled(true);
 
-        m_buttonMenu->addChild(btn);
+        m_buttonMenu->addChild(m_rightArrow);
 
         if (!m_isPreview) {
             spr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
@@ -311,15 +314,7 @@ public:
 
         m_buttonMenu->addChild(toggle);
 
-        #if defined(GEODE_IS_IOS) || defined(GEODE_IS_MACOS) 
-
-        ButtonSprite* btnSpr = ButtonSprite::create("Hide UI");
-
-        #else
-
         ButtonSprite* btnSpr = ButtonSprite::create("Save Image");
-
-        #endif
 
         btnSpr->setScale(0.7f);
 
@@ -327,6 +322,8 @@ public:
         btn->setPosition({486, 23});
 
         m_buttonMenu->addChild(btn);
+        
+        loadSpeechBubble(m_currentSpeechBubble);
     }
 
     void end() override {

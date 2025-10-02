@@ -44,6 +44,8 @@ public:
     void start() override {
         Utils::playSound(Anim::YouDied, "you-died.mp3", m_speed, 3000, 5000);
         
+        Utils::setHighestZ(this);
+        
         m_bg = CCLayerColor::create({0, 0, 0, 0});
         m_bg->setOpacity(0);
         
