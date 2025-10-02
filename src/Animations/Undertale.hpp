@@ -213,7 +213,7 @@ private:
     }
     
     void next() {
-        if (m_isOnCooldown) return;
+        if (m_isOnCooldown || !m_canGoNext || m_currentStep > 5) return;
         
         m_canGoNext = false;
         
@@ -303,7 +303,7 @@ private:
     void seventhStep(float) {
         m_gameOver->runAction(CCSequence::create(
             CCFadeTo::create(1.2f / m_speed, 0),
-            CCDelayTime::create(0.8f),
+            CCDelayTime::create(1.2f),
             CCCallFunc::create(this, callfunc_selector(Undertale::finalStep)),
             nullptr
         ));
