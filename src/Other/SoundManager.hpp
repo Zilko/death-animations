@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../Includes.hpp"
 
 class SoundUpdater : public CCObject {

@@ -17,5 +17,5 @@ public:
     virtual void reset() {}
 
     virtual void stopReset() {}
-    
+
 };

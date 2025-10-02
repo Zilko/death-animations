@@ -405,7 +405,7 @@ private:
         fmod->m_globalChannel->setVolume(sfx);
     }
 
-    void update(float dt) {
+    void update(float dt) override {
         dt *= m_speed;
         
         m_time += dt;

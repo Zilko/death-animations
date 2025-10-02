@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Geode/Geode.hpp>
+
 using namespace geode::prelude;
 
 class PreviewDelegate;
@@ -134,7 +136,7 @@ inline const std::unordered_set<std::string> gloalBoolDefaults = {
 inline const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
     { Anim::What, {
         { "top-text", "WHAT" },
-        { "bottom-text", "what" },
+        { "bottom-text", "how" },
     } }
 };
 
@@ -181,7 +183,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .retryLayerDelay = 7.7f, .isNoDeathSound = true, .isNoShakeEffect = true, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Maro, .thumbnail = "maro-thumbnail.png", .name = "Super Mario Bros.", .duration = 3.f, .retryLayerDelay = 1.9f, .isNoDeathEffect = true, .isFreezeGameLayer = true, .isStopMusic = true },
     { .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f, .retryLayerDelay = 0.3f },
-    { .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .retryLayerDelay = 16.3f, .isNoDeathEffect = true, .isStopMusic = true, .isDelayNewBest = true },
+    { .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Minecraft, .thumbnail = "minecraft-thumbnail.png", .name = "Minecraft", .duration = 1.2f, .retryLayerDelay = 0.4f, .isNoDeathEffect = true },
     { .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
     { .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
@@ -295,4 +297,5 @@ inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSet
     { Anim::PracticeComplete, { "play-sound-effects" } },
     { Anim::MrHippo, { "play-sound-effects", "speed" } },
     { Anim::Minecraft, { "speed" } },
+    { Anim::Undertale, { "speed" } },
 };

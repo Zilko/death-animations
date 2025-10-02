@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Includes.hpp"
+#include "../Other/Utils.hpp"
+#include "../Other/SoundManager.hpp"
 #include "../Other/PreviewDelegate.hpp"
 
 #define ANIMATION_CTOR(Class) \

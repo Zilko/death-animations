@@ -101,8 +101,14 @@ private:
     CCLabelBMFont* m_label1 = nullptr;
     CCLabelBMFont* m_label2 = nullptr;
 
+    bool m_canGoNext = false;
+    bool m_isOnCooldown = false;
+    
     int m_currentLetter = 0;
-    float m_waitTime = 0.f;
+    int m_currentStep = 0;
+    
+    float m_ogVolume = 1.f;
+    float m_fadeTime = 0.f;
 
     void addHeart(CCNodeRGBA* player, bool isSecondPlayer = false) {
         UndertaleHeart* heart = UndertaleHeart::create(m_speed, getCurrentZoom(), isSecondPlayer);
@@ -127,7 +133,7 @@ private:
 
         addChild(m_gameOver);
 
-        Utils::playSound(Anim::Undertale, "determination.mp3", m_speed, 200, 1200, 13000, 0.22f);
+        Utils::playSound(Anim::Undertale, "determination.mp3", m_speed, 200, 0, 13000, 0.22f, true);
 
         scheduleOnce(schedule_selector(Undertale::secondStep), 2.f / m_speed);
     }
@@ -138,9 +144,10 @@ private:
         lbl->setScale(0.875f);
         lbl->setAnchorPoint({0, 0.5f});
 
-        addChild(lbl);
         Utils::fixScaleTextureSizexd(lbl);
-
+        
+        addChild(lbl);
+        
         for (CCNode* letter : CCArrayExt<CCNode*>(lbl->getChildren()))
             letter->setVisible(false);
 
@@ -160,7 +167,12 @@ private:
     }
 
     void updateLetters(float dt) {
-        if (m_currentLetter >= static_cast<int>(m_letters.size())) return;
+        if (m_currentLetter >= static_cast<int>(m_letters.size())) {
+            if (m_currentStep > 2)
+                m_canGoNext = true;
+                
+            return;
+        }
 
         CCNode* letter = m_letters[m_currentLetter++];
 
@@ -176,8 +188,56 @@ private:
         for (CCNode* letter : CCArrayExt<CCNode*>(lbl->getChildren()))
             letter->setVisible(true);
     }
-
+    
+    void removeCooldown(float) {
+        m_isOnCooldown = false;
+    }
+    
+    void skip() {
+        if (m_isOnCooldown) return;
+        
+        if (m_currentStep == 2 || m_currentStep == 3 || m_currentStep == 4)
+            finishLabel(m_label1);
+        
+        if (m_currentStep == 2 || m_currentStep == 3 || m_currentStep == 5)
+            finishLabel(m_label2);
+        
+        CCScheduler::get()->unscheduleSelector(schedule_selector(Undertale::thirdStep), this);
+        
+        m_canGoNext = true;
+        m_currentLetter = 999;
+        m_letters.clear();
+        
+        m_isOnCooldown = true;
+        scheduleOnce(schedule_selector(Undertale::removeCooldown), 0.1f);
+    }
+    
+    void next() {
+        if (m_isOnCooldown) return;
+        
+        m_canGoNext = false;
+        
+        switch (m_currentStep) {
+            case 2:
+            case 3: fourthStep(0.f); break;
+            case 4: fifthStep(0.f); break;
+            case 5: sixthStep(0.f); break;
+        };
+        
+        m_isOnCooldown = true;
+        scheduleOnce(schedule_selector(Undertale::removeCooldown), 0.1f);
+    }
+    
+    void both() {
+        if (m_canGoNext)
+            next();
+        else
+            skip();
+    }
+    
     void secondStep(float) {
+        m_currentStep = 2;
+        
         m_label1 = createLabel("Y o u    c a n n o t    g i v e", 100);
         m_label2 = createLabel("u p    j u s t    y e t .  .  .", 76);
 
@@ -188,13 +248,15 @@ private:
     }
 
     void thirdStep(float) {
+        m_currentStep = 3;
+        
         finishLabel(m_label1);
         loadLabel(m_label2);
-
-        scheduleOnce(schedule_selector(Undertale::fourthStep), (71.f / 60.f + 2.f) / m_speed);
     }
 
     void fourthStep(float) {
+        m_currentStep = 4;
+        
         m_letters.clear();
 
         m_label1->removeFromParentAndCleanup(true);
@@ -211,47 +273,110 @@ private:
             newName += c;
             newName += " ";
         }
-
+        
         newName += "!";
 
         m_label1 = createLabel(newName.c_str(), 100);
         m_label2 = createLabel("S t a y    d e t e r m i n e d .  .  .", 76);
 
         loadLabel(m_label1);
-
-        scheduleOnce(schedule_selector(Undertale::fifthStep), 1.5f / m_speed);
     }
 
     void fifthStep(float) {
+        m_currentStep = 5;
+        
         finishLabel(m_label1);
         loadLabel(m_label2);
-
-        scheduleOnce(schedule_selector(Undertale::sixthStep), 2.8f / m_speed);
     }
 
     void sixthStep(float) {
+        m_currentStep = 6;
+        
         m_letters.clear();
 
         m_label1->removeFromParentAndCleanup(true);
         m_label2->removeFromParentAndCleanup(true);
-
+        
         scheduleOnce(schedule_selector(Undertale::seventhStep), 1.9f / m_speed);
     }
 
     void seventhStep(float) {
-        m_gameOver->runAction(CCFadeTo::create(1.2f / m_speed, 0));
-    }   
-
+        m_gameOver->runAction(CCSequence::create(
+            CCFadeTo::create(1.2f / m_speed, 0),
+            CCDelayTime::create(0.8f),
+            CCCallFunc::create(this, callfunc_selector(Undertale::finalStep)),
+            nullptr
+        ));
+        
+        m_ogVolume = FMODAudioEngine::get()->m_sfxVolume;
+        
+        schedule(schedule_selector(Undertale::update));
+    }
+    
+    void finalStep() {
+        resetLevel();
+    }
+    
+    void update(float dt) override {
+        m_fadeTime += dt;
+        
+        FMODAudioEngine::get()->m_globalChannel->setVolume(
+            m_ogVolume - std::min(m_fadeTime / 0.5f, 1.f) * m_ogVolume
+        );
+    }
+    
+    void keyDown(enumKeyCodes key) override {
+        CCLayer::keyDown(key);
+        
+        if (
+            key != enumKeyCodes::KEY_W
+            && key != enumKeyCodes::KEY_X
+            && key != enumKeyCodes::KEY_Z
+            && key != enumKeyCodes::KEY_Space
+            && key != enumKeyCodes::KEY_ArrowUp
+        ) {     
+            return;
+        }
+        
+        if (key == enumKeyCodes::KEY_X)
+            skip();
+        else if (key == enumKeyCodes::KEY_Z)
+            next();
+        else
+            both();
+    }
+    
+    bool ccTouchBegan(CCTouch*, CCEvent*) override {
+        both();
+        
+        return false;
+    }
+    
+    ~Undertale() {
+        if (!m_isPreview)
+            Utils::setHookEnabled("cocos2d::CCKeyboardDispatcher::dispatchKeyboardMSG", false);
+        
+        FMODAudioEngine::get()->m_globalChannel->setVolume(m_ogVolume);
+    }
+    
     ANIMATION_CTOR_CREATE(Undertale) {}
 
 public:
 
     void start() override {
+        disableRetryLayer();
+        enableTouch();
+        
+        if (m_isPreview)
+            setKeyboardEnabled(true);
+        else
+            Utils::setHookEnabled("cocos2d::CCKeyboardDispatcher::dispatchKeyboardMSG", true);
+        
         scheduleOnce(schedule_selector(Undertale::playSound), 0.15f / m_speed);
         scheduleOnce(schedule_selector(Undertale::firstStep), 2.5f / m_speed);
 
         Utils::setHighestZ(this);
-
+        
         addChild(CCLayerColor::create({0, 0, 0, 255}));
 
         if (m_isPreview)
@@ -263,5 +388,13 @@ public:
                 addHeart(m_playLayer->m_player2, true);
         }
     }
+    
+    void onPause() override {
+        FMODAudioEngine::get()->m_globalChannel->setVolume(m_ogVolume);
+    }
 
+    void onResume() override {
+        m_ogVolume = FMODAudioEngine::get()->m_sfxVolume;
+    }
+    
 };

@@ -277,7 +277,7 @@ private:
         m_titleScreenButton->setSelected(isHoveringButton(m_titleScreenButton, pos));
     }
 
-    void update(float dt) {
+    void update(float dt) override {
         checkButtons(getMousePos());
 
         if (!m_isPreview)

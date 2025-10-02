@@ -742,7 +742,7 @@ private:
             || (m_isPreview && m_delegate->isDead());
     }
     
-    void update(float) {
+    void update(float) override {
         for (CCSprite* sprite : m_animationSprites) {
             sprite->setPosition(m_players.at(sprite)->getPosition() + ccp(27, 4));
             m_players.at(sprite)->setVisible(false);
@@ -797,16 +797,6 @@ public:
             setZOrder(10);
         else
             Utils::setHighestZ(this);
-        
-        if (m_extras.transition != 0) {
-            CelesteTransition::create({
-                .parentNode = this,
-                .playLayer = m_playLayer,
-                .delegate = m_delegate, 
-                .extras = { .transition = m_extras.transition, .reverse = true},
-                .speed = m_speed,
-            })->start();
-        }
         
         if (m_isPreview)
             addAnimation(m_delegate->getPlayer());
@@ -912,13 +902,23 @@ private:
     int m_transition = 0;
 
     void transitionOut(float) {
-        CelesteRevive::create({
-            .parentNode = m_parentNode,
-            .playLayer = m_playLayer,
-            .delegate = m_delegate,
-            .extras = { .transition = m_transition },
-            .speed = Utils::getSettingBool(Anim::Celeste, "speed-affects-respawn") ? m_speed : 1.f,
-        })->start();
+        if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
+            CelesteRevive::create({
+                .parentNode = m_parentNode,
+                .playLayer = m_playLayer,
+                .delegate = m_delegate,
+                .extras = { .transition = m_transition },
+                .speed = Utils::getSettingBool(Anim::Celeste, "speed-affects-respawn") ? m_speed : 1.f,
+            })->start();
+        
+        if (m_transition != 0)
+            CelesteTransition::create({
+                .parentNode = m_parentNode,
+                .playLayer = m_playLayer,
+                .delegate = m_delegate, 
+                .extras = { .transition = m_transition, .reverse = true},
+                .speed = m_speed,
+            })->start();
 
         if (m_isDelayRestart) {
             m_dontRestart = false;
@@ -939,25 +939,29 @@ private:
     void playTransition(float) {
         scheduleOnce(schedule_selector(Celeste::transitionOut), m_duration / m_speed - m_transitionDelays.at(m_transition));
 
-        m_transitionNode = CelesteTransition::create({
-            .parentNode = this,
-            .playLayer = m_playLayer,
-            .delegate = m_delegate,
-            .extras = { .transition = m_transition },
-            .speed = m_speed, 
-        });
+        if (m_transition != 0) {
+            m_transitionNode = CelesteTransition::create({
+                .parentNode = this,
+                .playLayer = m_playLayer,
+                .delegate = m_delegate,
+                .extras = { .transition = m_transition },
+                .speed = m_speed, 
+            });
         
-        m_transitionNode->start();
+            m_transitionNode->start();
+        }
     }
 
     void updateShockwave(float dt) {
         if (m_frameSprite) m_frameSprite->setVisible(false);
         if (m_transitionNode) m_transitionNode->setVisible(false);
+        if (m_isPreview) m_delegate->getBackButton()->setVisible(false);
         
         Utils::takeScreenshot(m_renderTexture);
 
         if (m_frameSprite) m_frameSprite->setVisible(true);
         if (m_transitionNode) m_transitionNode->setVisible(true);
+        if (m_isPreview) m_delegate->getBackButton()->setVisible(true);
 
         m_time += dt * m_speed;
 
@@ -1050,15 +1054,10 @@ public:
                 
         scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.45f / m_speed);
 
-        if (
-            m_transition != 0
-            && Utils::getSettingBool(Anim::Celeste, "respawn-animation")
-            && (GameManager::get()->getGameVariable("0026") || m_isPreview)
-        ) {
+        if (GameManager::get()->getGameVariable("0026") || m_isPreview)
             scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelays.at(m_transition) / m_speed);
-        } else {
+        else
             scheduleOnce(schedule_selector(Celeste::enableDelayedRestart), 0.7f / m_speed);
-        }
 
         if (m_isPreview) {
             m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
@@ -1112,7 +1111,7 @@ public:
         Utils::setHighestZ(m_explosion2);
     }
     
-    void start() {
+    void start() override {
         Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
     }
     

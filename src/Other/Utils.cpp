@@ -1,6 +1,7 @@
 #include "Utils.hpp"
 #include "SoundManager.hpp"
 
+#include "../Animations/BaseAnimation.hpp"
 #include "../Animations/YouDied.hpp"
 #include "../Animations/Bsod.hpp"
 #include "../Animations/AmongUs.hpp"

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Includes.hpp"
-#include "../Animations/BaseAnimation.hpp"
 
+class BaseAnimation;
 class SoundUpdater;
 
 class Utils {

@@ -18,10 +18,12 @@
 #include <Geode/modify/CCFadeOut.hpp>
 #include <Geode/modify/CCAnimation.hpp>
 #include <Geode/modify/ChannelControl.hpp>
+#include <Geode/modify/CCKeyboardDispatcher.hpp>
 
 $on_mod(Loaded) {
 
     Utils::setHookEnabled("cocos2d::CCFadeOut::create", false);
+    Utils::setHookEnabled("cocos2d::CCKeyboardDispatcher::dispatchKeyboardMSG", false);
     Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
     Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
@@ -354,6 +356,39 @@ class $modify(ProPlayLayer, PlayLayer) {
     
 };
 
+class $modify(GJBaseGameLayer) {
+    
+    void shakeCamera(float duration, float strength, float interval) {
+        if (!Variables::getSelectedAnimation().isNoDeathEffect && !Variables::getSelectedAnimation().isNoShakeEffect)
+            GJBaseGameLayer::shakeCamera(duration, strength, interval);
+    }
+    
+    void update(float dt) { // disabled by defolt
+        if (!Variables::getSelectedAnimation().isFreezeGameLayer)
+            GJBaseGameLayer::update(dt * Variables::getSpeed());
+    }
+
+};
+
+class $modify(CCKeyboardDispatcher) {
+
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) { // disabled by defolt
+        if (!CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat)) return false;
+        
+        if (!down || repeat) return true;
+        
+        if (PlayLayer* pl = PlayLayer::get()) {
+            auto f = static_cast<ProPlayLayer*>(pl)->m_fields.self();
+            
+            if (f->m_animation)
+                f->m_animation->keyDown(key);
+        }
+        
+        return true;
+    }
+    
+};
+
 class $modify(CCFadeOut) {
 
     static CCFadeOut* create(float time) { // disabled by defolt
@@ -390,20 +425,6 @@ class $modify(CCCircleWave) {
 
     void updateTweenAction(float dt, const char* p1) { // disabled by defolt
         CCCircleWave::updateTweenAction(dt * Variables::getSpeed(), p1);
-    }
-
-};
-
-class $modify(GJBaseGameLayer) {
-    
-    void update(float dt) { // disabled by defolt
-        if (!Variables::getSelectedAnimation().isFreezeGameLayer)
-            GJBaseGameLayer::update(dt * Variables::getSpeed());
-    }
-
-    void shakeCamera(float duration, float strength, float interval) {
-        if (!Variables::getSelectedAnimation().isNoDeathEffect && !Variables::getSelectedAnimation().isNoShakeEffect)
-            GJBaseGameLayer::shakeCamera(duration, strength, interval);
     }
 
 };
