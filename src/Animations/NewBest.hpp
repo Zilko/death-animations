@@ -4,19 +4,46 @@ class NewBest : public BaseAnimation {
 
 private:
 
+    bool m_didRevive = false;
+
+    void update(float) override {
+        if (m_didRevive && m_playLayer->m_player1->m_isDead) {
+            stopAllActions();
+            unscheduleAllSelectors();
+            setVisible(false);
+            
+            Loader::get()->queueInMainThread([self = Ref(this)] {
+                self->BaseAnimation::end();
+            });
+        } else if (!m_didRevive && !m_playLayer->m_player1->m_isDead)
+            m_didRevive = true;
+    }
+
     ANIMATION_CTOR_CREATE(NewBest) {}
 
 public:
 
     void start() override {
+        if (!m_isPreview)
+            schedule(schedule_selector(NewBest::update));
+        
+        bool demonKey = false;
+            
+        int orbs = 0;
+        int diamonds = 0;
         int percent = Utils::getSettingBool(Anim::NewBest, "use-custom-percent")
             ? static_cast<int>(Utils::getSettingFloat(Anim::NewBest, "custom-percent"))
             : (m_isPreview ? 99 : m_playLayer->getCurrentPercentInt());
-
-        int orbs = 0;
-        int diamonds = 0;
-
-        bool demonKey = false;
+        
+        float fadeTime = orbs > 0 || diamonds > 0 ? 1.3f : 0.7f;
+        
+        runAction(CCSequence::create(
+            CCDelayTime::create(fadeTime + 2.f),
+            CallFuncExt::create([this] {
+                removeFromParentAndCleanup(true);
+            }),
+            nullptr
+        ));
 
         if (!m_isPreview && percent > 0) {
             if (m_playLayer->m_level->m_stars.value() > 0) {
@@ -56,8 +83,6 @@ public:
         lbl->setScale(1.1f);
 
         scaleContainer->addChild(lbl);
-
-        float fadeTime = orbs > 0 || diamonds > 0 ? 1.3f : 0.7f;
 
         if (diamonds > 0 && orbs > 0) {
             lbl = CCLabelBMFont::create(fmt::format("+{}", diamonds).c_str(), "bigFont.fnt");
@@ -139,16 +164,10 @@ public:
             CCFadeTo::create(0.3f, 100),
             CCDelayTime::create(fadeTime + 0.3f),
             CCFadeTo::create(0.4f, 0),
-            CCDelayTime::create(1.f),
-            CCCallFunc::create(this, callfunc_selector(NewBest::realEnd)),
             nullptr
         ));
 
         addChild(overlay, -1);
-    }
-
-    void realEnd() {
-        removeFromParentAndCleanup(true);
     }
 
     void end() override {}

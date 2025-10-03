@@ -846,6 +846,8 @@ public:
         m_animationSprites.clear();
         m_implosionEnded = true;
         
+        unscheduleAllSelectors();
+        
         Loader::get()->queueInMainThread([self = Ref(this)] {
             self->BaseAnimation::end();
         });
