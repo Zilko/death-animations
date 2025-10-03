@@ -37,7 +37,7 @@ private:
 
     bool m_audioOnly = false;
 
-    void update(float dt) {
+    void update(float dt) override {
         m_time += dt * m_speed;
 
         FMODAudioEngine* fmod = FMODAudioEngine::get();

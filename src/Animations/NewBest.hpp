@@ -37,17 +37,20 @@ public:
         }
 
         CCNode* scaleContainer = CCNode::create();
+        scaleContainer->setID("container");
         scaleContainer->setScale(0.01f);
         scaleContainer->setPosition({m_size.width * 0.5f, (orbs > 0 || diamonds ? 10 : 0) + m_size.height * 0.5f + 20.f});
         
         addChild(scaleContainer);
 
         CCSprite* spr = CCSprite::createWithSpriteFrameName("GJ_newBest_001.png");
+        spr->setID("new-best-sprite");
         spr->setAnchorPoint({0.5f, 0.f});
 
         scaleContainer->addChild(spr);
 
         CCLabelBMFont* lbl = CCLabelBMFont::create(fmt::format("{}%", percent).c_str(), "bigFont.fnt");
+        lbl->setID("percent-label");
         lbl->setAnchorPoint({0.5f, 1.f});
         lbl->setPosition({0.f, -4.f});
         lbl->setScale(1.1f);
@@ -58,11 +61,13 @@ public:
 
         if (diamonds > 0 && orbs > 0) {
             lbl = CCLabelBMFont::create(fmt::format("+{}", diamonds).c_str(), "bigFont.fnt");
+            lbl->setID("diamonds-label");
             lbl->setScale(0.6f);
 
             scaleContainer->addChild(lbl);
 
             spr = CCSprite::createWithSpriteFrameName("GJ_bigDiamond_001.png");
+            spr->setID("diamonds-sprite");
             spr->setAnchorPoint({0.f, 0.5f});
             spr->setScale(0.55f);
 
@@ -77,10 +82,12 @@ public:
 
         if (orbs > 0) {
             lbl = CCLabelBMFont::create(fmt::format("+{}", orbs).c_str(), "bigFont.fnt");
+            lbl->setID("orbs-label");
             lbl->setScale(0.6f);
             scaleContainer->addChild(lbl);
 
             spr = CCSprite::createWithSpriteFrameName("currencyOrbIcon_001.png");
+            spr->setID("orbs-sprite");
             spr->setAnchorPoint(ccp(0.f, 0.5f));
             scaleContainer->addChild(spr);
 
@@ -121,10 +128,12 @@ public:
             0.f,
             0.9f
         );
+        rewardLayer->setID("reward-layer");
         
         addChild(rewardLayer);
 
         CCLayerColor* overlay = CCLayerColor::create({0, 0, 0, 0});
+        overlay->setID("overlay-layer");
 
         overlay->runAction(CCSequence::create(
             CCFadeTo::create(0.3f, 100),

@@ -57,6 +57,12 @@
             "resources/sprites/animations/celeste/spritesheets/*.plist",
             "resources/sprites/animations/undertale/spritesheets/*.png",
             "resources/sprites/animations/undertale/spritesheets/*.plist"
-        ]
+        ],
+        "fonts": {
+          "terraria": {
+              "path": "resources/fonts/terraria.ttf",
+              "size": 80
+          }
+        }
     }
 }

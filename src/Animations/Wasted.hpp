@@ -189,7 +189,7 @@ private:
     
 public:
 
-    void startEarly() {
+    void startEarly() override {
         Variables::setSpeed(0.07f * m_speed);
 
         Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", true);

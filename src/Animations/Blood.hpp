@@ -41,7 +41,7 @@ private:
 
     inline static const ParticleStruct m_particleStruct = {137,1,1,0,3000,-90,180,230,132,11,0,0,-1000,0,0,0,0,3,4,0,0,0.4,0,0,0,0,0,1,0,0,3,0,0,0.4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,false,false,false,false,2,false,0,0,0,0,false,false,false,false,false,0,0,0,0,"particle_02_001.png"};
 
-    CCNodeRGBA* m_player = nullptr;
+    CCNode* m_player = nullptr;
 
     CCSprite* m_playerSprite = nullptr;
 
@@ -50,7 +50,7 @@ private:
     float m_speed = 1.f;
     float m_time = 0.f;
 
-    BloodEffect(CCNodeRGBA* player, float speed)
+    BloodEffect(CCNode* player, float speed)
         : m_player(player), m_speed(speed) {}
 
     void update(float dt) override {
@@ -69,18 +69,19 @@ private:
         addChild(particle);
     }
 
-    bool init() {
+    bool init() override {
         CCNode::init();
 
+        setID("blood-effect"_spr);
+        
         m_program = Utils::createShader(m_shader, true);
 
-        m_playerSprite = Utils::renderPlayerSprite(m_player, false);
+        m_playerSprite = Utils::renderPlayerSprite(static_cast<CCNodeRGBA*>(m_player), false);
         m_playerSprite->setShaderProgram(m_program);
 
         addChild(m_playerSprite);
 
         schedule(schedule_selector(BloodEffect::update));
-
         scheduleOnce(schedule_selector(BloodEffect::blood), 0.f);
         scheduleOnce(schedule_selector(BloodEffect::killMyself), 2.f / m_speed);
 
@@ -93,7 +94,7 @@ private:
 
 public:
 
-    static BloodEffect* create(CCNodeRGBA* player, float speed) {
+    static BloodEffect* create(CCNode* player, float speed) {
         BloodEffect* ret = new BloodEffect(player, speed);
 
         ret->init();
@@ -116,6 +117,7 @@ private:
     };
 
     std::vector<BloodDrop> m_bloodDrops;
+    std::vector<CCNode*> m_visiblePlayers;
 
     void addSpatter(CCNode* player) {
         CCPoint velocity = {0, 0};
@@ -179,14 +181,18 @@ private:
         }
     }
 
-    void playBlood(CCNodeRGBA* player) {
-        BloodEffect* Blood = BloodEffect::create(player, m_speed);
-        Blood->setPosition(player->getPosition());
+    void playBlood(CCNode* player) {
+        BloodEffect* blood = BloodEffect::create(player, m_speed);
+        blood->setPosition(player->getPosition());
 
-        player->getParent()->addChild(Blood);
-        player->setVisible(false); 
+        player->getParent()->addChild(blood);
+        
+        if (player->isVisible()) {
+            m_visiblePlayers.push_back(player);
+            player->setVisible(false); 
+        }
 
-        Utils::setHighestZ(Blood);
+        Utils::setHighestZ(blood);
 
         if (Utils::getSettingBool(Anim::Blood, "blood-spatter"))
             addSpatter(player);
@@ -218,6 +224,13 @@ public:
             if (Utils::getSettingBool(Anim::Blood, "second-player") && m_playLayer->m_gameState.m_isDualMode)
                 playBlood(m_playLayer->m_player2);
         }
+    }
+    
+    void end() override {
+        for (CCNode* player : m_visiblePlayers)
+            player->setVisible(true);
+            
+        BaseAnimation::end();
     }
 
 };

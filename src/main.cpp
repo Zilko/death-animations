@@ -14,6 +14,7 @@
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/CCCircleWave.hpp>
 #include <Geode/modify/CCParticleSystem.hpp>
+#include <Geode/modify/CCParticleSystemQuad.hpp>
 #include <Geode/modify/ExplodeItemNode.hpp>
 #include <Geode/modify/CCFadeOut.hpp>
 #include <Geode/modify/CCAnimation.hpp>
@@ -26,7 +27,9 @@ $on_mod(Loaded) {
     Utils::setHookEnabled("cocos2d::CCKeyboardDispatcher::dispatchKeyboardMSG", false);
     Utils::setHookEnabled("cocos2d::CCAnimation::createWithSpriteFrames", false);
     Utils::setHookEnabled("cocos2d::CCParticleSystem::update", false);
+    Utils::setHookEnabled("cocos2d::CCParticleSystemQuad::create", false);
     Utils::setHookEnabled("CCCircleWave::updateTweenAction", false);
+    Utils::setHookEnabled("CCCircleWave::create", false);
     Utils::setHookEnabled("ExplodeItemNode::update", false);
     Utils::setHookEnabled("GJBaseGameLayer::update", false);
     Utils::setHookEnabled("FMOD::ChannelControl::stop", false);
@@ -177,7 +180,7 @@ class $modify(ProPlayLayer, PlayLayer) {
 
         m_gameState.m_unkBool26 = og;
         m_uiLayer->m_pauseBtn->setEnabled(true);
-        f->m_didShowRetryLayer = false;
+        f->m_didShowRetryLayer = GameManager::get()->getGameVariable("0026");
         
         f->m_animation->startWithObject(obj);
         f->m_animation->start();
@@ -275,7 +278,7 @@ class $modify(ProPlayLayer, PlayLayer) {
             f->m_animation->end();
             f->m_animation = nullptr;
 
-            if (!f->m_didShowRetryLayer && !GameManager::get()->getGameVariable("0026"))
+            if (!f->m_didShowRetryLayer)
                 f->m_accumulatedRetryLayers++;
         }
 
@@ -412,6 +415,18 @@ class $modify(ExplodeItemNode) {
 
 };
 
+class $modify(CCParticleSystemQuad) {
+
+    static CCParticleSystemQuad* create(const char* p0, bool p1) { // disabled by defolt
+        CCParticleSystemQuad* ret = CCParticleSystemQuad::create(p0, p1);
+        
+        ret->setVisible(false);
+        
+        return ret;
+    }
+    
+};
+
 class $modify(CCParticleSystem) {
 
     void update(float dt) { // disabled by defolt
@@ -421,6 +436,14 @@ class $modify(CCParticleSystem) {
 };
 
 class $modify(CCCircleWave) {
+    
+    static CCCircleWave* create(float p0, float p1, float p2, bool p3, bool p4) { // disabled by defolt
+        CCCircleWave* ret = CCCircleWave::create(p0, p1, p2, p3, p4);
+        
+        ret->setVisible(false);
+        
+        return ret;
+    }
 
     void updateTweenAction(float dt, const char* p1) { // disabled by defolt
         CCCircleWave::updateTweenAction(dt * Variables::getSpeed(), p1);

@@ -360,6 +360,7 @@ public:
         player->setVisible(false);
 
         m_playerSprite = Utils::renderPlayerSprite(player, false);
+        m_playerSprite->setID("minecraft-death"_spr);
         m_playerSprite->setPosition(player->getPosition());
         m_playerSprite->setShaderProgram(Utils::createShader(m_shader, true));
 

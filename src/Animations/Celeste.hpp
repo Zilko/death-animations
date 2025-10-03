@@ -71,16 +71,16 @@ private:
     
     float m_speed;
     float m_time = 0.f;
+    
     bool m_isWhite = false;
+    bool m_playerWasVisible = false;
     
     CelesteExplosion(CCNodeRGBA* player, const ccColor3B& color, float speed)
         : m_player(player), m_color(color), m_speed(speed) {}
 
-    ~CelesteExplosion() {
-        m_player->setVisible(true);
-    }
-
     bool init(const CCPoint& velocity) {
+        CCNode::init();
+        
         setID("celeste-explosion"_spr);
 
         m_program = Utils::createShader(m_shader, true);
@@ -91,6 +91,8 @@ private:
         setShaderState("u_white", 0);
         setShaderState("u_fullWhite", 0);
         glUniform1f(glGetUniformLocation(m_program->getProgram(), "u_time"), 0.f);
+        
+        m_playerWasVisible = m_player->isVisible();
         
         m_player->setVisible(false);
         
@@ -207,6 +209,15 @@ public:
         ret->init(velocity);
         ret->autorelease();
         return ret;
+    }
+    
+    void end() {
+        if (m_animationSprite)
+            m_animationSprite->removeFromParentAndCleanup(true);
+        
+        m_player->setVisible(m_playerWasVisible);
+        
+        removeFromParentAndCleanup(true);
     }
 
 };
@@ -706,6 +717,8 @@ private:
     std::unordered_map<CCSprite*, CCNodeRGBA*> m_players;
     
     bool m_isWhite = false;
+    bool m_implosionEnded = false;
+    bool m_didRevive = false;
 
     ~CelesteRevive() {
         SoundManager::release(m_sound);
@@ -729,7 +742,7 @@ private:
                 CCSequence::create(
                     CCAnimate::create(CCAnimation::createWithSpriteFrames(animFrames, 1.f / 60.f / m_speed)),
                     CCDelayTime::create(1.f / 60.f / m_speed),
-                    CCCallFunc::create(this, callfunc_selector(CelesteRevive::implosionEnded)),
+                    CCCallFunc::create(this, callfunc_selector(CelesteRevive::end)),
                     nullptr
                 )
             );
@@ -757,6 +770,13 @@ private:
     }
     
     void update(float) override {
+        if (m_implosionEnded) return;
+        
+        if (!m_isPreview && m_playLayer->m_player1->m_isDead && m_didRevive)
+            return end();
+        else if (!m_isPreview && !m_playLayer->m_player1->m_isDead && !m_didRevive)
+            m_didRevive = true;
+        
         for (CCSprite* sprite : m_animationSprites) {
             sprite->setPosition(m_players.at(sprite)->getPosition() + ccp(27, 4));
             m_players.at(sprite)->setVisible(false);
@@ -766,17 +786,17 @@ private:
     void updateColors(float) {
         m_isWhite = !m_isWhite;
         
-        for (CCSprite* sprite : m_animationSprites)
-            sprite->setColor(m_isWhite ? ccc3(255, 255, 255) : ccc3(172, 62, 56));
-    }
-    
-    void implosionEnded() {
         for (CCSprite* sprite : m_animationSprites) {
-            sprite->removeFromParentAndCleanup(true);
-            m_players.at(sprite)->setVisible(true);
+            if (m_isWhite) {
+                sprite->setColor({255, 255, 255});
+                continue;
+            }
+            
+            if (!m_isPreview && m_players.at(sprite) == static_cast<CCNodeRGBA*>(m_playLayer->m_player2))
+                sprite->setColor({125, 253, 255});
+            else
+                sprite->setColor({172, 62, 56});
         }
-        
-        m_animationSprites.clear();
     }
     
     void playSound(float) {
@@ -816,12 +836,19 @@ public:
     }
     
     void end() override {
-        for (CCSprite* sprite : m_animationSprites)
+        for (CCSprite* sprite : m_animationSprites) {
             sprite->removeFromParentAndCleanup(true);
+            
+            if (!m_isPreview && !m_playLayer->m_player1->m_isDead)
+                m_players.at(sprite)->setVisible(true);
+        }
         
         m_animationSprites.clear();
-                
-        BaseAnimation::end();
+        m_implosionEnded = true;
+        
+        Loader::get()->queueInMainThread([self = Ref(this)] {
+            self->BaseAnimation::end();
+        });
     }
     
 };
@@ -897,6 +924,7 @@ private:
     };
 
     float m_time = 0.f;
+    float m_transitionDelay = 0.f;
 
     int m_transition = 0;
 
@@ -936,7 +964,7 @@ private:
     }
     
     void playTransition(float) {
-        scheduleOnce(schedule_selector(Celeste::transitionOut), m_duration / m_speed - m_transitionDelays.at(m_transition));
+        scheduleOnce(schedule_selector(Celeste::transitionOut), m_duration / m_speed - m_transitionDelay);
 
         if (m_transition != 0) {
             m_transitionNode = CelesteTransition::create({
@@ -1034,6 +1062,9 @@ public:
 
     void onRestart() override {
         if (!m_isDelayRestart || m_dontRestart) return;
+        
+        if (m_transition == 0)
+            return transitionOut(0.f);
 
         m_dontRestart = true;
 
@@ -1050,12 +1081,17 @@ public:
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
             m_transition = Utils::getRandomInt(2, 9);   
+        
+        if (m_transition == 0)
+            enableDelayedRestart(0.f);
                 
+        m_transitionDelay = m_transitionDelays.contains(m_transition) ? m_transitionDelays.at(m_transition) : 0.f;
+        
         scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.45f / m_speed);
 
         if (GameManager::get()->getGameVariable("0026") || m_isPreview)
-            scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelays.at(m_transition) / m_speed);
-        else
+            scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelay / m_speed);
+        else if (m_transition != 0)
             scheduleOnce(schedule_selector(Celeste::enableDelayedRestart), 0.7f / m_speed);
 
         if (m_isPreview) {
@@ -1116,12 +1152,12 @@ public:
     
     void end() override {
         if (m_explosion1) {
-            m_explosion1->removeFromParentAndCleanup(true);
+            m_explosion1->end();
             m_explosion1 = nullptr;
         }
         
         if (m_explosion2) {
-            m_explosion2->removeFromParentAndCleanup(true);
+            m_explosion2->end();
             m_explosion2 = nullptr;
         }
 

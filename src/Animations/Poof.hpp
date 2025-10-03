@@ -9,6 +9,8 @@ private:
     void init(float speed) {
         CCNode::init();
 
+        setID("poof-effect"_spr);
+        
         static const std::array<ParticleStruct, 4> m_particles = {{
             {10,1.2,1.2,0,-1,90,0,26,0,13,8,0,0,0,0,0,0,22,24,50,50,1,0,1,0,1,0,0.35,0,30,24,50,50,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,true,false,false,false,180,false,0,0,0,0,false,false,false,false,false,0,0,0,0,"poof-particle.png"_spr},
             {14,1.4,1.4,0,-1,90,0,138,0,20,13,0,0,0,0,0,0,40,40,50,50,1,0,1,0,1,0,0.5,0,40,40,50,50,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,true,false,false,false,180,false,1.55,0,0,0,false,false,false,false,false,0,0,0,0,"poof-particle.png"_spr},
@@ -49,17 +51,23 @@ class Poof : public BaseAnimation {
 
 private:
 
-    ANIMATION_CTOR_CREATE(Poof) {}
-
+    std::vector<CCNode*> m_visiblePlayers;
+    
     void playPoof(CCNode* player) {
         PoofEffect* poof = PoofEffect::create(m_speed);
         poof->setPosition(player->getPosition());
-
+        
         player->getParent()->addChild(poof);
-        player->setVisible(false); 
-
+        
+        if (player->isVisible()) {
+            m_visiblePlayers.push_back(player);
+            player->setVisible(false); 
+        }
+        
         Utils::setHighestZ(poof);
     }
+    
+    ANIMATION_CTOR_CREATE(Poof) {}
     
 public:
 
@@ -81,8 +89,13 @@ public:
             if (Utils::getSettingBool(Anim::Poof, "second-player") && m_playLayer->m_gameState.m_isDualMode)
                 playPoof(m_playLayer->m_player2);
         }
-
-        
+    }
+    
+    void end() override {
+        for (CCNode* player : m_visiblePlayers)
+            player->setVisible(true);
+            
+        BaseAnimation::end();
     }
 
 };

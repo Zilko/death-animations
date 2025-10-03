@@ -92,6 +92,9 @@ protected:
 
     virtual void setAnimationID() {
         setID("death-animation"_spr);
+        
+        if (m_id > 2)
+            setTag(m_id);
     }
 
     virtual void onAnimationEnd() {

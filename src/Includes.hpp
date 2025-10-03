@@ -187,7 +187,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Ghost, .thumbnail = "ghost-thumbnail.png", .name = "Ghost", .duration = 1.2f, .retryLayerDelay = 0.3f },
     { .id = Anim::Undertale, .thumbnail = "undertale-thumbnail.png", .name = "Undertale", .duration = 17.f, .isNoDeathEffect = true, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Minecraft, .thumbnail = "minecraft-thumbnail.png", .name = "Minecraft", .duration = 1.2f, .retryLayerDelay = 0.4f, .isNoDeathEffect = true },
-    { .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f },
+    { .id = Anim::Terraria, .thumbnail = "none-thumbnail.png", .name = "Terraria", .duration = 10.f, .retryLayerDelay = 9.2f, .isNoDeathSound = true, .isNoShakeEffect = true },
     { .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
     { .id = Anim::Pop, .thumbnail = "pop-thumbnail.png", .name = "Pop", .duration = 1.1f, .retryLayerDelay = 0.5f, .isNoDeathEffect = true },
     { .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 1.f, .retryLayerDelay = 0.4f, .isNoDeathEffect = true, .isDelayNewBest = true },

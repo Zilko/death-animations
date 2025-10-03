@@ -154,7 +154,7 @@ private:
         for (int i = 0; i < m_percentProgresses.size(); i++)
             m_percentTimes.push_back(9.5f / static_cast<float>(m_percentProgresses.size()) / m_speed);
         
-            for (int i = 0; i < m_percentTimes.size(); i++)
+        for (int i = 0; i < m_percentTimes.size(); i++)
             if (Utils::getRandomInt(0, 1)) {
                 float time = Utils::getRandomInt(50, 500) / 1000.f / m_speed;                
                 int chosen = i == m_percentTimes.size() - 1 ? i - 1 : i + 1;

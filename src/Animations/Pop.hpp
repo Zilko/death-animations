@@ -91,6 +91,8 @@ private:
     void init(CCNodeRGBA* player) {
         CCNode::init();
 
+        setID("pop-effect"_spr);
+        
         Utils::playSound(Anim::Pop, "dart.mp3", m_speed * 1.5, 1.5f);
 
         m_sprite = Utils::renderPlayerSprite(player, true);

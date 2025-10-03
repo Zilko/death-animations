@@ -185,6 +185,7 @@ public:
         }
 
         m_effectContainer = CCNode::create();
+        m_effectContainer->setID(fmt::format("{}-complete"_spr, m_isPractice ? "practice" : "level"));
         m_effectContainer->setPosition(m_position);
 
         m_parentLayer->addChild(m_effectContainer);
@@ -258,6 +259,7 @@ public:
         float duration = 0.5f / m_speed;
 
         CCLightFlash* lightFlash = CCLightFlash::create();
+        lightFlash->setID("light-flash"_spr);
         lightFlash->setPosition({0, 0});
         lightFlash->m_mainLayer = m_parentLayer;
         lightFlash->m_layerColorZOrder = 100;
