@@ -155,15 +155,8 @@ bool AnimationsLayer::setup() {
     
     int selected = Mod::get()->getSavedValue<int>("selected-animation");
     
-    if (m_animationCells.contains(selected)) {
-        AnimationCell* cell = m_animationCells.at(selected);
-        selectAnimation(cell);
-
-        float y = cell->getParent()->getParent()->getPositionY();
-
-        if (y < m_contentLayer->getContentHeight() - 180)
-            m_contentLayer->setPositionY(-y);
-    }
+    if (m_animationCells.contains(selected))
+        selectAnimation(m_animationCells.at(selected));
 
     schedule(schedule_selector(AnimationsLayer::updateTableView), 0, kCCRepeatForever, 1.f / 240.f);
     

@@ -11,6 +11,15 @@
     "version": "v1.0.0",
     "developer": "Zilko",
     "description": "it animates ur deaths",
+    "links": {
+      "source": "https://github.com/Zilko/death-animations"
+    },
+    "dependencies": {
+  		"geode.node-ids": {
+  			"version": ">=1.20.1",
+  			"importance": "required"
+  		}
+		},
     "resources": {
         "spritesheets": {
             "among-us-death-1": [

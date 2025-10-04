@@ -16,16 +16,12 @@ private:
         uniform sampler2D u_texture;
         uniform float u_time;
 
-        float rand(vec2 co) {
-            return fract(sin(dot(co, vec2(12.9898,78.233))) * 43758.5453);
-        }
-
         void main() {
             vec2 uv = v_texCoord * 2.0 - 1.0;
             float angle = atan(uv.y, uv.x);
             float radius = length(uv);
 
-            float star = cos(float(min(rand(v_texCoord * u_time) + 0.5, 1.0) * 10.0) * angle) * 0.5 + 0.5;
+            float star = cos(float(min(u_time + 0.5, 1.0) * 10.0) * angle) * 0.5 + 0.5;
             float progress = clamp(u_time / 0.25, 0.0, 1.0);
             float threshold = mix(0.0, 1.5, progress);
             float mask = step(threshold, radius * (0.6 + 0.4 * star));

@@ -202,12 +202,22 @@ public:
 
         if (m_currentSpeechBubble >= static_cast<int>(m_speechBubbles.size()))
             m_currentSpeechBubble = static_cast<int>(m_speechBubbles.size()) - 1;
+        
+        bool ogVisible = false;
+        
+        if (!m_isPreview) {
+            ogVisible = m_playLayer->m_uiLayer->m_pauseBtn->isVisible();
+            m_playLayer->m_uiLayer->m_pauseBtn->setVisible(false);
+        }
 
         m_freezeSprite = CCSprite::createWithTexture(Utils::takeScreenshot());
         m_freezeSprite->setFlipY(true);
         m_freezeSprite->setScale(m_size.width / m_freezeSprite->getContentWidth());
         m_freezeSprite->setAnchorPoint({0, 0});
         m_freezeSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
+        
+        if (!m_isPreview)
+            m_playLayer->m_uiLayer->m_pauseBtn->setVisible(ogVisible);
         
         addChild(m_freezeSprite, -2);
 
@@ -222,6 +232,8 @@ public:
         schedule(schedule_selector(SpeechBubble::update));
 
         #endif
+        
+        CCNode* parent = m_isPreview ? static_cast<CCNode*>(this) : static_cast<CCNode*>(m_playLayer->m_uiLayer);
 
         CCSprite* spr = nullptr;
         CCMenuItemSpriteExtra* btn = nullptr;
@@ -229,9 +241,10 @@ public:
         disableRetryLayer();
 
         m_buttonMenu = CCMenu::create();
+        m_buttonMenu->setID("speech-bubble-menu"_spr);
         m_buttonMenu->setPosition({0, 0});
 
-        addChild(m_buttonMenu, 10);
+        parent->addChild(m_buttonMenu, 10);
 
         spr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
         spr->setScale(1.1f);
@@ -333,7 +346,10 @@ public:
             PlatformToolbox::hideCursor();
         
         #endif
-
+        
+        if (m_buttonMenu)
+            m_buttonMenu->removeFromParentAndCleanup(true);
+            
         BaseAnimation::end();
     }
 

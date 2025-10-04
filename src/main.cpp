@@ -20,6 +20,7 @@
 #include <Geode/modify/CCAnimation.hpp>
 #include <Geode/modify/ChannelControl.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
+#include <Geode/modify/GJGarageLayer.hpp>
 
 $on_mod(Loaded) {
 
@@ -79,10 +80,28 @@ $on_mod(Loaded) {
                 
 }
 
-class $modify(MenuLayer) {
-  
-    void onMoreGames(CCObject* obj) {
+class $modify(ProGJGarageLayer, GJGarageLayer) {
+    
+    void onButon(CCObject*) {
         AnimationsLayer::create()->show();
+    }
+  
+    bool init() {
+        if (!GJGarageLayer::init()) return false;
+        
+        if (CCNode* menu = getChildByID("shards-menu")) {
+			CCMenuItemSpriteExtra* btn = CCMenuItemSpriteExtra::create(
+    			CircleButtonSprite::createWithSprite("buton.png"_spr, 0.87f, CircleBaseColor::Gray, CircleBaseSize::Small),
+    			this,
+    			menu_selector(ProGJGarageLayer::onButon)
+			);
+			btn->setID("gradient-button"_spr);
+        
+			menu->addChild(btn);
+			menu->updateLayout();
+		}
+        
+        return true;
     }
     
 };
@@ -95,10 +114,10 @@ class $modify(ProPlayLayer, PlayLayer) {
         bool m_forceRetryLayer = false;
         bool m_keyPressHookEnabled = false;
         bool m_didShowRetryLayer = false;
+        bool m_isNewBest = false;
 
         int m_accumulatedRetryLayers = false;
 
-        bool m_isNewBest = false;
         bool m_forceRestart = false;
         bool m_storedNewReward = false;
         bool m_storedDemonKey = false;
