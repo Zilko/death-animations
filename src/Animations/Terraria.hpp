@@ -50,15 +50,17 @@ public:
     }
 
     void start() override {
-        m_playLayer->m_player1->setVisible(false);
+        CCNodeRGBA* player = m_isPreview ? m_delegate->getPlayer() : m_playLayer->m_player1;
+        
+        player->setVisible(false);
         
         CCParticleSystemQuad* particle = GameToolbox::particleFromStruct(m_particleStruct, nullptr, false);
         particle->setID("terraria-blood"_spr);
-        particle->setPosition(m_playLayer->m_player1->getPosition());
+        particle->setPosition(player->getPosition());
         particle->resetSystem();
         particle->setAutoRemoveOnFinish(true);
         
-        m_playLayer->m_player1->getParent()->addChild(particle);
+        player->getParent()->addChild(particle);
         
         Utils::setHighestZ(particle);
         

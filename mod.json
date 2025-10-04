@@ -8,7 +8,7 @@
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.0.0",
+    "version": "v1.0.1",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
@@ -18,6 +18,10 @@
   		"geode.node-ids": {
   			"version": ">=1.20.1",
   			"importance": "required"
+  		},
+  		"hiimjustin000.more_icons": {
+  			"version": ">=1.13.3",
+  			"importance": "suggested"
   		}
 		},
     "resources": {

@@ -3,6 +3,8 @@
 
 #include "PreviewLayer.hpp"
 
+#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+
 PreviewLayer::~PreviewLayer() {
     if (m_circleWave)
         m_circleWave->release();
@@ -199,6 +201,9 @@ bool PreviewLayer::setup() {
     m_player->updateColors();
     
     m_mainLayer->addChild(m_player);
+    
+    if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
+        MoreIcons::updateSimplePlayer(m_player, IconType::Cube);
     
     m_time = (m_spike->getPositionX() - m_player->getPositionX()) * 0.003625f;
         

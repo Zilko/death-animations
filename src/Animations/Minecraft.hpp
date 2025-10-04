@@ -486,6 +486,9 @@ public:
     void end() override {
         if (m_playerSprite)
             m_playerSprite->removeFromParentAndCleanup(true);
+        
+        if (!m_isPreview)
+            m_playLayer->m_player1->setVisible(true);
 
         #ifndef GEODE_IS_MOBILE
 
