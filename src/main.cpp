@@ -137,7 +137,8 @@ class $modify(ProPlayLayer, PlayLayer) {
             || (m_isTestMode && !Utils::getSettingBool(anim, "play-in-testmode"))
             || getCurrentPercentInt() < Utils::getSettingFloat(anim, "only-after")
             || (getCurrentPercentInt() <= m_level->m_normalPercent.value() && Utils::getSettingBool(anim, "only-on-new-best"))
-            || (getCurrentPercentInt() > m_level->m_normalPercent.value() && anim == Anim::NewBest);
+            || (anim == Anim::NewBest && !m_levelSettings->m_platformerMode && getCurrentPercentInt() > m_level->m_normalPercent.value())
+            || (anim == Anim::NewBest && m_levelSettings->m_platformerMode && !Utils::getSettingBool(anim, "play-in-platformer"));
     }
 
     void delayedResetLevelReal() {

@@ -27,18 +27,25 @@ public:
         if (!m_isPreview)
             schedule(schedule_selector(NewBest::update));
         
+        bool platformer = false;
+        
+        if (!m_isPreview && m_playLayer->m_levelSettings->m_platformerMode)
+            platformer = true;
+        
         bool demonKey = false;
-            
         int orbs = 0;
         int diamonds = 0;
         int percent = Utils::getSettingBool(Anim::NewBest, "use-custom-percent")
             ? static_cast<int>(Utils::getSettingFloat(Anim::NewBest, "custom-percent"))
             : (m_isPreview ? 99 : m_playLayer->getCurrentPercentInt());
+            
+        if (platformer)
+            percent = static_cast<int>(m_playLayer->m_timePlayed);
         
         float fadeTime = orbs > 0 || diamonds > 0 ? 1.3f : 0.7f;
         
         runAction(CCSequence::create(
-            CCDelayTime::create(fadeTime + 2.f),
+            CCDelayTime::create(fadeTime + 6.f),
             CallFuncExt::create([this] {
                 removeFromParentAndCleanup(true);
             }),
@@ -76,7 +83,7 @@ public:
 
         scaleContainer->addChild(spr);
 
-        CCLabelBMFont* lbl = CCLabelBMFont::create(fmt::format("{}%", percent).c_str(), "bigFont.fnt");
+        CCLabelBMFont* lbl = CCLabelBMFont::create(fmt::format("{}{}", percent, platformer ? "s" : "%").c_str(), "bigFont.fnt");
         lbl->setID("percent-label");
         lbl->setAnchorPoint({0.5f, 1.f});
         lbl->setPosition({0.f, -4.f});

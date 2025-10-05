@@ -270,6 +270,7 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "bottom-text", .name = "Bottom Text", .description = "", .type = SettingType::Text }
     } },
     { Anim::NewBest, {
+        { .id = "play-in-platformer", .name = "Play in platformer", .description = "New best in platformer (?).", .type = SettingType::Toggle },
         { .id = "use-custom-percent", .name = "Use Custom Percent", .description = "Show a constant % value instead of where you actually died.", .type = SettingType::PercentToggle },
         { .type = SettingType::Empty },
     } },

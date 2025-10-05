@@ -8,12 +8,21 @@
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.0.2",
+    "version": "v1.0.3",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
       "source": "https://github.com/Zilko/death-animations"
     },
+    "tags": [
+  		"enhancement",
+  		"utility",
+  		"customization",
+  		"gameplay",
+  		"offline",
+  		"interface",
+  		"content"
+  	],
     "dependencies": {
   		"geode.node-ids": {
   			"version": ">=1.20.1",
