@@ -1,6 +1,7 @@
 # v1.0.2
 
 * Fix hippo
+* Fix bsod
 
 # v1.0.1
 

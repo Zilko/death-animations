@@ -195,12 +195,20 @@ private:
             if (!channel) continue;
             
             bool isPlaying = true;
+            bool isPaused = true;
             
             channel->isPlaying(&isPlaying);
+            channel->getPaused(&isPaused);
             
-            if (isPlaying && m_diePositions.contains(channel))
+            if (isPlaying && !isPaused && m_diePositions.contains(channel))
                 channel->setPosition(m_diePositions.at(channel) - 16, FMOD_TIMEUNIT_MS);
         }
+    }
+    
+    void onAnimationEnd() override {
+        BaseAnimation::onAnimationEnd();
+        
+        unscheduleAllSelectors();
     }
     
     ANIMATION_CTOR_CREATE(Bsod) {}
