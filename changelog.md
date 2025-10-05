@@ -1,3 +1,7 @@
+# v1.0.2
+
+* Fix hippo
+
 # v1.0.1
 
 * Fix terraria preview crash

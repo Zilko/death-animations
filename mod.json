@@ -8,7 +8,7 @@
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.0.1",
+    "version": "v1.0.2",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
@@ -60,7 +60,7 @@
             "resources/sprites/animations/wasted/*.png",
             "resources/sprites/animations/minecraft/*.png",
             "resources/sprites/animations/blood/*.png",
-            "resources/sprites/animations/mr_hippo/*.png",
+            "resources/sprites/animations/mr-hippo/*.png",
             "resources/sprites/animations/bsod/*.png",
             "resources/sprites/animations/speech-bubble/*.png",
             "resources/sprites/animations/celeste/*.png",
