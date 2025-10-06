@@ -205,7 +205,7 @@ class $modify(ProPlayLayer, PlayLayer) {
         f->m_animation->startWithObject(obj);
         f->m_animation->start();
 
-        if (!GameManager::get()->getGameVariable("0026"))
+        if (!f->m_didShowRetryLayer || f->m_animation->isNoRetryLayer())
             return;
         
         stopActionByTag(16);

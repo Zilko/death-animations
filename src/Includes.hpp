@@ -301,4 +301,5 @@ inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSet
     { Anim::MrHippo, { "play-sound-effects", "speed" } },
     { Anim::Minecraft, { "speed" } },
     { Anim::Undertale, { "speed" } },
+    { Anim::SpeechBubble, { "speed", "play-sound-effects" } },
 };

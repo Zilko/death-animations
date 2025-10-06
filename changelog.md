@@ -1,3 +1,7 @@
+# v1.0.5
+
+* Fix bug with speech bubble
+
 # v1.0.4
 
 * Fix wasted crash
