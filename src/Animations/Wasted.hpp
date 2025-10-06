@@ -209,7 +209,7 @@ public:
 
         toggleHooks(true);
 
-        if (!m_isPreview)
+        if (!m_isPreview && GameManager::get()->getPlayerDeathEffect() > 1)
             m_explosionSprite = m_playLayer->m_player1->m_parentLayer->getChildByType<CCSprite>(-1);
 
         m_program = Utils::createShader(m_shader, false);
@@ -351,7 +351,7 @@ public:
             m_delegate->setBackgroundOpacity(200);
 
         if (m_explosionSprite) {
-            m_explosionSprite->removeFromParentAndCleanup(true);
+            m_explosionSprite->setVisible(false);
             m_explosionSprite = nullptr;
         }
 

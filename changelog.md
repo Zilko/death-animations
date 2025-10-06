@@ -1,3 +1,8 @@
+# v1.0.4
+
+* Fix wasted crash
+* Fix new best disappearing too early.
+
 # v1.0.3
 
 * Chagned some new best stuff

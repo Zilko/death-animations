@@ -18,6 +18,10 @@ private:
         } else if (!m_didRevive && !m_playLayer->m_player1->m_isDead)
             m_didRevive = true;
     }
+    
+    void onAnimationEnd() override {
+        m_didFinish = true;
+    }
 
     ANIMATION_CTOR_CREATE(NewBest) {}
 

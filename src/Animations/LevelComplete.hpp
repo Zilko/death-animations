@@ -162,6 +162,10 @@ protected:
                 nullptr
             ));
     }
+    
+    void onAnimationEnd() override {
+        m_didFinish = true;
+    }
 
     ANIMATION_CTOR_CREATE(LevelComplete) {}
     
