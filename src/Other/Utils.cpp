@@ -389,9 +389,7 @@ CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres b
 }
 
 CCSprite* Utils::renderPlayerSprite(CCNodeRGBA* player, bool rotation0) {
-    CCSize size = ccp(100, 100) * player->getScale();
-
-    CCRenderTexture* texture = CCRenderTexture::create(size.width, size.height);
+    CCRenderTexture* texture = CCRenderTexture::create(100, 100);
 
     CCPoint ogPosition = player->getPosition();
     GLubyte ogOpacity = player->getOpacity();

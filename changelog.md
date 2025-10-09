@@ -1,3 +1,7 @@
+# v1.0.6
+
+* Fix celeste mini
+
 # v1.0.5
 
 * Fix bug with speech bubble
