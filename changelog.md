@@ -1,3 +1,7 @@
+# v1.0.7
+
+* Fix celeste invisible player bug
+
 # v1.0.6
 
 * Fix celeste mini

@@ -73,7 +73,6 @@ private:
     float m_time = 0.f;
     
     bool m_isWhite = false;
-    bool m_playerWasVisible = false;
     
     CelesteExplosion(CCNodeRGBA* player, const ccColor3B& color, float speed)
         : m_player(player), m_color(color), m_speed(speed) {}
@@ -91,8 +90,6 @@ private:
         setShaderState("u_white", 0);
         setShaderState("u_fullWhite", 0);
         glUniform1f(glGetUniformLocation(m_program->getProgram(), "u_time"), 0.f);
-        
-        m_playerWasVisible = m_player->isVisible();
         
         m_player->setVisible(false);
         
@@ -215,7 +212,7 @@ public:
         if (m_animationSprite)
             m_animationSprite->removeFromParentAndCleanup(true);
         
-        m_player->setVisible(m_playerWasVisible);
+        m_player->setVisible(true);
         
         removeFromParentAndCleanup(true);
     }
