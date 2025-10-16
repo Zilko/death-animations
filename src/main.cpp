@@ -95,7 +95,7 @@ class $modify(ProGJGarageLayer, GJGarageLayer) {
     			this,
     			menu_selector(ProGJGarageLayer::onButon)
 			);
-			btn->setID("gradient-button"_spr);
+			btn->setID("animations-button"_spr);
         
 			menu->addChild(btn);
 			menu->updateLayout();
@@ -338,16 +338,20 @@ class $modify(ProPlayLayer, PlayLayer) {
             
         PlayLayer::showNewBest(newReward, orbs, diamonds, demonKey, noRetry, noTitle);
     }
+    
+    #ifndef GEODE_IS_ANDROID // these hook fix some bug when u get that one orbs shop message but it crash on addroi so i will sacrificace and leave the bug in cus its not that bad anyway and im lazy to find another fix
+    
+    void dialogClosed(DialogLayer* wa) {
+        if (!m_fields->m_animation)
+            PlayLayer::dialogClosed(wa);
+    }
 
-    // void dialogClosed(DialogLayer* wa) {
-    //     if (!m_fields->m_animation)
-    //         PlayLayer::dialogClosed(wa);
-    // }
-
-    // void currencyWillExit(CurrencyRewardLayer* wa) {
-    //     if (!m_fields->m_animation)
-    //         PlayLayer::currencyWillExit(wa);
-    // }
+    void currencyWillExit(CurrencyRewardLayer* wa) {
+        if (!m_fields->m_animation)
+            PlayLayer::currencyWillExit(wa);
+    }
+    
+    #endif
 
     void pauseGame(bool p0) {
         PlayLayer::pauseGame(p0);

@@ -1,3 +1,7 @@
+# v1.0.8
+
+* Fix crash on new best android
+
 # v1.0.7
 
 * Fix celeste invisible player bug
