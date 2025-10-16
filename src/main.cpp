@@ -231,7 +231,6 @@ class $modify(ProPlayLayer, PlayLayer) {
     }
 
     void showRetryLayer() {
-        const DeathAnimation& anim = Variables::getSelectedAnimation();
         auto f = m_fields.self();
 
         if (f->m_accumulatedRetryLayers > 0) {
@@ -244,6 +243,8 @@ class $modify(ProPlayLayer, PlayLayer) {
         if (!f->m_animation)
             return PlayLayer::showRetryLayer();
     
+        const DeathAnimation& anim = Variables::getSelectedAnimation();
+        
         float delay = f->m_animation->getRetryLayerDelay() > 0.f
             ? f->m_animation->getRetryLayerDelay()
             : anim.retryLayerDelay;
@@ -338,15 +339,15 @@ class $modify(ProPlayLayer, PlayLayer) {
         PlayLayer::showNewBest(newReward, orbs, diamonds, demonKey, noRetry, noTitle);
     }
 
-    void dialogClosed(DialogLayer* wa) {
-        if (!m_fields->m_animation)
-            PlayLayer::dialogClosed(wa);
-    }
+    // void dialogClosed(DialogLayer* wa) {
+    //     if (!m_fields->m_animation)
+    //         PlayLayer::dialogClosed(wa);
+    // }
 
-    void currencyWillExit(CurrencyRewardLayer* wa) {
-        if (!m_fields->m_animation)
-            PlayLayer::currencyWillExit(wa);
-    }
+    // void currencyWillExit(CurrencyRewardLayer* wa) {
+    //     if (!m_fields->m_animation)
+    //         PlayLayer::currencyWillExit(wa);
+    // }
 
     void pauseGame(bool p0) {
         PlayLayer::pauseGame(p0);
