@@ -8,7 +8,7 @@
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.0.8",
+    "version": "v1.0.9",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
@@ -35,18 +35,6 @@
 		},
     "resources": {
         "spritesheets": {
-            "among-us-death-1": [
-                "resources/sprites/animations/among-us/death-1/*.png"
-            ],
-            "among-us-death-2": [
-                "resources/sprites/animations/among-us/death-2/*.png"
-            ],
-            "among-us-death-3": [
-                "resources/sprites/animations/among-us/death-3/*.png"
-            ],
-            "among-us-death-4": [
-                "resources/sprites/animations/among-us/death-4/*.png"
-            ],
             "poof-particle": [
                 "resources/sprites/animations/poof/*.png"
             ]
@@ -54,7 +42,6 @@
         "sprites": [
             "resources/sprites/ui/*.png",
             "resources/sprites/ui/thumbnails/*.png",
-            "resources/sprites/animations/among-us/*.png",
             "resources/sprites/animations/jumpscare/*.png",
             "resources/sprites/animations/you-died/*.png"
         ],
@@ -65,6 +52,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/among-us/*.png",
             "resources/sprites/animations/to-be-continued/*.png",
             "resources/sprites/animations/wasted/*.png",
             "resources/sprites/animations/minecraft/*.png",
@@ -78,7 +66,9 @@
             "resources/sprites/animations/celeste/spritesheets/*.png",
             "resources/sprites/animations/celeste/spritesheets/*.plist",
             "resources/sprites/animations/undertale/spritesheets/*.png",
-            "resources/sprites/animations/undertale/spritesheets/*.plist"
+            "resources/sprites/animations/undertale/spritesheets/*.plist",
+            "resources/sprites/animations/among-us/spritesheets/*.plist",
+            "resources/sprites/animations/among-us/spritesheets/*.png"
         ],
         "fonts": {
           "terraria": {

@@ -62,7 +62,6 @@ private:
         CCArray* animFrames = CCArray::create();
         CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
         CCSpriteFrame* lastValidFrame = nullptr;
-        cache->addSpriteFramesWithFile(fmt::format("among-us-death-{}.plist"_spr, m_animation).c_str());
         
         for (int i = 1; i <= 115; ++i) {
             CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("among-us-death-{}-{}.png"_spr, m_animation, i)).c_str());
@@ -87,6 +86,8 @@ private:
         );
         
         addChild(m_animationSprite);
+        
+        Utils::fixScaleTextureSizexd(m_animationSprite);
 
         CCGLProgram* program = Utils::createShader(m_shader, true);
         
@@ -138,14 +139,19 @@ public:
         Utils::setHighestZ(this);
         
         Utils::playSound(Anim::AmongUs, "scary-among-us.ogg", m_speed, 0.5f);
+        
+        CCNode* bgContainer = CCNode::create();
+        bgContainer->setPosition(m_size / 2.f);
 
         m_bg = CCSprite::create("bg-among-us.png"_spr);
         m_bg->setScaleX(2.98f);
         m_bg->setScaleY(0.88f);
         m_bg->setRotation(-25);
-        m_bg->setPosition(m_size / 2.f);
+
+        bgContainer->addChild(m_bg);
+        addChild(bgContainer);
         
-        addChild(m_bg);
+        Utils::fixScaleTextureSizexd(bgContainer);
         
         m_redLayer = CCLayerColor::create({255, 1, 0, 255});
         

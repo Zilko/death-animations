@@ -1,3 +1,8 @@
+# v1.0.9
+
+* Force amogus to high quality sprites
+* Made congregation objects be created only when the screen is black to hide the possible lagspike on low end devices.
+
 # v1.0.8
 
 * Fix crash on new best android

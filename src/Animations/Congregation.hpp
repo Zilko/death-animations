@@ -436,11 +436,13 @@ private:
 
         m_player->m_totalTime = m_time;
 
-        float y = 649.9824f + m_arbitraryObject->getPositionY() - m_arbitraryObjectStartYPos;
-
-        if (m_isSecondStep && m_player->getPositionY() < y && !m_didJump) {
-            m_player->setPositionY(y);
-            m_player->hitGround(nullptr, false);
+        if (m_arbitraryObject) {
+            float y = 649.9824f + m_arbitraryObject->getPositionY() - m_arbitraryObjectStartYPos;
+    
+            if (m_isSecondStep && m_player->getPositionY() < y && !m_didJump) {
+                m_player->setPositionY(y);
+                m_player->hitGround(nullptr, false);
+            }
         }
 
         m_player->updateRotation(dt * 60.f);
@@ -516,12 +518,9 @@ private:
 
         m_congregationContainer->setVisible(true);
 
-        for (NoobGameObject* object : m_groupObjects.at(79))
-            object->setPositionY(object->getPositionY() + 60);
-
         addChild(CCLayerColor::create({0, 0, 0, 255}), 0);
 
-        scheduleOnce(schedule_selector(Congregation::secondPointFiveStep), 0.5f / m_speed);
+        scheduleOnce(schedule_selector(Congregation::secondPointFiveStep), 1.f / m_speed);
         scheduleOnce(schedule_selector(Congregation::idkAnymore), 1.45f / m_speed);
         scheduleOnce(schedule_selector(Congregation::thirdStep), 1.5f / m_speed);
     }
@@ -542,8 +541,13 @@ private:
     }
 
     void secondPointFiveStep(float) {
+        setupCongregation();
+        
+        for (NoobGameObject* object : m_groupObjects.at(79))
+            object->setPositionY(object->getPositionY() + 60);
+        
         for (NoobGameObject* object : m_groupObjects.at(82))
-            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(1.f / m_speed, {0, -60})));
+            object->runAction(CCEaseSineInOut::create(CCMoveBy::create(0.5f / m_speed, {0, -60})));
     }
 
     void thirdStep(float) {
@@ -1014,8 +1018,6 @@ public:
         m_congregationContainer->setVisible(false);
 
         m_objectLayer->addChild(m_congregationContainer);
-
-        setupCongregation();
 
         m_playerContainer = CCNode::create();
         m_playerContainer2 = CCNode::create();

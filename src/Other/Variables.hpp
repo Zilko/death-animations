@@ -9,7 +9,7 @@ private:
     DeathAnimation m_selectedAnimation = {};
 
     float m_speedMultiplier = 1.f;
-
+    
 public:
 
     static Variables& get() {
@@ -32,5 +32,5 @@ public:
     static float getSpeed() {
         return get().m_speedMultiplier;
     }
-
+    
 };

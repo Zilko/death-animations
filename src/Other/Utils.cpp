@@ -221,7 +221,8 @@ void Utils::fixScaleTextureSizexd(CCNode* sprite) {
 
     #endif
 
-    sprite->setScale(sprite->getScale() * mult);
+    sprite->setScaleX(sprite->getScaleX() * mult);
+    sprite->setScaleY(sprite->getScaleY() * mult);
 }
 
 std::vector<std::filesystem::path> Utils::getAllFilesFromFolder(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
