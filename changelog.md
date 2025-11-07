@@ -1,3 +1,10 @@
+# v1.0.10
+
+* Fixed cbf detected goig below the screen in wide screens
+* Fixed amogus thingy in the bg not filling the screen in unrealistically wide screens
+* Fixed celeste bugs when transition was set to none
+* Fixed celeste preview visibility bug
+
 # v1.0.9
 
 * Force amogus to high quality sprites

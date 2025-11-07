@@ -83,7 +83,7 @@ private:
                 CCCallFunc::create(this, callfunc_selector(AmongUs::fourthStep)),
                 nullptr
             )
-        );
+        );  
         
         addChild(m_animationSprite);
         
@@ -147,6 +147,34 @@ public:
         m_bg->setScaleX(2.98f);
         m_bg->setScaleY(0.88f);
         m_bg->setRotation(-25);
+
+        CCSize size = m_bg->getContentSize();
+        bool flipped = true;
+        int added = 0;
+
+        while (size.width * 0.745f < m_size.width) {
+            log::debug("ad");
+
+            added++;
+
+            CCSprite* extra = CCSprite::create("bg-among-us.png"_spr);
+            extra->setAnchorPoint({0, 0});
+            extra->setFlipX(flipped);
+            extra->setPosition({extra->getContentSize().width * added, 0});
+
+            m_bg->addChild(extra);
+
+            extra = CCSprite::create("bg-among-us.png"_spr);
+            extra->setAnchorPoint({1, 0});
+            extra->setFlipX(flipped);
+            extra->setPosition({-extra->getContentSize().width * (added - 1), 0});
+
+            m_bg->addChild(extra);
+
+            size.width += extra->getContentSize().width * 2;
+
+            flipped = !flipped;
+        }
 
         bgContainer->addChild(m_bg);
         addChild(bgContainer);

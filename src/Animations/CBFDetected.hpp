@@ -15,6 +15,10 @@ public:
     void start() override {
         setPositionY((m_size.height - m_size.width / 1.777777f) / 5.f);
 
+        if (getPositionY() < 0) {
+            setPositionY(0);
+        }
+
         CCLayerColor* layer = CCLayerColor::create({0, 0, 0, 144}, m_size.width, 60);
 
         addChild(layer);

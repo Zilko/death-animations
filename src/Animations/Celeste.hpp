@@ -836,8 +836,12 @@ public:
         for (CCSprite* sprite : m_animationSprites) {
             sprite->removeFromParentAndCleanup(true);
             
-            if (!m_isPreview && !m_playLayer->m_player1->m_isDead)
+            if (
+                m_isPreview
+                || (!m_isPreview && !m_playLayer->m_player1->m_isDead)
+            ) {
                 m_players.at(sprite)->setVisible(true);
+            }
         }
         
         m_animationSprites.clear();
@@ -1081,8 +1085,8 @@ public:
         if (m_transition == 1)
             m_transition = Utils::getRandomInt(2, 9);   
         
-        if (m_transition == 0)
-            enableDelayedRestart(0.f);
+        // if (m_transition == 0)
+        //     enableDelayedRestart(0.f);
                 
         m_transitionDelay = m_transitionDelays.contains(m_transition) ? m_transitionDelays.at(m_transition) : 0.f;
         
