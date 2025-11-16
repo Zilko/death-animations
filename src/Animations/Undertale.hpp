@@ -334,7 +334,7 @@ private:
     }
     
     void keyDown(enumKeyCodes key) override {
-        CCLayer::keyDown(key);
+        // CCLayer::keyDown(key);
         
         if (
             key != enumKeyCodes::KEY_W
@@ -375,6 +375,8 @@ public:
         disableRetryLayer();
         enableTouch();
         
+        m_ogVolume = FMODAudioEngine::get()->m_sfxVolume;
+
         if (m_isPreview)
             setKeyboardEnabled(true);
         else

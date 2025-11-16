@@ -1,3 +1,9 @@
+# v1.0.11
+
+* Fixed undertale pause bug
+* Fixed undertale volume bug
+* Added amogus falllback in case it failed to be preloaded
+
 # v1.0.10
 
 * Fixed cbf detected goig below the screen in wide screens

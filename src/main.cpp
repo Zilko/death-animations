@@ -83,7 +83,6 @@ $on_mod(Loaded) {
     for (int i = 1; i < 5; i++) {
         cache->addSpriteFramesWithFile(fmt::format("among-us-death-{}.plist"_spr, i).c_str());
     }
-                
 }
 
 class $modify(ProGJGarageLayer, GJGarageLayer) {

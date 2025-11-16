@@ -63,6 +63,12 @@ private:
         CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
         CCSpriteFrame* lastValidFrame = nullptr;
         
+        m_animationSprite = CCSprite::createWithSpriteFrameName(fmt::format("among-us-death-{}-1.png"_spr, m_animation).c_str());
+
+        if (!m_animationSprite || m_animationSprite->getUserObject("geode.texture-loader/fallback")) {
+            cache->addSpriteFramesWithFile(fmt::format("among-us-death-{}.plist"_spr, m_animation).c_str());
+        }
+
         for (int i = 1; i <= 115; ++i) {
             CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("among-us-death-{}-{}.png"_spr, m_animation, i)).c_str());
     
@@ -73,7 +79,12 @@ private:
                 animFrames->addObject(lastValidFrame);
         }
         
-        m_animationSprite = CCSprite::createWithSpriteFrameName(fmt::format("among-us-death-{}-1.png"_spr, m_animation).c_str());
+        if (!m_animationSprite)
+            m_animationSprite = CCSprite::createWithSpriteFrameName(fmt::format("among-us-death-{}-1.png"_spr, m_animation).c_str());
+
+        if (!m_animationSprite)
+            return;
+
         m_animationSprite->setPosition(m_size / 2.f + ccp(31.5f, -6));
         m_animationSprite->setScale(1.19f);
         m_animationSprite->runAction(
