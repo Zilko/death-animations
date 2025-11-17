@@ -101,11 +101,17 @@ private:
         }
 
         schedule(schedule_selector(CelesteExplosion::updateBall), 0, kCCRepeatForever, 0);
-        scheduleOnce(schedule_selector(CelesteExplosion::firstStep), 1.f / 60.f / m_speed);
-        
+
+        if (Utils::getSettingBool(Anim::Celeste, "fast")) {
+            setShaderState("u_fullWhite", 1);
+            scheduleOnce(schedule_selector(CelesteExplosion::ninthStep), 0.f);
+        } else {
+            scheduleOnce(schedule_selector(CelesteExplosion::firstStep), 1.f / 60.f / m_speed);
+        }
+
         return true;
     }
-    
+
     void updateBall(float dt) {
         m_time += dt * m_speed;
         float t = std::min(m_time / 0.34f, 1.0f);
@@ -933,6 +939,9 @@ private:
 
     int m_transition = 0;
 
+    bool m_fast = false;
+    float m_fastDurationDiff = 0.f;
+
     void transitionOut(float) {
         if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
             CelesteRevive::create({
@@ -1061,7 +1070,14 @@ private:
             m_renderTexture->release();
     }
         
-    ANIMATION_CTOR_CREATE(Celeste) {}
+    ANIMATION_CTOR_CREATE(Celeste) {
+        m_fast = Utils::getSettingBool(Anim::Celeste, "fast");
+        if (m_fast) {
+            m_fastDurationDiff = 25.f / 60.f;
+            m_duration -= m_fastDurationDiff;
+            m_retryLayerDelay -= m_fastDurationDiff;
+        }
+    }
     
 public:
 
@@ -1081,7 +1097,7 @@ public:
             Utils::setHighestZ(this);
 
         if (Utils::getSettingBool(Anim::Celeste, "shockwave"))
-            scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
+            scheduleOnce(schedule_selector(Celeste::startShockwave), (0.5f - m_fastDurationDiff) / m_speed);
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
@@ -1092,7 +1108,7 @@ public:
                 
         m_transitionDelay = m_transitionDelays.contains(m_transition) ? m_transitionDelays.at(m_transition) : 0.f;
         
-        scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.45f / m_speed);
+        scheduleOnce(schedule_selector(Celeste::playDeathSound), (0.45f - m_fastDurationDiff) / m_speed);
 
         if (GameManager::get()->getGameVariable("0026") || m_isPreview)
             scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelay / m_speed);
@@ -1152,7 +1168,8 @@ public:
     }
     
     void start() override {
-        Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
+        if (!m_fast)
+            Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
     }
     
     void end() override {

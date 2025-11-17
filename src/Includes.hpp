@@ -222,6 +222,7 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "shockwave", .name = "Shockwave", .description = "Play the shockwave effect.", .type = SettingType::Toggle },
         { .id = "bounce-off", .name = "Bounce Off", .description = "Bounce the player off.", .type = SettingType::Toggle },
         { .id = "speed-affects-respawn", .name = "Speed Affects Respawn", .description = "The Speed setting will affect the respawn animation (if enabled) as well.", .type = SettingType::Toggle },
+        { .id = "fast", .name = "Fast", .description = "Skip the wait time before the explosion effect.", .type = SettingType::Toggle },
         { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8" } }
     } },
     { Anim::Jumpscare, {
