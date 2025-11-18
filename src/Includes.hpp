@@ -41,6 +41,8 @@ enum SettingType {
     PercentToggle,
     MonologueSelect,
     SpeechBubbleSelect,
+    CelesteFastToggle,
+    CelesteColor,
 };
 
 enum Anim {
@@ -148,7 +150,10 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
         { "b2", 235.f }
     } },
     { Anim::Celeste, {
-        { "transition", 1.f }
+        { "transition", 1.f },
+        { "explosion-color-r", 172.f },
+        { "explosion-color-g", 62.f },
+        { "explosion-color-b", 56.f }
     } },
     { Anim::Jumpscare, {
         { "probability", 10.f }
@@ -160,7 +165,7 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
 };
 
 inline const std::unordered_map<int, std::unordered_map<std::string, bool>> specificBoolDefaults {
-    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true }, { "shockwave", true }, { "speed-affects-respawn", true } } },
+    { Anim::Celeste, { { "respawn-animation", true }, { "second-player", true }, { "shockwave", true }, { "bounce-off", true }, { "speed-affects-respawn", true } } },
     { Anim::CBFDetected, { { "use-level-name", true } } },
     { Anim::ToBeContinued, { { "yellow-shader", true } } },
     { Anim::Blood, { { "blood-spatter", true }, { "play-in-practice", true } } },
@@ -218,9 +223,12 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
     } },
     { Anim::Celeste, {
         { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player as well.", .type = SettingType::Toggle },
+        { .id = "explosion-color", .name = "Explosion Color", .description = "The color to use for the explosion animation.", .type = SettingType::CelesteColor },
         { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the Celeste respawn animation.", .type = SettingType::Toggle },
         { .id = "shockwave", .name = "Shockwave", .description = "Play the shockwave effect.", .type = SettingType::Toggle },
+        { .id = "bounce-off", .name = "Bounce Off", .description = "Bounce the player off.", .type = SettingType::Toggle },
         { .id = "speed-affects-respawn", .name = "Speed Affects Respawn", .description = "The Speed setting will affect the respawn animation (if enabled) as well.", .type = SettingType::Toggle },
+        { .id = "fast", .name = "Fast", .description = "Skip the wait time before the explosion effect.", .type = SettingType::CelesteFastToggle },
         { .id = "transition", .name = "Transition", .description = "The Celeste transition to use in the animation.", .type = SettingType::Select, .elements = { "None", "Random", "Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Chapter 6", "Chapter 7", "Chapter 8" } }
     } },
     { Anim::Jumpscare, {

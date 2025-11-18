@@ -94,16 +94,24 @@ private:
         m_player->setVisible(false);
         
         addChild(m_playerSprite);
-        
-        float angle = ccpToAngle(velocity) - M_PI;
-        runAction(CCEaseCubeOut::create(CCMoveTo::create(0.41f / m_speed, getPosition() + ccp(cos(angle) * 47.f, sin(angle) * 47.f))));
-        
+
+        if (Utils::getSettingBool(Anim::Celeste, "bounce-off")) {
+            float angle = ccpToAngle(velocity) - static_cast<float>(M_PI);
+            runAction(CCEaseCubeOut::create(CCMoveTo::create(0.41f / m_speed, getPosition() + ccp(cos(angle) * 47.f, sin(angle) * 47.f))));
+        }
+
         schedule(schedule_selector(CelesteExplosion::updateBall), 0, kCCRepeatForever, 0);
-        scheduleOnce(schedule_selector(CelesteExplosion::firstStep), 1.f / 60.f / m_speed);
-        
+
+        if (Utils::getSettingBool(Anim::Celeste, "fast")) {
+            setShaderState("u_fullWhite", 1);
+            scheduleOnce(schedule_selector(CelesteExplosion::ninthStep), 0.f);
+        } else {
+            scheduleOnce(schedule_selector(CelesteExplosion::firstStep), 1.f / 60.f / m_speed);
+        }
+
         return true;
     }
-    
+
     void updateBall(float dt) {
         m_time += dt * m_speed;
         float t = std::min(m_time / 0.34f, 1.0f);
@@ -753,7 +761,11 @@ private:
         cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
 
         CCSprite* sprite = CCSprite::createWithSpriteFrame(cache->spriteFrameByName("celeste-revive-1.png"_spr));
-        sprite->setColor({172, 62, 56});
+        sprite->setColor({
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-r")),
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-g")),
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-b"))
+        });
         sprite->setScale(8.75f);
         sprite->getTexture()->setAliasTexParameters();
         sprite->setPosition(player->getPosition());
@@ -792,7 +804,11 @@ private:
             if (!m_isPreview && m_players.at(sprite) == static_cast<CCNodeRGBA*>(m_playLayer->m_player2))
                 sprite->setColor({125, 253, 255});
             else
-                sprite->setColor({172, 62, 56});
+                sprite->setColor({
+                    static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-r")),
+                    static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-g")),
+                    static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-b"))
+                });
         }
     }
     
@@ -931,6 +947,9 @@ private:
 
     int m_transition = 0;
 
+    bool m_fast = false;
+    float m_fastDurationDiff = 0.f;
+
     void transitionOut(float) {
         if (Utils::getSettingBool(Anim::Celeste, "respawn-animation"))
             CelesteRevive::create({
@@ -1059,7 +1078,14 @@ private:
             m_renderTexture->release();
     }
         
-    ANIMATION_CTOR_CREATE(Celeste) {}
+    ANIMATION_CTOR_CREATE(Celeste) {
+        m_fast = Utils::getSettingBool(Anim::Celeste, "fast");
+        if (m_fast) {
+            m_fastDurationDiff = 25.f / 60.f;
+            m_duration -= m_fastDurationDiff;
+            m_retryLayerDelay -= m_fastDurationDiff;
+        }
+    }
     
 public:
 
@@ -1079,7 +1105,7 @@ public:
             Utils::setHighestZ(this);
 
         if (Utils::getSettingBool(Anim::Celeste, "shockwave"))
-            scheduleOnce(schedule_selector(Celeste::startShockwave), 0.5f / m_speed);
+            scheduleOnce(schedule_selector(Celeste::startShockwave), (0.5f - m_fastDurationDiff) / m_speed);
 
         m_transition = Utils::getSettingFloat(Anim::Celeste, "transition");
         if (m_transition == 1)
@@ -1090,7 +1116,7 @@ public:
                 
         m_transitionDelay = m_transitionDelays.contains(m_transition) ? m_transitionDelays.at(m_transition) : 0.f;
         
-        scheduleOnce(schedule_selector(Celeste::playDeathSound), 0.45f / m_speed);
+        scheduleOnce(schedule_selector(Celeste::playDeathSound), (0.45f - m_fastDurationDiff) / m_speed);
 
         if (GameManager::get()->getGameVariable("0026") || m_isPreview)
             scheduleOnce(schedule_selector(Celeste::playTransition), m_transitionDelay / m_speed);
@@ -1098,7 +1124,11 @@ public:
             scheduleOnce(schedule_selector(Celeste::enableDelayedRestart), 0.7f / m_speed);
 
         if (m_isPreview) {
-            m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {172, 62, 56}, m_speed);
+            m_explosion1 = CelesteExplosion::create(m_delegate->getPlayer(), {15, 0}, {
+                static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-r")),
+                static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-g")),
+                static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-b"))
+            }, m_speed);
             m_explosion1->setPosition(m_delegate->getPlayer()->getPosition());
             addChild(m_explosion1, 9);
             
@@ -1117,7 +1147,11 @@ public:
         }
         
         PlayerObject* player = m_playLayer->m_player1;
-        ccColor3B color = dashOrb1 ? (dashOrb1->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
+        ccColor3B color = dashOrb1 ? (dashOrb1->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-r")),
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-g")),
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-b"))
+        );
 
         m_explosion1 = CelesteExplosion::create(
             player,
@@ -1134,7 +1168,11 @@ public:
         if (!Utils::getSettingBool(Anim::Celeste, "second-player") || !m_playLayer->m_gameState.m_isDualMode) return;
         
         player = m_playLayer->m_player2;
-        color = dashOrb2 ? (dashOrb2->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(172, 62, 56);
+        color = dashOrb2 ? (dashOrb2->m_objectID == 1704 ? ccc3(0, 255, 0) : ccc3(254, 1, 212)) : ccc3(
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-r")),
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-g")),
+            static_cast<GLubyte>(Utils::getSettingFloat(Anim::Celeste, "explosion-color-b"))
+        );
         
         m_explosion2 = CelesteExplosion::create(
             player,
@@ -1150,7 +1188,8 @@ public:
     }
     
     void start() override {
-        Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
+        if (!m_fast)
+            Utils::playSound(Anim::Celeste, "predeath-celeste.wav", m_speed, 0.5f);
     }
     
     void end() override {
