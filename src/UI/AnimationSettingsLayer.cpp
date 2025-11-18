@@ -13,6 +13,7 @@
 #include "MonologueSetting.hpp"
 #include "SpeechBubbleSetting.hpp"
 #include "CelesteFastSetting.hpp"
+#include "CelesteColorSetting.hpp"
 
 AnimationSettingsLayer::AnimationSettingsLayer(const DeathAnimation& animation) {
     m_animation = animation;
@@ -159,6 +160,7 @@ bool AnimationSettingsLayer::setup() {
             case SettingType::MonologueSelect: settingNode = MonologueSetting::create(this, setting, m_animation, y); break;
             case SettingType::SpeechBubbleSelect: settingNode = SpeechBubbleSetting::create(this, setting, m_animation, y); break;
             case SettingType::CelesteFastToggle: settingNode = CelesteFastSetting::create(this, setting, m_animation, y); break;
+            case SettingType::CelesteColor: settingNode = CelesteColorSetting::create(this, setting, m_animation, y); break;
             default: break;
         }
 

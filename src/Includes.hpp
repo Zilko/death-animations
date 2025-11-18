@@ -42,6 +42,7 @@ enum SettingType {
     MonologueSelect,
     SpeechBubbleSelect,
     CelesteFastToggle,
+    CelesteColor,
 };
 
 enum Anim {
@@ -149,7 +150,10 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
         { "b2", 235.f }
     } },
     { Anim::Celeste, {
-        { "transition", 1.f }
+        { "transition", 1.f },
+        { "explosion-color-r", 172.f },
+        { "explosion-color-g", 62.f },
+        { "explosion-color-b", 56.f },
     } },
     { Anim::Jumpscare, {
         { "probability", 10.f }
@@ -219,6 +223,7 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
     } },
     { Anim::Celeste, {
         { .id = "second-player", .name = "Second Player", .description = "Play the death/respawn animation on the second player as well.", .type = SettingType::Toggle },
+        { .id = "explosion-color", .name = "Explosion Color", .description = "The color to use for the explosion animation.", .type = SettingType::CelesteColor },
         { .id = "respawn-animation", .name = "Respawn Animation", .description = "Play the Celeste respawn animation.", .type = SettingType::Toggle },
         { .id = "shockwave", .name = "Shockwave", .description = "Play the shockwave effect.", .type = SettingType::Toggle },
         { .id = "bounce-off", .name = "Bounce Off", .description = "Bounce the player off.", .type = SettingType::Toggle },
