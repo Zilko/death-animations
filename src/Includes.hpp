@@ -153,7 +153,7 @@ inline const std::unordered_map<int, std::unordered_map<std::string, float>> spe
         { "transition", 1.f },
         { "explosion-color-r", 172.f },
         { "explosion-color-g", 62.f },
-        { "explosion-color-b", 56.f },
+        { "explosion-color-b", 56.f }
     } },
     { Anim::Jumpscare, {
         { "probability", 10.f }
