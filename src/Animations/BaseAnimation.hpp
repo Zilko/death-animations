@@ -108,7 +108,7 @@ protected:
         setTouchMode(kCCTouchesOneByOne);
     }
 
-    void disableRetryLayer() {
+    void disableRetry() {
         m_isNoRetryLayer = true;
 
         stopActionByTag(534);

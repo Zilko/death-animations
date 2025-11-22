@@ -372,7 +372,7 @@ private:
 public:
 
     void start() override {
-        disableRetryLayer();
+        disableRetry();
         enableTouch();
         
         m_ogVolume = FMODAudioEngine::get()->m_sfxVolume;

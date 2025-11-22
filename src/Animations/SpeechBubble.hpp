@@ -238,7 +238,7 @@ public:
         CCSprite* spr = nullptr;
         CCMenuItemSpriteExtra* btn = nullptr;
 
-        disableRetryLayer();
+        disableRetry();
 
         m_buttonMenu = CCMenu::create();
         m_buttonMenu->setID("speech-bubble-menu"_spr);

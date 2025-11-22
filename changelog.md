@@ -1,3 +1,9 @@
+# v1.1.0
+
+* Add Wii Home animation.
+* Add some settings for Celeste thanks to cgytrus.
+* Kill iOS because it buggy and there's no way for me to fix.
+
 # v1.0.11
 
 * Fixed undertale pause bug

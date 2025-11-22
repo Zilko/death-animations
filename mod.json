@@ -3,12 +3,11 @@
     "gd": {
         "win": "2.2074",
         "android": "2.2074",
-        "mac": "2.2074",
-        "ios": "2.2074"
+        "mac": "2.2074"
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.0.11",
+    "version": "v1.1.0",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
@@ -43,7 +42,8 @@
             "resources/sprites/ui/*.png",
             "resources/sprites/ui/thumbnails/*.png",
             "resources/sprites/animations/jumpscare/*.png",
-            "resources/sprites/animations/you-died/*.png"
+            "resources/sprites/animations/you-died/*.png",
+            "resources/sprites/animations/wii/*.png"
         ],
         "files": [
             "resources/sounds/*.mp3",
@@ -52,6 +52,7 @@
             "resources/sounds/*.opus",
             "resources/fonts/*/*.fnt",
             "resources/fonts/*/*.png",
+            "resources/sprites/animations/wii/high-quality/*.png",
             "resources/sprites/animations/among-us/*.png",
             "resources/sprites/animations/to-be-continued/*.png",
             "resources/sprites/animations/wasted/*.png",

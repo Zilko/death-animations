@@ -2,6 +2,8 @@
 
 using namespace geode::prelude;
 
+#include <Geode/Geode.hpp>
+
 class PreviewDelegate;
 
 inline const std::string vertexShader = R"(
@@ -42,7 +44,7 @@ enum SettingType {
     MonologueSelect,
     SpeechBubbleSelect,
     CelesteFastToggle,
-    CelesteColor,
+    CelesteColor
 };
 
 enum Anim {
@@ -72,6 +74,7 @@ enum Anim {
     Poof = 25,
     FadeOut = 26,
     MrHippo = 27,
+    Wii = 28
 };
 
 struct NoobHSV {
@@ -124,19 +127,19 @@ struct AnimationSetting {
 
 inline const std::unordered_map<std::string, float> globalFloatDefaults = {
     { "speed", 0.183673f },
-    { "probability", 100.f },
+    { "probability", 100.f }
 };
 
 inline const std::unordered_set<std::string> gloalBoolDefaults = {
     "play-sound-effects",
     "play-in-testmode",
-    "second-player",
+    "second-player"
 };
 
 inline const std::unordered_map<int, std::unordered_map<std::string, std::string>> specificStringDefaults {
     { Anim::What, {
         { "top-text", "WHAT" },
-        { "bottom-text", "how" },
+        { "bottom-text", "how" }
     } }
 };
 
@@ -173,10 +176,10 @@ inline const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Ghost, { { "play-in-practice", true } } },
     { Anim::Pop, { { "play-in-practice", true } } },
     { Anim::FadeOut, { { "desaturate", true }, { "slow-down", true } } },
-    { Anim::SpeechBubble, { { "show-ui", true } } },
+    { Anim::SpeechBubble, { { "show-ui", true } } }
 };
 
-inline const std::array<DeathAnimation, 26> animations = {{
+inline const std::array<DeathAnimation, 27> animations = {{
     { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     { .id = Anim::Poof, .thumbnail = "poof-thumbnail.png", .name = "Poof", .duration = 1.2f, .retryLayerDelay = 0.3f, .isNoDeathEffect = true },
@@ -190,6 +193,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .retryLayerDelay = 7.7f, .isNoDeathSound = true, .isNoShakeEffect = true, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f, .retryLayerDelay = 2.4f, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .retryLayerDelay = 0.94f, .isNoDeathEffect = true, .isNoSpawnEffect = true },
+    { .id = Anim::Wii, .thumbnail = "celeste-thumbnail.png", .name = "Wii HOME", .duration = 1.f, .retryLayerDelay = 0.74f, .isNoDeathSound = true },
     { .id = Anim::LevelComplete, .thumbnail = "level-complete-thumbnail.png", .name = "Level Complete", .duration = 3.9f, .retryLayerDelay = 3.1f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::PracticeComplete, .thumbnail = "practice-complete-thumbnail.png", .name = "Practice Complete", .duration = 2.3f, .retryLayerDelay = 1.5f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::NewBest, .thumbnail = "new-best-thumbnail.png", .name = "New Best", .duration = 2.f, .retryLayerDelay = 1.85f },
@@ -202,7 +206,7 @@ inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::ToBeContinued, .thumbnail = "to-be-continued-thumbnail.png", .name = "To Be Continued", .duration = 5.f, .retryLayerDelay = 4.7f, .isNoDeathEffect = true, .isStopMusic = true },
     { .id = Anim::Jumpscare, .thumbnail = "jumpscare-thumbnail.png", .name = "Jumpscare", .duration = 0.8f, .retryLayerDelay = 0.85f, .isNoDeathSound = true, .isStopMusic = true },
     { .id = Anim::CBFDetected, .thumbnail = "cbf-detected-thumbnail.png", .name = "CBF Detected, Loser!", .duration = 1.f },
-    { .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 1.f, .retryLayerDelay = 0.4f, .isNoDeathEffect = true, .isDelayNewBest = true },
+    { .id = Anim::SpeechBubble, .thumbnail = "speech-bubble-thumbnail.png", .name = "Speech Bubble", .duration = 1.f, .retryLayerDelay = 0.4f, .isNoDeathEffect = true, .isDelayNewBest = true }
 }};
 
 inline const std::array<AnimationSetting, 8> defaultSettings = {{
@@ -213,7 +217,7 @@ inline const std::array<AnimationSetting, 8> defaultSettings = {{
     { .id = "play-sound-effects", .name = "Play Sound Effects", .description = "Play any sound effects associated with the animation.", .type = SettingType::Toggle },
     { .id = "play-in-practice", .name = "Play in Practice", .description = "Play the animation in practice mode.", .type = SettingType::Toggle },
     { .id = "play-in-testmode", .name = "Play in Testmode", .description = "Play the animation in test mode.", .type = SettingType::Toggle },
-    { .id = "only-on-new-best", .name = "Only on New Best", .description = "Play the animation only when achieving a new best.", .type = SettingType::Toggle },
+    { .id = "only-on-new-best", .name = "Only on New Best", .description = "Play the animation only when achieving a new best.", .type = SettingType::Toggle }
 }};
 
 inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSettings = {
@@ -292,11 +296,14 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
     } },
     { Anim::FadeOut, {
         { .id = "slow-down", .name = "Slow Down", .description = "Slow down the game along with the sound.", .type = SettingType::Toggle },
-        { .id = "desaturate", .name = "Desaturate", .description = "Slightly desaturate the colors for more immersion.", .type = SettingType::Toggle },
+        { .id = "desaturate", .name = "Desaturate", .description = "Slightly desaturate the colors for more immersion.", .type = SettingType::Toggle }
     } },
     { Anim::Minecraft, {
         { .id = "no-overlay", .name = "No Overlay", .description = "Disables the \"You Died!\" overlay, leaving only the player animation.", .type = SettingType::Toggle },
-        { .id = "no-cooldown", .name = "No Cooldown", .description = "Disables the 1s button cooldown in overlay.", .type = SettingType::Toggle },
+        { .id = "no-cooldown", .name = "No Cooldown", .description = "Disables the 1s button cooldown in overlay.", .type = SettingType::Toggle }
+    } },
+    { Anim::Wii, {
+        { .id = "auto-retry", .name = "Auto Retry", .description = "Automatically retries.", .type = SettingType::Toggle }
     } },
 };
 
@@ -307,5 +314,5 @@ inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSet
     { Anim::MrHippo, { "play-sound-effects", "speed" } },
     { Anim::Minecraft, { "speed" } },
     { Anim::Undertale, { "speed" } },
-    { Anim::SpeechBubble, { "speed", "play-sound-effects" } },
+    { Anim::SpeechBubble, { "speed", "play-sound-effects" } }
 };

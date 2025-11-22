@@ -395,7 +395,7 @@ public:
         if (Utils::getSettingBool(Anim::Minecraft, "no-overlay"))
             return;
 
-        disableRetryLayer();
+        disableRetry();
 
         std::string username = GJAccountManager::get()->m_username;
         if (username.empty())
