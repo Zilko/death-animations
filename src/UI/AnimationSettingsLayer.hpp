@@ -1,6 +1,6 @@
 #include "../Includes.hpp"
 
-class AnimationSettingsLayer : public geode::Popup<> {
+class AnimationSettingsLayer : public Popup {
 
 private:
 
@@ -13,7 +13,7 @@ private:
 
     AnimationSettingsLayer(const DeathAnimation&);
 
-    bool setup() override;
+    bool init() override;
     
     void onRestore(CCObject*);
 

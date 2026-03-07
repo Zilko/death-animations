@@ -1,6 +1,6 @@
 #include "BaseAnimation.hpp"
 
-#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+// #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 struct ObjectProperties {
     int p1 = 1; // id
@@ -647,8 +647,8 @@ private:
         player->updateGlowColor();
         player->updatePlayerGlow();
         
-        if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
-            MoreIcons::updatePlayerObject(player);
+        // if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
+        //     MoreIcons::updatePlayerObject(player);
 
         return player;
     }

@@ -4,7 +4,7 @@
 
 #include "AnimationCell.hpp"
 
-class AnimationsLayer : public geode::Popup<> {  
+class AnimationsLayer : public Popup {  
   
 private:
 
@@ -25,7 +25,7 @@ private:
     
     std::unordered_map<int, AnimationCell*> m_animationCells;
 
-    bool setup() override;
+    bool init() override;
     
     void onPreview(CCObject*);
     void onSettings(CCObject*);

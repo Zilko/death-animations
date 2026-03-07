@@ -1,6 +1,6 @@
 #include "BaseSetting.hpp"
 
-class CelesteColorSetting : public BaseSetting, public ColorPickPopupDelegate {
+class CelesteColorSetting : public BaseSetting {
 
 private:
 
@@ -9,8 +9,6 @@ private:
     CCMenuItemSpriteExtra* m_colorButton = nullptr;
 
     void onColorPicker(CCObject*);
-
-    virtual void updateColor(const ccColor4B&) override;
 
     void init(float) override;
 

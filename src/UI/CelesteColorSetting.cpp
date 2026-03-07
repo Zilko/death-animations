@@ -4,16 +4,16 @@
 
 void CelesteColorSetting::onColorPicker(CCObject* btn) {
     ColorPickPopup* popup = ColorPickPopup::create(m_colorSprite->getColor());
-    popup->setDelegate(this);
+
+    popup->setCallback([this](const ccColor4B& color) {
+        m_colorSprite->setColor({ color.r, color.g, color.b });
+
+        Utils::saveSetting(m_animation.id, m_setting.id + "-r", static_cast<float>(color.r));
+        Utils::saveSetting(m_animation.id, m_setting.id + "-g", static_cast<float>(color.g));
+        Utils::saveSetting(m_animation.id, m_setting.id + "-b", static_cast<float>(color.b));
+    });
+
     popup->show();
-}
-
-void CelesteColorSetting::updateColor(const ccColor4B& color) {
-    m_colorSprite->setColor({ color.r, color.g, color.b });
-
-    Utils::saveSetting(m_animation.id, m_setting.id + "-r", static_cast<float>(color.r));
-    Utils::saveSetting(m_animation.id, m_setting.id + "-g", static_cast<float>(color.g));
-    Utils::saveSetting(m_animation.id, m_setting.id + "-b", static_cast<float>(color.b));
 }
 
 void CelesteColorSetting::init(float y) {

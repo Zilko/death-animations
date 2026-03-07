@@ -90,7 +90,8 @@ private:
     CCSprite* m_wastedSprite = nullptr;
 
     CCNode* m_wastedContainer = nullptr;
-    CCNode* m_explosionSprite = nullptr;
+    
+    Ref<CCNode> m_explosionSprite = nullptr;
 
     float m_time = 0.f;
 
@@ -107,7 +108,7 @@ private:
     
         m_time += dt;
 
-        if (m_explosionSprite && static_cast<CCNodeRGBA*>(m_explosionSprite)->getOpacity() < 50)
+        if (m_explosionSprite && static_cast<CCNodeRGBA*>(m_explosionSprite.data())->getOpacity() < 50)
             m_explosionSprite = nullptr;
 
         m_program->use();

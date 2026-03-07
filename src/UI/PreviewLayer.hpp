@@ -2,7 +2,7 @@
 #include "../Animations/BaseAnimation.hpp"
 #include "../Other/PreviewDelegate.hpp"
 
-class PreviewLayer : public geode::Popup<>, public PreviewDelegate {
+class PreviewLayer : public Popup, public PreviewDelegate {
   
 private:
 
@@ -28,14 +28,14 @@ private:
 
     ~PreviewLayer();
 
-    bool setup() override;
+    bool init() override;
     
     void updateCircle(float);
     void spawnPlayer(float = 0.f);
     void playerDied(float);
     void playDeathEffect();
 
-    virtual void keyDown(enumKeyCodes) override;
+    virtual void keyDown(enumKeyCodes, double) override;
     
 public:
     

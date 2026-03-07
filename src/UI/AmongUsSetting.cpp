@@ -8,18 +8,18 @@ void AmongUsSetting::onColorPicker(CCObject* btn) {
     ColorPickPopup* popup = ColorPickPopup::create(
         (m_currentColor == 1 ? m_colorSprite1 : m_colorSprite2)->getColor()
     );
-    popup->setDelegate(this);
-    popup->show();
-}
+    
+    popup->setCallback([this](const ccColor4B& color) {
+        (m_currentColor == 1 ? m_colorSprite1 : m_colorSprite2)->setColor({ color.r, color.g, color.b });
+    
+        std::string n = std::to_string(m_currentColor);
+        
+        Utils::saveSetting(m_animation.id, "r" + n, static_cast<float>(color.r));
+        Utils::saveSetting(m_animation.id, "g" + n, static_cast<float>(color.g));
+        Utils::saveSetting(m_animation.id, "b" + n, static_cast<float>(color.b));
+    });
 
-void AmongUsSetting::updateColor(const ccColor4B& color) {
-    (m_currentColor == 1 ? m_colorSprite1 : m_colorSprite2)->setColor({ color.r, color.g, color.b });
-    
-    std::string n = std::to_string(m_currentColor);
-    
-    Utils::saveSetting(m_animation.id, "r" + n, static_cast<float>(color.r));
-    Utils::saveSetting(m_animation.id, "g" + n, static_cast<float>(color.g));
-    Utils::saveSetting(m_animation.id, "b" + n, static_cast<float>(color.b));
+    popup->show();
 }
 
 void AmongUsSetting::onSelectorArrow(CCObject* obj) {

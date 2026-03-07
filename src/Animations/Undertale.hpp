@@ -333,7 +333,7 @@ private:
         );
     }
     
-    void keyDown(enumKeyCodes key) override {
+    void keyDown(enumKeyCodes key, double timestamp) override {
         // CCLayer::keyDown(key);
         
         if (

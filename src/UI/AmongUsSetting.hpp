@@ -1,6 +1,6 @@
 #include "SelectSetting.hpp"
 
-class AmongUsSetting : public SelectSetting, public ColorPickPopupDelegate {
+class AmongUsSetting : public SelectSetting {
 
 private:
 
@@ -13,8 +13,6 @@ private:
     int m_currentColor;
 
     void onColorPicker(CCObject*);
-
-    virtual void updateColor(const ccColor4B&) override;
 
     void onSelectorArrow(CCObject*) override;
 

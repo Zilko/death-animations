@@ -3,7 +3,7 @@
 
 #include "PreviewLayer.hpp"
 
-#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+// #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 PreviewLayer::~PreviewLayer() {
     if (m_circleWave)
@@ -19,10 +19,8 @@ PreviewLayer::~PreviewLayer() {
 
 PreviewLayer* PreviewLayer::create() {
     PreviewLayer* ret = new PreviewLayer();
-    
-    CCSize winSize = CCDirector::get()->getWinSize();
-    
-    if (ret->initAnchored(winSize.width, winSize.height)) {
+        
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
@@ -136,8 +134,8 @@ void PreviewLayer::playDeathEffect() {
     m_player->setVisible(false);
 }
 
-void PreviewLayer::keyDown(enumKeyCodes key) {
-    geode::Popup<>::keyDown(key);
+void PreviewLayer::keyDown(enumKeyCodes key, double timestamp) {
+    Popup::keyDown(key, timestamp);
 
     if (
         (m_animation && m_animation->isDontRestart())
@@ -149,7 +147,11 @@ void PreviewLayer::keyDown(enumKeyCodes key) {
     reset();
 }
 
-bool PreviewLayer::setup() {
+bool PreviewLayer::init() {
+    CCSize winSize = CCDirector::get()->getWinSize();
+
+    Popup::init(winSize.width, winSize.height);
+
     m_noElasticity = true;
     
     m_bgSprite->setVisible(false);
@@ -202,8 +204,8 @@ bool PreviewLayer::setup() {
     
     m_mainLayer->addChild(m_player);
     
-    if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
-        MoreIcons::updateSimplePlayer(m_player, IconType::Cube);
+    // if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
+    //     MoreIcons::updateSimplePlayer(m_player, IconType::Cube);
     
     m_time = (m_spike->getPositionX() - m_player->getPositionX()) * 0.003625f;
         

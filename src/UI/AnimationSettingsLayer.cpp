@@ -22,7 +22,7 @@ AnimationSettingsLayer::AnimationSettingsLayer(const DeathAnimation& animation) 
 AnimationSettingsLayer* AnimationSettingsLayer::create(const DeathAnimation& animation) {
     AnimationSettingsLayer* ret = new AnimationSettingsLayer(animation);
     
-    if (ret->initAnchored(300, 200)) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
@@ -50,7 +50,9 @@ void AnimationSettingsLayer::onRestore(CCObject*) {
     );
 }
 
-bool AnimationSettingsLayer::setup() {
+bool AnimationSettingsLayer::init() {
+    Popup::init(300, 200);
+
     setTitle("Animation Settings");
     
     m_title->setPositionY(m_title->getPositionY() + 2);

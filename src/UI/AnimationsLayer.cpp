@@ -6,7 +6,7 @@
 AnimationsLayer* AnimationsLayer::create() {
     AnimationsLayer* ret = new AnimationsLayer();
     
-    if (ret->initAnchored(337, 240)) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
@@ -72,7 +72,9 @@ void AnimationsLayer::updateTableView(float) {
 	}
 }
 
-bool AnimationsLayer::setup() {
+bool AnimationsLayer::init() {
+    Popup::init(337, 240);
+    
     setTitle("Death Animations");
     
     ButtonSprite* btnSpr = ButtonSprite::create("Preview");

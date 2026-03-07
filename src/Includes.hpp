@@ -1,8 +1,8 @@
 #pragma once
 
-using namespace geode::prelude;
-
 #include <Geode/Geode.hpp>
+
+using namespace geode::prelude;
 
 class PreviewDelegate;
 
