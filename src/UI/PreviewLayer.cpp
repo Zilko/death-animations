@@ -205,7 +205,7 @@ bool PreviewLayer::init() {
     m_mainLayer->addChild(m_player);
     
     if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
-        more_icons::updateSimplePlayer(m_player, IconType::Cube);
+        more_icons::updateSimplePlayer(m_player, more_icons::activeIcon(IconType::Cube, false));
     
     m_time = (m_spike->getPositionX() - m_player->getPositionX()) * 0.003625f;
         
