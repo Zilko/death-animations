@@ -1,6 +1,8 @@
 #include "BaseAnimation.hpp"
 
-// #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+#define MORE_ICONS_EVENTS // required according to jasmine, required before header include --raydeeux
+
+#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 struct ObjectProperties {
     int p1 = 1; // id
@@ -647,8 +649,8 @@ private:
         player->updateGlowColor();
         player->updatePlayerGlow();
         
-        // if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
-        //     MoreIcons::updatePlayerObject(player);
+        if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
+            more_icons::updatePlayerObject(player, more_icons::activeIcon(IconType::Cube, false));
 
         return player;
     }

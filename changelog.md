@@ -1,3 +1,7 @@
+# v1.2.0
+* Remove Wii-related animation.
+* Port to Geode v5/GD 2.2081.
+
 # v1.1.0
 
 * Add Wii Home animation.

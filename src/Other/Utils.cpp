@@ -26,7 +26,7 @@
 #include "../Animations/Poof.hpp"
 #include "../Animations/FadeOut.hpp"
 #include "../Animations/MrHippo.hpp"
-#include "../Animations/Wii.hpp"
+// #include "../Animations/Wii.hpp"
 
 #include <random>
 
@@ -340,7 +340,7 @@ BaseAnimation* Utils::createAnimation(Anim animation, const AnimationParams& par
     ANIMATION_CHECK(Poof)
     ANIMATION_CHECK(FadeOut)
     ANIMATION_CHECK(MrHippo)
-    ANIMATION_CHECK(Wii)
+    // ANIMATION_CHECK(Wii)
     return nullptr;
 }
 

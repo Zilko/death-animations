@@ -74,7 +74,7 @@ enum Anim {
     Poof = 25,
     FadeOut = 26,
     MrHippo = 27,
-    Wii = 28
+    // Wii = 28
 };
 
 struct NoobHSV {
@@ -193,7 +193,7 @@ inline const std::array<DeathAnimation, 27> animations = {{
     { .id = Anim::Wasted, .thumbnail = "wasted-thumbnail.png", .name = "GTA V - Wasted", .duration = 8.f, .retryLayerDelay = 7.7f, .isNoDeathSound = true, .isNoShakeEffect = true, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::AmongUs, .thumbnail = "among-us-thumbnail.png", .name = "Among Us", .duration = 3.f, .retryLayerDelay = 2.4f, .isStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::Celeste, .thumbnail = "celeste-thumbnail.png", .name = "Celeste", .duration = 1.35f, .retryLayerDelay = 0.94f, .isNoDeathEffect = true, .isNoSpawnEffect = true },
-    { .id = Anim::Wii, .thumbnail = "celeste-thumbnail.png", .name = "Wii HOME", .duration = 1.f, .retryLayerDelay = 0.74f, .isNoDeathSound = true },
+    // { .id = Anim::Wii, .thumbnail = "celeste-thumbnail.png", .name = "Wii HOME", .duration = 1.f, .retryLayerDelay = 0.74f, .isNoDeathSound = true },
     { .id = Anim::LevelComplete, .thumbnail = "level-complete-thumbnail.png", .name = "Level Complete", .duration = 3.9f, .retryLayerDelay = 3.1f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::PracticeComplete, .thumbnail = "practice-complete-thumbnail.png", .name = "Practice Complete", .duration = 2.3f, .retryLayerDelay = 1.5f, .isNoDeathEffect = true, .isNoStopMusic = true, .isDelayNewBest = true },
     { .id = Anim::NewBest, .thumbnail = "new-best-thumbnail.png", .name = "New Best", .duration = 2.f, .retryLayerDelay = 1.85f },
@@ -302,9 +302,11 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "no-overlay", .name = "No Overlay", .description = "Disables the \"You Died!\" overlay, leaving only the player animation.", .type = SettingType::Toggle },
         { .id = "no-cooldown", .name = "No Cooldown", .description = "Disables the 1s button cooldown in overlay.", .type = SettingType::Toggle }
     } },
+    /*
     { Anim::Wii, {
         { .id = "auto-retry", .name = "Auto Retry", .description = "Automatically retries.", .type = SettingType::Toggle }
     } },
+    */
 };
 
 inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSettings = {
