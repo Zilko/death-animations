@@ -50,7 +50,7 @@ void AnimationsLayer::onSettings(CCObject*) {
     AnimationSettingsLayer::create(m_selectedAnimation->getAnimation())->show();
 }
 
-void AnimationsLayer::updateTableView(float) {
+void AnimationsLayer::Oew(float) {
 	if (!m_tableView || !m_contentLayer || !m_scrollbar) return;
 
 	float scale = m_mainLayer->getScale();
@@ -59,7 +59,8 @@ void AnimationsLayer::updateTableView(float) {
 		m_tableView->setContentSize(m_list->getContentSize() * scale);
 		m_contentLayer->setPosition(m_contentLayer->getPosition());
 		m_scrollbar->setScaleY(1.f / scale);
-		m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(1.f / scale * 0.4f);
+		if (m_scrollbar->getChildByType<CCScale9Sprite>(1)) m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(1.f / scale * 0.4f);
+        else if (m_scrollbar->getChildByType<geode::NineSlice>(1)) m_scrollbar->getChildByType<geode::NineSlice>(1)->setScaleY(1.f / scale * 0.4f);
 	}
 
 	if (m_mainLayer->numberOfRunningActions() == 0) {
@@ -68,7 +69,8 @@ void AnimationsLayer::updateTableView(float) {
 		m_tableView->setContentSize(m_list->getContentSize());
 		m_contentLayer->setPosition(m_contentLayer->getPosition());
 		m_scrollbar->setScaleY(1);
-		m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(0.4f);
+		if (m_scrollbar->getChildByType<CCScale9Sprite>(1)) m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(0.4f);
+        else if (m_scrollbar->getChildByType<geode::NineSlice>(1)) m_scrollbar->getChildByType<geode::NineSlice>(1)->setScaleY(0.4f);
 	}
 }
 
