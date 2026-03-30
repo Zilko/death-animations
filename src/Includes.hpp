@@ -302,9 +302,11 @@ inline const std::unordered_map<int, std::vector<AnimationSetting>> extraSetting
         { .id = "no-overlay", .name = "No Overlay", .description = "Disables the \"You Died!\" overlay, leaving only the player animation.", .type = SettingType::Toggle },
         { .id = "no-cooldown", .name = "No Cooldown", .description = "Disables the 1s button cooldown in overlay.", .type = SettingType::Toggle }
     } },
+    /*
     { Anim::Wii, {
         { .id = "auto-retry", .name = "Auto Retry", .description = "Automatically retries.", .type = SettingType::Toggle }
     } },
+    */
 };
 
 inline const std::unordered_map<int, std::unordered_set<std::string>> blockedSettings = {
