@@ -1,3 +1,4 @@
+/*
 #include "BaseAnimation.hpp"
 
 const float FADE_IN = 0.23f;
@@ -396,3 +397,4 @@ public:
     }
 
 };
+*/

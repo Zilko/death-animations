@@ -404,8 +404,8 @@ class $modify(GJBaseGameLayer) {
 
 class $modify(CCKeyboardDispatcher) {
 
-    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) { // disabled by defolt
-        if (!CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat)) return false;
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat, double ts) { // disabled by defolt
+        if (!CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, ts)) return false;
         
         if (!down || repeat) return true;
         
@@ -413,7 +413,7 @@ class $modify(CCKeyboardDispatcher) {
             auto f = static_cast<ProPlayLayer*>(pl)->m_fields.self();
             
             if (f->m_animation)
-                f->m_animation->keyDown(key);
+                f->m_animation->keyDown(key, ts);
         }
         
         return true;
