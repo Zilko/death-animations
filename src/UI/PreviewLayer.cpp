@@ -3,9 +3,9 @@
 
 #include "PreviewLayer.hpp"
 
-#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+#define MORE_ICONS_EVENTS // required according to jasmine, required before header include --raydeeux
 
-#define MORE_ICONS_EVENTS // required according to jasmine
+#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 PreviewLayer::~PreviewLayer() {
     if (m_circleWave)
