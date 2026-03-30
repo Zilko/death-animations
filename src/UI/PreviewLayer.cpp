@@ -5,6 +5,8 @@
 
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
+#define MORE_ICONS_EVENTS // required according to jasmine
+
 PreviewLayer::~PreviewLayer() {
     if (m_circleWave)
         m_circleWave->release();

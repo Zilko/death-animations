@@ -2,6 +2,8 @@
 
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
+#define MORE_ICONS_EVENTS // required according to jasmine
+
 struct ObjectProperties {
     int p1 = 1; // id
     float p2 = 0.f; // positionX
