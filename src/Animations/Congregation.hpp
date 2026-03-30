@@ -648,7 +648,7 @@ private:
         player->updatePlayerGlow();
         
         if (Loader::get()->isModLoaded("hiimjustin000.more_icons"))
-            more_icons::updatePlayerObject(player, more_icons::activeIcon(IconType::Cube, false));
+            more_icons::updatePlayerObject(player, more_icons::activeIcon(IconType::Cube));
 
         return player;
     }
