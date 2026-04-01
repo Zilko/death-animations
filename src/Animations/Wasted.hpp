@@ -84,7 +84,7 @@ private:
 
     CCGLProgram* m_program = nullptr;
 
-    CCRenderTexture* m_renderTexture = nullptr;
+    std::shared_ptr<RenderTexture::Sprite> m_renderTexture = nullptr;
 
     CCSprite* m_frameSprite = nullptr;
     CCSprite* m_wastedSprite = nullptr;
@@ -172,9 +172,6 @@ private:
     }
 
     ~Wasted() {
-        if (m_renderTexture)
-            m_renderTexture->release();
-        
         if (m_program)
             m_program->release();
 
@@ -215,12 +212,13 @@ public:
 
         m_program = Utils::createShader(m_shader, false);
 
-        m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
-        m_renderTexture->retain();
+        auto director = CCDirector::get();
+
+        m_renderTexture = RenderTexture(director->getWinSizeInPixels().width, director->getWinSizeInPixels().height).intoManagedSprite();
 
         update(0.f);
 
-        m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        m_frameSprite = CCSprite::createWithTexture(m_renderTexture->sprite->getTexture());
         m_frameSprite->setFlipY(true);
         m_frameSprite->setPosition(m_size / 2.f);
         m_frameSprite->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
@@ -228,14 +226,14 @@ public:
 
         addChild(m_frameSprite);
 
-        CCSprite* copy = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        CCSprite* copy = CCSprite::createWithTexture(m_renderTexture->sprite->getTexture());
         copy->setAnchorPoint({0, 1});
         copy->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
         copy->setShaderProgram(m_program);
 
         m_frameSprite->addChild(copy);
 
-        copy = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        copy = CCSprite::createWithTexture(m_renderTexture->sprite->getTexture());
         copy->setPosition({0, m_size.height});
         copy->setAnchorPoint({0, 0});
         copy->setBlendFunc(ccBlendFunc{GL_ONE, GL_ZERO});
@@ -243,7 +241,7 @@ public:
 
         m_frameSprite->addChild(copy);
 
-        copy = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        copy = CCSprite::createWithTexture(m_renderTexture->sprite->getTexture());
         copy->setFlipY(true);
         copy->setFlipX(true);
         copy->setAnchorPoint({1, 0});
@@ -252,7 +250,7 @@ public:
 
         m_frameSprite->addChild(copy);
 
-        copy = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        copy = CCSprite::createWithTexture(m_renderTexture->sprite->getTexture());
         copy->setFlipY(true);
         copy->setFlipX(true);
         copy->setPosition({m_size.width, 0});

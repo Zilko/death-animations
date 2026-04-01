@@ -23,14 +23,40 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 CPMAddPackage("gh:xiph/ogg#v1.3.6")
 CPMAddPackage("gh:xiph/opus#v1.5.2")
+
+set(OP_DISABLE_HTTP ON CACHE BOOL "" FORCE)
+set(OP_DISABLE_DOCS ON CACHE BOOL "" FORCE)
+set(OP_DISABLE_EXAMPLES ON CACHE BOOL "" FORCE)
+
 CPMAddPackage(
     NAME opusfile
     GITHUB_REPOSITORY xiph/opusfile
     GIT_TAG 8890ea3
-    OPTIONS "OP_DISABLE_DOCS ON" "OP_DISABLE_HTTP ON" "OP_DISABLE_EXAMPLES ON"
+    DOWNLOAD_ONLY YES
 )
 
-target_link_libraries(${PROJECT_NAME} ogg opus opusfile)
+if(opusfile_ADDED)
+    file(READ "${opusfile_SOURCE_DIR}/CMakeLists.txt" _opusfile_cmake)
+    
+    string(REPLACE
+        "-std=c89>"
+        "$<$<NOT:$<PLATFORM_ID:Windows>>:-std=c89>>"
+        _opusfile_cmake "${_opusfile_cmake}"
+    )
+    string(REPLACE
+        "-pedantic>"
+        "$<$<NOT:$<PLATFORM_ID:Windows>>:-pedantic>>"
+        _opusfile_cmake "${_opusfile_cmake}"
+    )
+    
+    file(WRITE "${opusfile_SOURCE_DIR}/CMakeLists.txt" "${_opusfile_cmake}")
+
+    add_subdirectory("${opusfile_SOURCE_DIR}" "${opusfile_BINARY_DIR}")
+endif()
+
+CPMAddPackage("gh:undefined06855/gd-render-texture#8f319a8")
+
+target_link_libraries(${PROJECT_NAME} ogg opus opusfile gd-render-texture)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_BINARY_DIR}/_deps/ogg-src/include"

@@ -8,13 +8,7 @@ class AnimationsLayer : public Popup {
   
 private:
 
-    GJCommentListLayer* m_list = nullptr;
-
-    CCNode* m_contentLayer = nullptr;
-
-    Scrollbar* m_scrollbar = nullptr;
-
-    TableView* m_tableView = nullptr;
+    Border* m_border = nullptr;
 
     AnimationCell* m_selectedAnimation = nullptr;
     
@@ -40,6 +34,6 @@ public:
     
     void createdCell(AnimationCell*);
 
-    GJCommentListLayer* getList();
+    Border* getBorder();
         
 };

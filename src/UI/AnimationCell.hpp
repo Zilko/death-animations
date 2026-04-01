@@ -10,9 +10,14 @@ private:
 
     AnimationsLayer* m_layer = nullptr;
 
+    CCPoint m_touchStart;
+
+    bool m_cancelled = false;
+
     ProMenu(AnimationsLayer*);
 
     bool ccTouchBegan(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override;
+    void ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override;
 
 public:
 

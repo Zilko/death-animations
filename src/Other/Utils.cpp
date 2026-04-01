@@ -31,11 +31,7 @@
 #include <random>
 
 int Utils::getRandomInt(int min, int max) {
-    static std::mt19937 gen(std::random_device{}());
-
-    std::uniform_int_distribution<> dis(min, max);
-    
-    return dis(gen);
+    return utils::random::generate<int>(min, max);
 }
 
 std::filesystem::path Utils::getRandomFile(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
@@ -359,36 +355,15 @@ CCGLProgram* Utils::createShader(const std::string& shader, bool autorelease) {
     return ret;
 }
 
-CCTexture2D* Utils::takeScreenshot(CCRenderTexture* renderTexture) { // theres bug with non 16:9 aspect ratios lets hope no one notices
-    CCEGLView* view = CCEGLView::get();
-    CCDirector* director = CCDirector::get();
-
-    CCSize winSize = director->getWinSize();
-    CCSize ogRes = view->getDesignResolutionSize();
-    CCSize size = { roundf(320.f * (winSize.width / winSize.height)), 320.f };
-    CCSize newScale = { winSize.width / size.width, winSize.height / size.height };
-    CCPoint ogScale = { view->m_fScaleX, view->m_fScaleY };
-
-    float scale = director->getContentScaleFactor() / utils::getDisplayFactor();
-
-    director->m_obWinSizeInPoints = size;
-    view->setDesignResolutionSize(size.width, size.height, ResolutionPolicy::kResolutionExactFit);
-    view->m_fScaleX = scale * newScale.width;
-    view->m_fScaleY = scale * newScale.height;
+CCTexture2D* Utils::takeScreenshot(std::shared_ptr<RenderTexture::Sprite> renderTexture) {
+    auto director = CCDirector::get();
 
     if (!renderTexture)
-        renderTexture = CCRenderTexture::create(winSize.width, winSize.height);
+        renderTexture = RenderTexture(director->getWinSizeInPixels().width, director->getWinSizeInPixels().height).intoManagedSprite();
 
-    renderTexture->beginWithClear(0, 0, 0, 1);
-    CCScene::get()->visit();
-    renderTexture->end();
+    renderTexture->render.capture(CCScene::get());
 
-    director->m_obWinSizeInPoints = ogRes;
-    view->setDesignResolutionSize(ogRes.width, ogRes.height, ResolutionPolicy::kResolutionExactFit);
-    view->m_fScaleX = ogScale.x;
-    view->m_fScaleY = ogScale.y;
-
-    return renderTexture->getSprite()->getTexture();
+    return renderTexture->sprite->getTexture();
 }
 
 CCSprite* Utils::renderPlayerSprite(CCNodeRGBA* player, bool rotation0) {

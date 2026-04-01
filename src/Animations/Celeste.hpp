@@ -922,7 +922,7 @@ private:
 
     CCGLProgram* m_program = nullptr;
 
-    CCRenderTexture* m_renderTexture = nullptr;
+    std::shared_ptr<RenderTexture::Sprite> m_renderTexture = nullptr;
 
     CCSprite* m_frameSprite = nullptr;
 
@@ -1026,12 +1026,13 @@ private:
     void startShockwave(float) {
         m_program = Utils::createShader(m_shader, false);
 
-        m_renderTexture = CCRenderTexture::create(m_size.width, m_size.height);
-        m_renderTexture->retain();
+        auto director = CCDirector::get();
+
+        m_renderTexture = RenderTexture(director->getWinSizeInPixels().width, director->getWinSizeInPixels().height).intoManagedSprite();
 
         update(0.f);
 
-        m_frameSprite = CCSprite::createWithTexture(m_renderTexture->getSprite()->getTexture());
+        m_frameSprite = CCSprite::createWithTexture(m_renderTexture->sprite->getTexture());
         m_frameSprite->setVisible(false);
         m_frameSprite->setFlipY(true);
         m_frameSprite->setPosition(m_size / 2.f);
@@ -1073,11 +1074,6 @@ private:
         m_didFinish = true;
     }
 
-    ~Celeste() {
-        if (m_renderTexture)
-            m_renderTexture->release();
-    }
-        
     ANIMATION_CTOR_CREATE(Celeste) {
         m_fast = Utils::getSettingBool(Anim::Celeste, "fast");
         if (m_fast) {

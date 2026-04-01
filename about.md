@@ -8,33 +8,32 @@ The spike invites you to die.
 
 I will take any Death Animation suggestions, they can be original ideas!
 
-# Thanks
-
-* <cl>SawBlade</c> for always being there for me.
-* Eri for existing.
-* Jamin for testing MacOS live.
-* Xyle for fishing with me.
-
 # Honorable Mentions
 
+* Sawblade
 * Zemi
 * Cheerios
+* Luanxd
 * Druid
 * Atg
 * Gray
 * Cringify
 * Krispizz
 * Zingus
+* katt
 * Dorito
 * Zelender
 * Ataz
+* Preview spike
 * Fingynium
 * Qpau
 * Royal
 * Sharks
 * Evil Zilko
 * Eggs
+* zawtrikkl
 * xdBot
+* kenos laser
 * SawBot
 * Sawbladette
 * Zequlous
@@ -44,10 +43,4 @@ I will take any Death Animation suggestions, they can be original ideas!
 * Sylveon
 * Judy Hopps
 * Stereo Madness spike
-* Preview spike
-
-# Rest In Peace SawBlade
-
-I miss you, man.
-
-i actually do
+* fire_b_01_2_003.png

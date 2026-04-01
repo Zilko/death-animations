@@ -38,8 +38,8 @@ void AnimationsLayer::createdCell(AnimationCell* cell) {
     m_animationCells[cell->getAnimation().id] = cell;
 }
 
-GJCommentListLayer* AnimationsLayer::getList() {
-    return m_list;
+Border* AnimationsLayer::getBorder() {
+    return m_border;
 }
 
 void AnimationsLayer::onPreview(CCObject*) {
@@ -48,30 +48,6 @@ void AnimationsLayer::onPreview(CCObject*) {
 
 void AnimationsLayer::onSettings(CCObject*) {
     AnimationSettingsLayer::create(m_selectedAnimation->getAnimation())->show();
-}
-
-void AnimationsLayer::Oew(float) {
-	if (!m_tableView || !m_contentLayer || !m_scrollbar) return;
-
-	float scale = m_mainLayer->getScale();
-	
-	if (scale >= 1.f) {
-		m_tableView->setContentSize(m_list->getContentSize() * scale);
-		m_contentLayer->setPosition(m_contentLayer->getPosition());
-		m_scrollbar->setScaleY(1.f / scale);
-		if (m_scrollbar->getChildByType<CCScale9Sprite>(1)) m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(1.f / scale * 0.4f);
-        else if (m_scrollbar->getChildByType<geode::NineSlice>(1)) m_scrollbar->getChildByType<geode::NineSlice>(1)->setScaleY(1.f / scale * 0.4f);
-	}
-
-	if (m_mainLayer->numberOfRunningActions() == 0) {
-        unschedule(schedule_selector(AnimationsLayer::updateTableView));
-
-		m_tableView->setContentSize(m_list->getContentSize());
-		m_contentLayer->setPosition(m_contentLayer->getPosition());
-		m_scrollbar->setScaleY(1);
-		if (m_scrollbar->getChildByType<CCScale9Sprite>(1)) m_scrollbar->getChildByType<CCScale9Sprite>(1)->setScaleY(0.4f);
-        else if (m_scrollbar->getChildByType<geode::NineSlice>(1)) m_scrollbar->getChildByType<geode::NineSlice>(1)->setScaleY(0.4f);
-	}
 }
 
 bool AnimationsLayer::init() {
@@ -104,65 +80,49 @@ bool AnimationsLayer::init() {
     m_nameLabel->setScale(0.475f);
     
     m_mainLayer->addChild(m_nameLabel);
-    
-    CCScale9Sprite* bg = CCScale9Sprite::create("square02b_001.png");
-    bg->setColor({0, 0, 0});
-    bg->setOpacity(24);
-    bg->setAnchorPoint({0, 0});
-    bg->setContentSize({ 289, 153 });
-    
-    m_mainLayer->addChild(bg);
-    
-    CCArray* array = CCArray::create();
-    
+
+    auto scroll = ScrollLayer::create({289, 153}, true, true);
+    scroll->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+
+    m_border = Border::create(scroll, {138, 77, 46, 255}, {289, 153}, {0, 0});
+    m_border->ignoreAnchorPointForPosition(false);
+    m_border->setPosition(m_size / 2.f + CCPoint{0, 3.5f});
+
+    m_mainLayer->addChild(m_border);
+
     std::vector<DeathAnimation> row;
     
     for (const DeathAnimation& animation : animations) {
         row.push_back(animation);
         
         if (row.size() == 4) {
-            array->addObject(ListRow::create(row, this));
+            scroll->m_contentLayer->addChild(ListRow::create(row, this));
             row.clear();
         }
     }
     
     if (row.size() != 4 && !row.empty())
-        array->addObject(ListRow::create(row, this));
+        scroll->m_contentLayer->addChild(ListRow::create(row, this));
+
+    scroll->m_contentLayer->updateLayout();
+
+    auto scrollbar = Scrollbar::create(scroll);
+    scrollbar->setPosition({323, m_border->getPositionY()});
+
+    m_mainLayer->addChild(scrollbar, 5);
+    
+    scroll->scrollToTop();
         
-    ListView* listView = ListView::create(array, 50, 289, 153);
-    
-    listView->setPrimaryCellColor(ccc3(138, 77, 46));
-    listView->setSecondaryCellColor(ccc3(138, 77, 46));
-    listView->setCellBorderColor(ccc4(0, 0, 0, 0));
-    
-    m_list = GJCommentListLayer::create(listView, "", ccc4(255, 255, 255, 0), 289, 153, false);
-    m_list->setPosition((m_size - m_list->getContentSize()) / 2.f);
-    m_list->setUserObject("dont-correct-borders", CCBool::create(true));
-
-    m_mainLayer->addChild(m_list, 2);
-
-    m_tableView = listView->m_tableView;
-    m_contentLayer = m_tableView->m_contentLayer;
-    
-    bg->setPosition(m_list->getPosition());
-    
-    CCSprite* topBorder = m_list->getChildByType<CCSprite>(1);
-    CCSprite* bottomBorder = m_list->getChildByType<CCSprite>(0);
-    
-    topBorder->setScale(0.85f);
-    bottomBorder->setScale(0.85f);
-    
-    m_scrollbar = Scrollbar::create(listView->m_tableView);
-    m_scrollbar->setPosition(m_list->getPosition() + ccp(m_list->getContentSize().width + 6, 0));
-    m_scrollbar->setAnchorPoint({0, 0});
-    m_mainLayer->addChild(m_scrollbar, 5);
-    
     int selected = Mod::get()->getSavedValue<int>("selected-animation");
     
     if (m_animationCells.contains(selected))
         selectAnimation(m_animationCells.at(selected));
 
-    schedule(schedule_selector(AnimationsLayer::updateTableView), 0, kCCRepeatForever, 1.f / 240.f);
+    queueInMainThread([scroll = Ref(scroll)] {
+        if (auto handler = CCTouchDispatcher::get()->findHandler(scroll)) {
+            CCTouchDispatcher::get()->setPriority(handler->getPriority() - 1, handler->getDelegate());
+        }
+    });
     
     return true;
 }   

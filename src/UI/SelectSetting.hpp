@@ -6,7 +6,7 @@ class SelectSetting : public BaseSetting {
 
 protected:
 
-    CCScale9Sprite* m_bg = nullptr;
+    NineSlice* m_bg = nullptr;
 
     CCMenuItemSpriteExtra* m_rightArrow = nullptr;
 

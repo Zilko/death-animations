@@ -2,6 +2,8 @@
 
 #include "../Includes.hpp"
 
+#include <RenderTexture.hpp>
+
 class BaseAnimation;
 class SoundUpdater;
 
@@ -43,7 +45,7 @@ public:
 
     static BaseAnimation* createAnimation(Anim, const AnimationParams&);
     static CCGLProgram* createShader(const std::string&, bool);
-    static CCTexture2D* takeScreenshot(CCRenderTexture* = nullptr);
+    static CCTexture2D* takeScreenshot(std::shared_ptr<RenderTexture::Sprite> = nullptr);
     static CCSprite* renderPlayerSprite(CCNodeRGBA*, bool);
     
 };

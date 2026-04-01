@@ -57,7 +57,7 @@ bool AnimationSettingsLayer::init() {
     
     m_title->setPositionY(m_title->getPositionY() + 2);
     
-    CCScale9Sprite* bg = CCScale9Sprite::create("square02b_001.png");
+    NineSlice* bg = NineSlice::create("square02b_001.png");
     bg->setColor({0, 0, 0});
     bg->setOpacity(70);
     bg->setPosition({150, 153});
@@ -66,7 +66,7 @@ bool AnimationSettingsLayer::init() {
     
     m_mainLayer->addChild(bg);
     
-    bg = CCScale9Sprite::create("square02b_001.png");
+    bg = NineSlice::create("square02b_001.png");
     bg->setColor({0, 0, 0});
     bg->setOpacity(70);
     bg->setPosition({150, 85});

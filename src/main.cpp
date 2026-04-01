@@ -80,6 +80,8 @@ $on_mod(Loaded) {
     
     CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
     
+    cache->addSpriteFramesWithFile("blood-drops.plist"_spr);
+
     for (int i = 1; i < 5; i++) {
         cache->addSpriteFramesWithFile(fmt::format("among-us-death-{}.plist"_spr, i).c_str());
     }

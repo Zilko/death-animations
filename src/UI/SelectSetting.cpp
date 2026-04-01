@@ -21,7 +21,7 @@ void SelectSetting::init(float y) {
 
     float xOffset = m_nameLabel->getContentWidth() * m_nameLabel->getScale() - 60;
     
-    m_bg = CCScale9Sprite::create("square02b_001.png");
+    m_bg = NineSlice::create("square02b_001.png");
     m_bg->setColor({0, 0, 0});
     m_bg->setOpacity(90);
     m_bg->setScale(0.275f);

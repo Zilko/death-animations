@@ -18,11 +18,25 @@ ProMenu* ProMenu::create(AnimationsLayer* layer) {
 }
 
 bool ProMenu::ccTouchBegan(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) {
-    cocos2d::CCPoint pos = m_layer->getList()->convertToNodeSpace(touch->getLocation());
+    cocos2d::CCPoint pos = m_layer->getBorder()->convertToNodeSpace(touch->getLocation());
 
     if (pos.x < 0 || pos.y < 0 || pos.x > 289 || pos.y > 153) return false;
 
+    m_cancelled = false;
+    m_touchStart = touch->getLocation();
+
     return CCMenu::ccTouchBegan(touch, event);
+}
+
+void ProMenu::ccTouchMoved(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) {
+    if (m_cancelled || abs(m_touchStart.y - touch->getLocation().y) >= 19) {
+        touch->m_startPoint = CCPoint{129312, 129031};
+        touch->m_point = CCPoint{129312, 129031};
+        touch->m_prevPoint = CCPoint{129312, 129031};
+        m_cancelled = true;
+    }
+
+    CCMenu::ccTouchMoved(touch, event);
 }
 
 AnimationCell::AnimationCell(const DeathAnimation& animation, AnimationsLayer* parentLayer) {
@@ -65,7 +79,7 @@ bool AnimationCell::init() {
     CCNode* container = CCNode::create();
     container->setAnchorPoint({0.5f, 0.5f});
     
-    CCScale9Sprite* border = CCScale9Sprite::create("border.png"_spr);
+    NineSlice* border = NineSlice::create("border.png"_spr);
     border->setContentSize({61, 39.639f});
     container->addChild(border, 1);
     

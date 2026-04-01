@@ -16,6 +16,8 @@ ListRow* ListRow::create(const std::vector<DeathAnimation>& animations, Animatio
 
 bool ListRow::init(const std::vector<DeathAnimation>& animations, AnimationsLayer* parentLayer) {
     CCNode::init();
+
+    setContentSize({289, 48});
     
     for (int i = 0; i < animations.size(); i++) {
         AnimationCell* cell = AnimationCell::create(animations[i], parentLayer);

@@ -176,10 +176,9 @@ inline const std::unordered_map<int, std::unordered_map<std::string, bool>> spec
     { Anim::Ghost, { { "play-in-practice", true } } },
     { Anim::Pop, { { "play-in-practice", true } } },
     { Anim::FadeOut, { { "desaturate", true }, { "slow-down", true } } },
-    { Anim::SpeechBubble, { { "show-ui", true } } }
 };
 
-inline const std::array<DeathAnimation, 27> animations = {{
+inline const std::array<DeathAnimation, 26> animations = {{
     { .id = Anim::None, .thumbnail = "none-thumbnail.png", .name = "None" },
     { .id = Anim::Random, .thumbnail = "random-thumbnail.png", .name = "Random" },
     { .id = Anim::Poof, .thumbnail = "poof-thumbnail.png", .name = "Poof", .duration = 1.2f, .retryLayerDelay = 0.3f, .isNoDeathEffect = true },

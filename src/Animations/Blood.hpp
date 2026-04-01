@@ -162,7 +162,13 @@ private:
                     for (size_t j = i; j < i + 9 && j < m_bloodDrops.size(); ++j) {
                         const BloodDrop& bloodDrop = m_bloodDrops[j];
 
-                        CCSprite* spr = CCSprite::create(fmt::format("blood-drop-{}.png"_spr, bloodDrop.id).c_str());
+                        CCSprite* spr = CCSprite::createWithSpriteFrameName(fmt::format("blood-drop-{}.png"_spr, bloodDrop.id).c_str());
+
+                        if (!spr || spr->getUserObject("geode.texture-loader/fallback")) {
+                            CCSpriteFrameCache::get()->addSpriteFramesWithFile("blood-drops.plist"_spr);
+                            spr = CCSprite::createWithSpriteFrameName(fmt::format("blood-drop-{}.png"_spr, bloodDrop.id).c_str());
+                        }
+
                         spr->setPosition(getNodeScreenPos(player) + bloodDrop.offset);
                         spr->setRotation(bloodDrop.rotation);
                         spr->setScale(bloodDrop.scale * zoom);

@@ -1,5 +1,5 @@
 {
-    "geode": "5.4.0",
+    "geode": "5.5.2",
     "gd": {
         "win": "2.2081",
         "android": "2.2081",
@@ -11,7 +11,8 @@
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
-      "source": "https://github.com/Zilko/death-animations"
+      "source": "https://github.com/Zilko/death-animations",
+      "community": "https://discord.gg/w6yvdzVzBd"
     },
     "tags": [
   		"enhancement",
@@ -54,7 +55,6 @@
             "resources/sprites/animations/to-be-continued/*.png",
             "resources/sprites/animations/wasted/*.png",
             "resources/sprites/animations/minecraft/*.png",
-            "resources/sprites/animations/blood/*.png",
             "resources/sprites/animations/mr-hippo/*.png",
             "resources/sprites/animations/bsod/*.png",
             "resources/sprites/animations/speech-bubble/*.png",
@@ -66,7 +66,9 @@
             "resources/sprites/animations/undertale/spritesheets/*.png",
             "resources/sprites/animations/undertale/spritesheets/*.plist",
             "resources/sprites/animations/among-us/spritesheets/*.plist",
-            "resources/sprites/animations/among-us/spritesheets/*.png"
+            "resources/sprites/animations/among-us/spritesheets/*.png",
+            "resources/sprites/animations/blood/spritesheets/*.plist",
+            "resources/sprites/animations/blood/spritesheets/*.png"
         ],
         "fonts": {
           "terraria": {

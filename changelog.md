@@ -1,6 +1,7 @@
 # v1.2.0
-* Remove Wii-related animation.
-* Port to Geode v5/GD 2.2081.
+
+* Ported to gode v5 gd v2.2.084
+* Added some celeste settings thanks to cgytrus pull request.
 
 # v1.1.0
 

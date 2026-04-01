@@ -29,7 +29,9 @@ private:
     void playSpeech(float) {
         std::filesystem::path path = Mod::get()->getResourcesDir() / fmt::format("hippo-{}.opus", m_speech);
 
-        FILE* fp = fopen(utils::string::pathToString(path).c_str(), "rb");
+        FILE* fp = nullptr;
+
+        fopen_s(&fp, utils::string::pathToString(path).c_str(), "rb");
 
         if (!fp) return log::error("Mr. Hippo: Couldn't open file. {}", path);
 
