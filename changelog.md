@@ -1,13 +1,8 @@
-# v1.2.0
+# v1.1.0
 
 * Ported to gode v5 gd v2.2.084
 * Added some celeste settings thanks to cgytrus pull request.
-
-# v1.1.0
-
-* Add Wii Home animation.
-* Add some settings for Celeste thanks to cgytrus.
-* Kill iOS because it buggy and there's no way for me to fix.
+* Killed iOS because it buggy and there's no way for me to fix.
 
 # v1.0.11
 
