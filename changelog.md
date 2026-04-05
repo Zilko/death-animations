@@ -1,3 +1,9 @@
+# v1.1.1
+
+* fixed geen jumpscare thumbnail
+* fixed andorid touch bug
+* fixed ui gap
+
 # v1.1.0
 
 * Ported to gode v5 gd v2.2.084

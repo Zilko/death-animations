@@ -90,6 +90,11 @@ bool AnimationsLayer::init() {
 
     m_mainLayer->addChild(m_border);
 
+    auto filler = CCNode::create();
+    filler->setContentHeight(1.4f);
+
+    scroll->m_contentLayer->addChild(filler);
+
     std::vector<DeathAnimation> row;
     
     for (const DeathAnimation& animation : animations) {
@@ -122,6 +127,12 @@ bool AnimationsLayer::init() {
         if (auto handler = CCTouchDispatcher::get()->findHandler(scroll)) {
             CCTouchDispatcher::get()->setPriority(handler->getPriority() - 1, handler->getDelegate());
         }
+
+        queueInMainThread([scroll] {
+            if (auto handler = CCTouchDispatcher::get()->findHandler(scroll)) {
+                CCTouchDispatcher::get()->setPriority(handler->getPriority() + 1, handler->getDelegate());
+            }
+        });
     });
     
     return true;
