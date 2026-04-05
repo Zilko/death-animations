@@ -8,6 +8,8 @@ class AnimationsLayer : public Popup {
   
 private:
 
+    ScrollLayer* m_scroll = nullptr;
+
     Border* m_border = nullptr;
 
     AnimationCell* m_selectedAnimation = nullptr;
@@ -18,6 +20,10 @@ private:
     CCMenuItemSpriteExtra* m_settingsBtn = nullptr;
     
     std::unordered_map<int, AnimationCell*> m_animationCells;
+
+    ~AnimationsLayer() {
+        CCTouchDispatcher::get()->removeDelegate(m_scroll);
+    }
 
     bool init() override;
     

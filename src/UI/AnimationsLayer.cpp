@@ -81,10 +81,12 @@ bool AnimationsLayer::init() {
     
     m_mainLayer->addChild(m_nameLabel);
 
-    auto scroll = ScrollLayer::create({289, 153}, true, true);
-    scroll->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+    m_scroll = ScrollLayer::create({289, 153}, true, true);
+    m_scroll->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+    
+    CCTouchDispatcher::get()->addPrioTargetedDelegate(m_scroll, -500, false);
 
-    m_border = Border::create(scroll, {138, 77, 46, 255}, {289, 153}, {0, 0});
+    m_border = Border::create(m_scroll, {138, 77, 46, 255}, {289, 153}, {0, 0});
     m_border->ignoreAnchorPointForPosition(false);
     m_border->setPosition(m_size / 2.f + CCPoint{0, 3.5f});
 
@@ -93,7 +95,7 @@ bool AnimationsLayer::init() {
     auto filler = CCNode::create();
     filler->setContentHeight(1.4f);
 
-    scroll->m_contentLayer->addChild(filler);
+    m_scroll->m_contentLayer->addChild(filler);
 
     std::vector<DeathAnimation> row;
     
@@ -101,39 +103,27 @@ bool AnimationsLayer::init() {
         row.push_back(animation);
         
         if (row.size() == 4) {
-            scroll->m_contentLayer->addChild(ListRow::create(row, this));
+            m_scroll->m_contentLayer->addChild(ListRow::create(row, this));
             row.clear();
         }
     }
     
     if (row.size() != 4 && !row.empty())
-        scroll->m_contentLayer->addChild(ListRow::create(row, this));
+        m_scroll->m_contentLayer->addChild(ListRow::create(row, this));
 
-    scroll->m_contentLayer->updateLayout();
+    m_scroll->m_contentLayer->updateLayout();
 
-    auto scrollbar = Scrollbar::create(scroll);
+    auto scrollbar = Scrollbar::create(m_scroll);
     scrollbar->setPosition({323, m_border->getPositionY()});
 
     m_mainLayer->addChild(scrollbar, 5);
     
-    scroll->scrollToTop();
+    m_scroll->scrollToTop();
         
     int selected = Mod::get()->getSavedValue<int>("selected-animation");
     
     if (m_animationCells.contains(selected))
         selectAnimation(m_animationCells.at(selected));
 
-    queueInMainThread([scroll = Ref(scroll)] {
-        if (auto handler = CCTouchDispatcher::get()->findHandler(scroll)) {
-            CCTouchDispatcher::get()->setPriority(handler->getPriority() - 1, handler->getDelegate());
-        }
-
-        queueInMainThread([scroll] {
-            if (auto handler = CCTouchDispatcher::get()->findHandler(scroll)) {
-                CCTouchDispatcher::get()->setPriority(handler->getPriority() + 1, handler->getDelegate());
-            }
-        });
-    });
-    
     return true;
 }   

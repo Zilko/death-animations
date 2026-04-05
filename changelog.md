@@ -1,7 +1,7 @@
 # v1.1.1
 
 * fixed geen jumpscare thumbnail
-* fixed andorid touch bug
+* fixed andorid & mac touch bug
 * fixed ui gap
 
 # v1.1.0
