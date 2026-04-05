@@ -21,10 +21,6 @@ private:
     
     std::unordered_map<int, AnimationCell*> m_animationCells;
 
-    ~AnimationsLayer() {
-        CCTouchDispatcher::get()->removeDelegate(m_scroll);
-    }
-
     bool init() override;
     
     void onPreview(CCObject*);

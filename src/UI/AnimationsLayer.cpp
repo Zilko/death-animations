@@ -84,8 +84,6 @@ bool AnimationsLayer::init() {
     m_scroll = ScrollLayer::create({289, 153}, true, true);
     m_scroll->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     
-    CCTouchDispatcher::get()->addPrioTargetedDelegate(m_scroll, -500, false);
-
     m_border = Border::create(m_scroll, {138, 77, 46, 255}, {289, 153}, {0, 0});
     m_border->ignoreAnchorPointForPosition(false);
     m_border->setPosition(m_size / 2.f + CCPoint{0, 3.5f});
