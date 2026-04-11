@@ -1,6 +1,6 @@
 #include "BaseAnimation.hpp"
 
-#include "../Other/SpeedCCParticleSystemQuad.hpp"
+#include "Other/SpeedCCParticleSystemQuad.hpp"
 
 class BloodEffect : public CCNode {
 

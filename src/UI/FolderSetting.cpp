@@ -1,6 +1,6 @@
 #include "FolderSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void FolderSetting::onFolder(CCObject* obj) {
     if (!std::filesystem::exists(m_setting.folder))

@@ -1,5 +1,5 @@
-#include "../Other/Utils.hpp"
-#include "../Other/SoundManager.hpp"
+#include "Other/Utils.hpp"
+#include "Other/SoundManager.hpp"
 
 #include "PreviewLayer.hpp"
 

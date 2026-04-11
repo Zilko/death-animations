@@ -1,6 +1,6 @@
 #include "ScaleSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void ScaleSetting::onSlider(CCObject* obj) {
     SliderThumb* slider = static_cast<SliderThumb*>(obj);

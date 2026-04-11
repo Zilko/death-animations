@@ -1,6 +1,6 @@
 #include "PercentSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void PercentSetting::textChanged(CCTextInputNode* node) {
     int number = numFromString<int>(node->getString()).unwrapOr(0);

@@ -2,7 +2,7 @@
 
 #include "BaseAnimation.hpp"
 
-#include "../Other/SpeedCCParticleSystemQuad.hpp"
+#include "Other/SpeedCCParticleSystemQuad.hpp"
 
 class Shake : public CCActionInterval {
 

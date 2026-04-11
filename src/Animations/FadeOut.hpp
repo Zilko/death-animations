@@ -1,6 +1,6 @@
 #include "BaseAnimation.hpp"
 
-#include "../Other/Variables.hpp"
+#include "Other/Variables.hpp"
 
 class FadeOut : public BaseAnimation {
 

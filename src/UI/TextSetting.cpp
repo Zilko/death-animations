@@ -1,6 +1,6 @@
 #include "TextSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void TextSetting::textChanged(CCTextInputNode* node) {
     std::string str = node->getString();

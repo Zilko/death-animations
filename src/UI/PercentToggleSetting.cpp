@@ -1,7 +1,7 @@
 #include "PercentToggleSetting.hpp"
 #include "PercentSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void PercentToggleSetting::onToggle(CCObject*) {
     ToggleSetting::onToggle(nullptr);

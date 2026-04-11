@@ -1,5 +1,6 @@
 #include "AnimationsLayer.hpp"
 #include "AnimationSettingsLayer.hpp"
+#include "ProScrollLayer.hpp"
 #include "PreviewLayer.hpp"
 #include "ListRow.hpp"
 
@@ -81,7 +82,7 @@ bool AnimationsLayer::init() {
     
     m_mainLayer->addChild(m_nameLabel);
 
-    m_scroll = ScrollLayer::create({289, 153}, true, true);
+    m_scroll = ProScrollLayer::create({289, 153}, true, true);
     m_scroll->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     
     m_border = Border::create(m_scroll, {138, 77, 46, 255}, {289, 153}, {0, 0});

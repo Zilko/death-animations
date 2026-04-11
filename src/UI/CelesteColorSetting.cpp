@@ -1,6 +1,6 @@
 #include "CelesteColorSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void CelesteColorSetting::onColorPicker(CCObject* btn) {
     ColorPickPopup* popup = ColorPickPopup::create(m_colorSprite->getColor());

@@ -1,6 +1,6 @@
 #include "SelectSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void SelectSetting::onSelectorArrow(CCObject* obj) {
     int currentElement = static_cast<int>(Utils::getSettingFloat(m_animation.id, m_setting.id));

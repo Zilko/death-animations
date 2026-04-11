@@ -1,7 +1,7 @@
 #include "SpeechBubbleSetting.hpp"
 #include "AnimationSettingsLayer.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void SpeechBubbleSetting::onSelectorArrow(CCObject* obj) {
     SelectSetting::onSelectorArrow(obj);

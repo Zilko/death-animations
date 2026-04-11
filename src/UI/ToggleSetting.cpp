@@ -1,6 +1,6 @@
 #include "ToggleSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void ToggleSetting::onToggle(CCObject*) {
     Utils::saveSetting(m_animation.id, m_setting.id, !m_toggle->isToggled());

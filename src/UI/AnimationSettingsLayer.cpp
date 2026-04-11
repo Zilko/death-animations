@@ -1,6 +1,7 @@
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 #include "AnimationSettingsLayer.hpp"
+#include "ProScrollLayer.hpp"
 #include "ToggleSetting.hpp"
 #include "SpeedSetting.hpp"
 #include "PercentSetting.hpp"
@@ -113,7 +114,7 @@ bool AnimationSettingsLayer::init() {
     
     m_mainLayer->addChild(m_durationSprite);
     
-    ScrollLayer* scroll = ScrollLayer::create({270, 102});
+    ProScrollLayer* scroll = ProScrollLayer::create({270, 102});
 	scroll->setPosition(ccp(150, 85) - ccp(270, 102) / 2.f);
     m_mainLayer->addChild(scroll);
     

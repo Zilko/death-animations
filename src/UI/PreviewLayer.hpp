@@ -1,6 +1,6 @@
-#include "../Includes.hpp"
-#include "../Animations/BaseAnimation.hpp"
-#include "../Other/PreviewDelegate.hpp"
+#include "Includes.hpp"
+#include "Animations/BaseAnimation.hpp"
+#include "Other/PreviewDelegate.hpp"
 
 class PreviewLayer : public Popup, public PreviewDelegate {
   

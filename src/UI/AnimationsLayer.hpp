@@ -1,14 +1,16 @@
 #pragma once
 
-#include "../Includes.hpp"
+#include "Includes.hpp"
 
 #include "AnimationCell.hpp"
+
+class ProScrollLayer;
 
 class AnimationsLayer : public Popup {  
   
 private:
 
-    ScrollLayer* m_scroll = nullptr;
+    ProScrollLayer* m_scroll = nullptr;
 
     Border* m_border = nullptr;
 

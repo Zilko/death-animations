@@ -1,7 +1,7 @@
 #include "SpeedSetting.hpp"
 #include "AnimationSettingsLayer.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void SpeedSetting::onSlider(CCObject* obj) {
     SliderThumb* slider = static_cast<SliderThumb*>(obj);

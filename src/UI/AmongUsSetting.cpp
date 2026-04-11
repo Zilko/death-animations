@@ -1,6 +1,6 @@
 #include "AmongUsSetting.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void AmongUsSetting::onColorPicker(CCObject* btn) {
     m_currentColor = static_cast<CCNode*>(btn)->getTag();

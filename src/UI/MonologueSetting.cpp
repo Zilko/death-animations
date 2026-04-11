@@ -1,7 +1,7 @@
 #include "MonologueSetting.hpp"
 #include "AnimationSettingsLayer.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void MonologueSetting::onSelectorArrow(CCObject* obj) {
     if (obj)

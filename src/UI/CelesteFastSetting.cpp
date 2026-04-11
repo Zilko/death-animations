@@ -1,7 +1,7 @@
 #include "CelesteFastSetting.hpp"
 #include "AnimationSettingsLayer.hpp"
 
-#include "../Other/Utils.hpp"
+#include "Other/Utils.hpp"
 
 void CelesteFastSetting::onToggle(CCObject* obj) {
     if (obj)

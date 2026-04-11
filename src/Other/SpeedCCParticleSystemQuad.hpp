@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Includes.hpp"
+#include "Includes.hpp"
 
 class SpeedCCParticleSystemQuad : public CCParticleSystemQuad {
 

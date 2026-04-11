@@ -1,3 +1,7 @@
+# v1.1.2
+
+* Fixed scroll annoying bug hehehehaehaahheheahhehaeha
+
 # v1.1.1
 
 * fixed geen jumpscare thumbnail

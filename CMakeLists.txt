@@ -64,4 +64,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_BINARY_DIR}/_deps/opusfile-src/include"
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE src/)
 setup_geode_mod(${PROJECT_NAME})
