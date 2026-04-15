@@ -1,3 +1,8 @@
+# v1.1.3
+
+* Fixed texture loader incompatibility
+* Fixed bug when choosing anything random where it wouldnt choose the last one
+
 # v1.1.2
 
 * Fixed scroll annoying bug hehehehaehaahheheahhehaeha

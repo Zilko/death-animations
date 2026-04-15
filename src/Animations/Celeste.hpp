@@ -161,7 +161,7 @@ private:
     void ninthStep(float) {
         CCArray* animFrames = CCArray::create();
         CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
-        cache->addSpriteFramesWithFile("celeste-explosion.plist"_spr);
+        cache->addSpriteFramesWithFile(string::pathToString(Mod::get()->getResourcesDir() / "celeste-explosion.plist").c_str());
         
         for (int i = 1; i <= 43; i++)
             if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-explosion-{}.png"_spr, i)).c_str()))
@@ -736,7 +736,7 @@ private:
 
             CCArray* animFrames = CCArray::create();
             CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
-            cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
+            cache->addSpriteFramesWithFile(string::pathToString(Mod::get()->getResourcesDir() / "celeste-revive.plist").c_str());
             
             for (int i = 1; i <= 22; i++)
                 if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("celeste-revive-{}.png"_spr, i)).c_str()))
@@ -758,7 +758,7 @@ private:
     
     void addAnimation(CCNodeRGBA* player) {
         CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
-        cache->addSpriteFramesWithFile("celeste-revive.plist"_spr);
+        cache->addSpriteFramesWithFile(string::pathToString(Mod::get()->getResourcesDir() / "celeste-revive.plist").c_str());
 
         CCSprite* sprite = CCSprite::createWithSpriteFrame(cache->spriteFrameByName("celeste-revive-1.png"_spr));
         sprite->setColor({

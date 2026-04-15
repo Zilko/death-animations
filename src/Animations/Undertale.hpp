@@ -57,7 +57,7 @@ private:
     void createShard(CCPoint velocity) {
         CCArray* animFrames = CCArray::create();
         CCSpriteFrameCache* cache = CCSpriteFrameCache::get();
-        cache->addSpriteFramesWithFile("heart-shard-undertale.plist"_spr);
+        cache->addSpriteFramesWithFile(string::pathToString(Mod::get()->getResourcesDir() / "heart-shard-undertale.plist").c_str());
         
         for (int i = 1; i <= 3; i++)
             if (CCSpriteFrame* frame = cache->spriteFrameByName((fmt::format("heart-shard-{}-undertale.png"_spr, i)).c_str()))

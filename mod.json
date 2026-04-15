@@ -7,7 +7,7 @@
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.1.2",
+    "version": "v1.1.3",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {
@@ -20,7 +20,6 @@
   		"customization",
   		"gameplay",
   		"offline",
-  		"interface",
   		"content"
   	],
     "dependencies": {

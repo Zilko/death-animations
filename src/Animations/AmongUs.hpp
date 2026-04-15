@@ -66,7 +66,7 @@ private:
         m_animationSprite = CCSprite::createWithSpriteFrameName(fmt::format("among-us-death-{}-1.png"_spr, m_animation).c_str());
 
         if (!m_animationSprite || m_animationSprite->getUserObject("geode.texture-loader/fallback")) {
-            cache->addSpriteFramesWithFile(fmt::format("among-us-death-{}.plist"_spr, m_animation).c_str());
+            cache->addSpriteFramesWithFile(string::pathToString(Mod::get()->getResourcesDir() / fmt::format("among-us-death-{}.plist", m_animation)).c_str());
         }
 
         for (int i = 1; i <= 115; ++i) {
@@ -164,8 +164,6 @@ public:
         int added = 0;
 
         while (size.width * 0.745f < m_size.width) {
-            log::debug("ad");
-
             added++;
 
             CCSprite* extra = CCSprite::create("bg-among-us.png"_spr);

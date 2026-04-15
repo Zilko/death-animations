@@ -31,7 +31,7 @@
 #include <random>
 
 int Utils::getRandomInt(int min, int max) {
-    return utils::random::generate<int>(min, max);
+    return utils::random::generate<int>(min, max + 1);
 }
 
 std::filesystem::path Utils::getRandomFile(const std::filesystem::path& folder, const std::unordered_set<std::string> validExtensions) {
