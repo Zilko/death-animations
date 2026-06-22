@@ -1,5 +1,5 @@
 {
-    "geode": "5.5.2",
+    "geode": "5.7.1",
     "gd": {
         "win": "2.2081",
         "android": "2.2081",
@@ -7,7 +7,7 @@
     },
     "id": "zilko.death_animations",
     "name": "Death Animations",
-    "version": "v1.1.3",
+    "version": "v1.1.4",
     "developer": "Zilko",
     "description": "it animates ur deaths",
     "links": {

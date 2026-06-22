@@ -1,3 +1,8 @@
+# v1.1.4
+
+* fixed geen jumpscare
+* added character limit to text inputs or something
+
 # v1.1.3
 
 * Fixed texture loader incompatibility
