@@ -767,7 +767,6 @@ private:
         m_player->m_maybeReverseSpeed = player->m_maybeReverseSpeed;
         m_player->m_maybeReverseAcceleration = player->m_maybeReverseAcceleration;
         m_player->m_xVelocityRelated2 = player->m_xVelocityRelated2;
-        m_player->m_unk9e8 = player->m_unk9e8;
         m_player->m_groundObjectMaterial = player->m_groundObjectMaterial;
         m_player->m_vehicleSize = player->m_vehicleSize;
         m_player->m_playerSpeed = player->m_playerSpeed;

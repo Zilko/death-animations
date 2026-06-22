@@ -21,8 +21,8 @@ void TextSetting::init(float y) {
     auto str = Utils::getSettingString(m_animation.id, m_setting.id);
 
     
-    if (str.length() > 100) {
-        str.resize(100);
+    if (str.length() > 313) {
+        str.resize(313);
     }
     
     input->setString(str.c_str());
