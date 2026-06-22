@@ -59,6 +59,16 @@ $on_mod(Loaded) {
                 std::filesystem::copy_options::overwrite_existing,
                 ec
             );
+    } else if (!Mod::get()->setSavedValue("fapped-it-up", true)) {
+        std::filesystem::path imagesFolder = Mod::get()->getSaveDir() / "jumpscare-images";
+        std::error_code ec;
+        
+        std::filesystem::copy_file(
+            Mod::get()->getResourcesDir() / "jumpscare.png",
+            imagesFolder / "jumpscare.png",
+            std::filesystem::copy_options::overwrite_existing,
+            ec
+        );
     }
 
     if (!Mod::get()->setSavedValue("created-speech-bubble-folder2", true)) {
